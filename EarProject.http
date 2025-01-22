@@ -1,0 +1,6 @@
+@EarProject_HostAddress = http://localhost:5236
+
+GET {{EarProject_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
