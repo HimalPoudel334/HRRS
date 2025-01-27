@@ -1,12 +1,13 @@
-﻿using EarProject.Dto;
-using EarProject.Dto.Auth;
-using EarProject.Dto.User;
-using EarProject.Persistence.Context;
-using EarProject.Persistence.Entities;
-using EarProject.Services.Interface;
+﻿using HRRS.Dto.User;
+using HRRS.Dto;
+using HRRS.Dto.Auth;
+using HRRS.Persistence.Context;
+using HRRS.Persistence.Entities;
+using HRRS.Services;
+using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
-namespace EarProject.Services.Implementation;
+namespace HRRS.Services.Implementation;
 
 public class AuthService : IAuthService
 {

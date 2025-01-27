@@ -1,11 +1,10 @@
-﻿
-using EarProject.Dto.User;
+﻿using HRRS.Dto.User;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace EarProject.Services;
+namespace HRRS.Services;
 
 
 public class TokenService(IConfiguration configuration)

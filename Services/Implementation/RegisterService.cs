@@ -1,12 +1,12 @@
-﻿using EarProject.Dto.Auth;
-using EarProject.Dto;
-using EarProject.Dto.User;
-using EarProject.Persistence.Entities;
-using EarProject.Services.Interface;
+﻿using HRRS.Dto.Auth;
 using Microsoft.EntityFrameworkCore;
-using EarProject.Persistence.Context;
+using HRRS.Dto;
+using HRRS.Dto.User;
+using HRRS.Persistence.Entities;
+using HRRS.Services.Interface;
+using HRRS.Persistence.Context;
 
-namespace EarProject.Services.Implementation;
+namespace HRRS.Services.Implementation;
 
 public class RegisterService(ApplicationDbContext context) : IRegisterService
 {

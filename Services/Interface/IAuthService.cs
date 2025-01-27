@@ -1,7 +1,7 @@
-﻿using EarProject.Dto.Auth;
-using EarProject.Dto;
+﻿using HRRS.Dto;
+using HRRS.Dto.Auth;
 
-namespace EarProject.Services.Interface;
+namespace HRRS.Services.Interface;
 
 public interface IAuthService
 {

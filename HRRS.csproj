@@ -16,7 +16,20 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Scalar.AspNetCore" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Dto\Anusuchi\" />
+    <Folder Include="Dto\HealthFacility\" />
+    <Folder Include="Dto\HealthStandard\" />
+    <Folder Include="Persistence\EntityMappings\" />
+    <Folder Include="Persistence\Repositories\Interfaces\" />
+    <Folder Include="Persistence\Repositories\Implementations\" />
   </ItemGroup>
 
 </Project>

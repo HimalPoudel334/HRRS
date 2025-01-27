@@ -1,5 +1,5 @@
-﻿using EarProject.Dto.User;
+﻿using HRRS.Dto.User;
 
-namespace EarProject.Dto.Auth;
+namespace HRRS.Dto.Auth;
 
 public record AuthResponseDto(LoggedInUser User, string Token);

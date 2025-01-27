@@ -1,8 +1,8 @@
-﻿using EarProject.Dto.Auth;
-using EarProject.Dto;
-using EarProject.Dto.User;
+﻿using HRRS.Dto.Auth;
+using HRRS.Dto;
+using HRRS.Dto.User;
 
-namespace EarProject.Services.Interface;
+namespace HRRS.Services.Interface;
 
 public interface IRegisterService
 {

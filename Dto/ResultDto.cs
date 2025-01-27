@@ -1,4 +1,4 @@
-﻿namespace EarProject.Dto;
+﻿namespace HRRS.Dto;
 public record ResultDto(bool IsSuccess, string? ErrorMessage)
 {
     public static ResultDto Success() => new(true, null);

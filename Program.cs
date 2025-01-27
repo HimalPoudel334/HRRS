@@ -1,13 +1,25 @@
-using EarProject.Endpoints;
-using EarProject.Persistence.Context;
-using EarProject.Services;
-using EarProject.Services.Implementation;
-using EarProject.Services.Interface;
+using HRRS.Endpoints;
+using HRRS.Persistence.Context;
+using HRRS.Persistence.Repositories.Implementations;
+using HRRS.Persistence.Repositories.Interfaces;
+using HRRS.Services;
+using HRRS.Services.Implementation;
+using HRRS.Services.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins", policy =>
+    {
+        policy.AllowAnyOrigin()  // Allows all origins
+              .AllowAnyMethod()  // Allows all HTTP methods
+              .AllowAnyHeader(); // Allows all headers
+    });
+});
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -16,6 +28,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<IMapdandaService, MapdandaService>();
+
+builder.Services.AddScoped<IMapdandaRepository, MapdandaRepository>();
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -34,14 +50,17 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.MapOpenApi();
+app.MapScalarApiReference();
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.MapOpenApi();
+//    app.MapScalarApiReference();
+//}
 
 app.UseHttpsRedirection();
+app.UseCors("AllowAllOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();

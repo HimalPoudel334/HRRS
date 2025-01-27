@@ -1,7 +1,7 @@
-﻿using EarProject.Dto.Auth;
-using EarProject.Services.Interface;
+﻿using HRRS.Dto.Auth;
+using HRRS.Services.Interface;
 
-namespace EarProject.Endpoints;
+namespace HRRS.Endpoints;
 
 public static class Endpoints
 {
@@ -12,6 +12,10 @@ public static class Endpoints
 
         //endpoints.MapPost("api/signup", async (RegisterDto dto, IAuthService authService) =>
         //    TypedResults.Ok(await authService.RegisterAsync(dto)));
+
+        endpoints.MapGet("api/mapdanda/{anusuchi_id}", async (int anusuchi_id, IMapdandaService mapdandaService) =>
+            TypedResults.Ok(await mapdandaService.GetByAnusuchi(anusuchi_id)));
+
 
         return endpoints;
     }

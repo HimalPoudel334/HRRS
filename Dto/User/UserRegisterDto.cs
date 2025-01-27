@@ -1,4 +1,4 @@
-﻿namespace EarProject.Dto.User;
+﻿namespace HRRS.Dto.User;
 
 public class UserRegisterDto
 {

@@ -1,4 +1,4 @@
-﻿namespace EarProject.Persistence.Entities;
+﻿namespace HRRS.Persistence.Entities;
 
 public class User
 {
