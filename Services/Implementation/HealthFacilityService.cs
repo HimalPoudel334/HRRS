@@ -54,6 +54,8 @@ namespace HRRS.Services.Implementation
             };
             await _healthFacilityRepository.Create(healthFacility);
 
+            
+
         }
 
         public async Task<ResultWithDataDto<HealthFacilityDto>> GetById(int id)
@@ -61,7 +63,7 @@ namespace HRRS.Services.Implementation
             var healthFacility = await _healthFacilityRepository.GetById(id);
             if(healthFacility == null)
             {
-                return new ResultWithDataDto(false, null, "Not found");
+                return new ResultWithDataDto<HealthFacilityDto>(false, null, "Not found");
             }
             var healthFacilityDto = new HealthFacilityDto
             {
@@ -105,8 +107,9 @@ namespace HRRS.Services.Implementation
 
         public async Task Update(HealthFacilityDto healthFacilityDto)
         {
+            throw new NotImplementedException();
 
-            
         }
+        
     }
 }

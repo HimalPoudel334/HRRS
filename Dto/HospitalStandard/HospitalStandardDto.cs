@@ -2,7 +2,7 @@ using Persistence.Entities;
 
 namespace HRRS.Dto.HealthStandard;
 
-public class HealthStandardDto
+public class HospitalStandardDto
 {
     public int Id { get; set; }
     public int HealthFacilityId { get; set; }

@@ -26,10 +26,7 @@
   <ItemGroup>
     <Folder Include="Dto\Anusuchi\" />
     <Folder Include="Dto\HealthFacility\" />
-    <Folder Include="Dto\HealthStandard\" />
     <Folder Include="Persistence\EntityMappings\" />
-    <Folder Include="Persistence\Repositories\Interfaces\" />
-    <Folder Include="Persistence\Repositories\Implementations\" />
   </ItemGroup>
 
 </Project>

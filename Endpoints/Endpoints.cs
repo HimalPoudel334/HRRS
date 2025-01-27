@@ -16,6 +16,15 @@ public static class Endpoints
         endpoints.MapGet("api/mapdanda/{anusuchi_id}", async (int anusuchi_id, IMapdandaService mapdandaService) =>
             TypedResults.Ok(await mapdandaService.GetByAnusuchi(anusuchi_id)));
 
+        endpoints.MapPost("api/HealthFaciltiy", async (HealthFacilityDto dto, IHealthFacilityService service) =>
+        {
+            await service.Create(dto);
+            return TypedResults.Created();
+        });
+
+
+           
+
 
         return endpoints;
     }
