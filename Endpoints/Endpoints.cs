@@ -1,4 +1,5 @@
 ﻿using HRRS.Dto.Auth;
+using HRRS.Dto.HealthStandard;
 using HRRS.Services.Interface;
 
 namespace HRRS.Endpoints;
@@ -20,6 +21,11 @@ public static class Endpoints
         {
             await service.Create(dto);
             return TypedResults.Created();
+        });
+        endpoints.MapPost("api/HospitalStandard", async (HospitalStandardDto dto, IHospitalStandardService service) =>
+        {
+            await service.Create(dto);
+            return TypedResults.Created();  
         });
 
 

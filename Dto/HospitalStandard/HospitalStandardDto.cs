@@ -4,7 +4,6 @@ namespace HRRS.Dto.HealthStandard;
 
 public class HospitalStandardDto
 {
-    public int Id { get; set; }
     public int HealthFacilityId { get; set; }
     public int MapdandaId { get; set; }
     public bool IsAvailable { get; set; }

@@ -45,12 +45,12 @@ public class HospitalStandardService : IHospitalStandardService
         await _hsrepo.Create(healthStandard);
     }
 
-    public Task<ResultWithDataDto<HospitalStandardDto>> GetById(int id)
+    Task<ResultWithDataDto<HospitalStandardDto>> IHospitalStandardService.GetById(int id)
     {
         throw new NotImplementedException();
     }
 
-    public Task Update(HospitalStandardDto dto)
+    Task IHospitalStandardService.Update(int id, HospitalStandardDto dto)
     {
         throw new NotImplementedException();
     }
