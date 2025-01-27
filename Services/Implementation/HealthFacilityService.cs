@@ -105,11 +105,9 @@ namespace HRRS.Services.Implementation
             return new ResultWithDataDto<HealthFacilityDto>(true, healthFacilityDto, "Success");
         }
 
-        public async Task Update(HealthFacilityDto healthFacilityDto)
+        Task IHealthFacilityService.Update(int id, HealthFacilityDto healthFacilityDto)
         {
             throw new NotImplementedException();
-
         }
-        
     }
 }

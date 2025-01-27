@@ -7,21 +7,17 @@ namespace HRRS.Services.Implementation;
 
 public class HospitalStandardService : IHospitalStandardService
 {
-    public HospitalStandardService(IHospitalStandardRespository repository)
-    {
-        
-    }
-    public Task Create(HospitalStandardDto dto)
+    Task IHospitalStandardService.Create(HospitalStandardDto dto)
     {
         throw new NotImplementedException();
     }
 
-    public Task<ResultWithDataDto<HospitalStandardDto>> GetById(int id)
+    Task<ResultWithDataDto<HospitalStandardDto>> IHospitalStandardService.GetById(int id)
     {
         throw new NotImplementedException();
     }
 
-    public Task Update(HospitalStandardDto dto)
+    Task IHospitalStandardService.Update(int id, HospitalStandardDto dto)
     {
         throw new NotImplementedException();
     }
