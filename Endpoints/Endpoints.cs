@@ -1,6 +1,7 @@
 ﻿using HRRS.Dto.Auth;
 using HRRS.Dto.HealthStandard;
 using HRRS.Services.Interface;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HRRS.Endpoints;
 
@@ -14,8 +15,8 @@ public static class Endpoints
         //endpoints.MapPost("api/signup", async (RegisterDto dto, IAuthService authService) =>
         //    TypedResults.Ok(await authService.RegisterAsync(dto)));
 
-        endpoints.MapGet("api/mapdanda/{anusuchi_id}", async (int anusuchi_id, IMapdandaService mapdandaService) =>
-            TypedResults.Ok(await mapdandaService.GetByAnusuchi(anusuchi_id)));
+        //endpoints.MapGet("api/mapdanda/{anusuchi_id}", async (int anusuchi_id, IMapdandaService mapdandaService) =>
+        //    TypedResults.Ok(await mapdandaService.GetByAnusuchi(anusuchi_id)));
 
         endpoints.MapPost("api/HealthFaciltiy", async (HealthFacilityDto dto, IHealthFacilityService service) =>
         {
@@ -28,8 +29,13 @@ public static class Endpoints
             return TypedResults.Created();  
         });
 
+        endpoints.MapGet("api/HospitalStandard", async ([FromQuery] int hospitalId, [FromQuery] int anusuchiId, [FromQuery] string? fiscalYear, IHospitalStandardService service) =>
+        {
+            return TypedResults.Ok(await service.Get(hospitalId, anusuchiId, fiscalYear));
+        });
 
-           
+
+
 
 
         return endpoints;

@@ -1,49 +1,91 @@
 using HRRS.Dto;
 using HRRS.Dto.HealthStandard;
+using HRRS.Persistence.Context;
 using HRRS.Persistence.Repositories.Interfaces;
 using HRRS.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRRS.Services.Implementation;
 
-public class HospitalStandardService : IHospitalStandardService
+public class HospitalStandardService(ApplicationDbContext dbContext) : IHospitalStandardService
 {
-    private readonly IHospitalStandardRespository _hsrepo;
-    private readonly IHealthFacilityRepositoroy _hfrepo;
-    private readonly IMapdandaRepository _mdrepo;
-    public HospitalStandardService(IHospitalStandardRespository hsrepo, IHealthFacilityRepositoroy hfrepo, IMapdandaRepository mdrepo)
-    {
-        _hsrepo = hsrepo;
-        _hfrepo = hfrepo;
-        _mdrepo = mdrepo;
-
-    }
+    private readonly ApplicationDbContext _dbContext = dbContext;
+    
     public async Task Create(HospitalStandardDto dto)
     {
-        var healthFacility = await _hfrepo.GetById(dto.HealthFacilityId);
+        var healthFacility = await _dbContext.HealthFacilities.FindAsync(dto.HealthFacilityId);
+
+        List<HospitalStandard> stdrs = [];
         if (healthFacility == null)
         {
             throw new Exception("Health Facility not found");
         }
 
-        var mapdanda = await _mdrepo.GetByIdAsync(dto.MapdandaId);
-        if(mapdanda == null)
+        foreach(var item in dto.HospitalMapdandas)
         {
-            throw new Exception("Mapdanda not found");
+            var mapdanda = await _dbContext.Mapdandas.FindAsync(item.MapdandaId) ?? throw new Exception("Mapdanda not found");
+
+            stdrs.Add(new HospitalStandard()
+            {
+                HealthFacility = healthFacility,
+                Mapdanda = mapdanda,
+                IsAvailable = item.IsAvailable,
+                Remarks = item.Remarks,
+                FilePath = item.FilePath,
+                FiscalYear = item.FiscalYear,
+                Status = item.Status,
+            });
+
         }
 
-        var healthStandard = new HospitalStandard
-        {
-            HealthFacility = healthFacility,
-            Mapdanda = mapdanda,
-            IsAvailable = dto.IsAvailable,
-            Remarks = dto.Remarks,
-            FilePath = dto.FilePath,
-            FiscalYear = dto.FiscalYear,
-            Status = dto.Status
-        };
-
-        await _hsrepo.Create(healthStandard);
+        await _dbContext.HospitalStandards.AddRangeAsync(stdrs);
+        await _dbContext.SaveChangesAsync();
     }
+
+    public async Task<HospitalStandardDto> Get(int hospitalId, int anusuchiId, string? fiscalYear)
+    {
+        var res = await _dbContext.HospitalStandards
+            .Where(x => x.HealthFacilityId == hospitalId)
+            .Where(x => x.FiscalYear == fiscalYear)
+            .Where(x => x.Mapdanda.AnusuchiNumber == anusuchiId)
+            .GroupBy(x => x.HealthFacility.Id)
+            .Select(x => new HospitalStandardDto()
+            {
+                HealthFacilityId = x.Key,
+                HospitalMapdandas = x.Select(x => new HospitalMapdandasDto()
+                {
+                    FilePath = x.FilePath,
+                    FiscalYear = x.FiscalYear,
+                    IsAvailable = x.IsAvailable,
+                    Status = x.Status,
+                    MapdandaName = x.Mapdanda.Name,
+                    MapdandaId = x.Mapdanda.Id,
+                    Remarks = x.Remarks
+                }).ToList(),
+            })
+            .FirstOrDefaultAsync();
+
+        if (res is not null) return res;
+
+        var mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiNumber == anusuchiId).ToListAsync();
+        return new HospitalStandardDto()
+        {
+            HealthFacilityId = hospitalId,
+            HospitalMapdandas = mapdandas.Select(x => new HospitalMapdandasDto()
+            {
+                FilePath = null,
+                FiscalYear = fiscalYear,
+                IsAvailable = false,
+                Status = false,
+                MapdandaName = x.Name,
+                MapdandaId = x.Id,
+                Remarks = ""
+            }).ToList(),
+        };
+    }
+
+    //public async Task<List<HospitalStandardDto>>()
+
 
     Task<ResultWithDataDto<HospitalStandardDto>> IHospitalStandardService.GetById(int id)
     {

@@ -2,32 +2,23 @@ using HRRS.Dto;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Repositories.Interfaces;
 using HRRS.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 
 public class MapdandaService : IMapdandaService
 {
+
+    
     
     private readonly IMapdandaRepository _mapdandaRepository;
+    private readonly IHospitalStandardRespository _hospitalStandardRespository;
+    private readonly ApplicationDbContext _dbContext;
 
-    public MapdandaService(IMapdandaRepository repository)
+    public MapdandaService(IMapdandaRepository repository, IHospitalStandardRespository hospitalStandardRespository, ApplicationDbContext dbContext)
     {
         _mapdandaRepository = repository;
+        _hospitalStandardRespository = hospitalStandardRespository;
+        _dbContext = dbContext;
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int anusuchi_id)
-    {
 
-        var mapdanda = await _mapdandaRepository.GetByAnusuchiId(anusuchi_id);
-        if (mapdanda is null) return new ResultWithDataDto<List<MapdandaDto>>(false, null, "Data not found");
-
-        var res = mapdanda.Select(x => new MapdandaDto
-        {
-            Id = x.Id,
-            AnusuchiNumber = x.AnusuchiNumber,
-            Name = x.Name,
-            SerialNumber = x.SerialNumber
-        }).OrderBy(x => x.SerialNumber)
-        .ToList();
-
-        return new ResultWithDataDto<List<MapdandaDto>>(true, res, null);
-    }
 }
