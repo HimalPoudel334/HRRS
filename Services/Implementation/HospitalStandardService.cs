@@ -20,8 +20,29 @@ public class HospitalStandardService : IHospitalStandardService
     public async Task Create(HospitalStandardDto dto)
     {
         var healthFacility = await _hfrepo.GetById(dto.HealthFacilityId);
-        //var mapdanda = await _mdrepo.
+        if (healthFacility == null)
+        {
+            throw new Exception("Health Facility not found");
+        }
 
+        var mapdanda = await _mdrepo.GetByIdAsync(dto.MapdandaId);
+        if(mapdanda == null)
+        {
+            throw new Exception("Mapdanda not found");
+        }
+
+        var healthStandard = new HospitalStandard
+        {
+            HealthFacility = healthFacility,
+            Mapdanda = mapdanda,
+            IsAvailable = dto.IsAvailable,
+            Remarks = dto.Remarks,
+            FilePath = dto.FilePath,
+            FiscalYear = dto.FiscalYear,
+            Status = dto.Status
+        };
+
+        await _hsrepo.Create(healthStandard);
     }
 
     public Task<ResultWithDataDto<HospitalStandardDto>> GetById(int id)
