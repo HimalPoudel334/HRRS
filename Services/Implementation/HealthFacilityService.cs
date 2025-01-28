@@ -111,6 +111,7 @@ namespace HRRS.Services.Implementation
         {
             var healthFacilityDto = await _context.HealthFacilities.Select(healthFacility => new HealthFacilityDto()
             {
+                Id = healthFacility.Id,
                 FacilityName = healthFacility.FacilityName,
                 FacilityType = healthFacility.FacilityType,
                 BedCount = healthFacility.BedCount,
@@ -149,7 +150,7 @@ namespace HRRS.Services.Implementation
 
             if(healthFacilityDto.Count == 0 || healthFacilityDto == null)
             {
-                return new ResultWithDataDto<List<HealthFacilityDto>>(false, null, "No any health facility available");
+                return new ResultWithDataDto<List<HealthFacilityDto>>(false, null, "There are no health facilities available");
             }
 
             return new ResultWithDataDto<List<HealthFacilityDto>>(true, healthFacilityDto, null);

@@ -20,14 +20,23 @@ public static class Endpoints
         //    TypedResults.Ok(await mapdandaService.GetByAnusuchi(anusuchi_id)));
 
         endpoints.MapPost("api/HealthFaciltiy", async (HealthFacilityDto dto, IHealthFacilityService service) =>
-        {
-            await service.Create(dto);
-            return TypedResults.Created();
+        {            
+            return TypedResults.Ok(await service.Create(dto));
         });
+
+        endpoints.MapGet("api/HealthFaciltiy", async (IHealthFacilityService service) =>
+        {
+            return TypedResults.Ok(await service.GetAll());
+        });
+
+        endpoints.MapGet("api/HealthFaciltiy/{id}", async (int id, IHealthFacilityService service) =>
+        {
+            return TypedResults.Ok(await service.GetById(id));
+        });
+
         endpoints.MapPost("api/HospitalStandard", async (HospitalStandardDto dto, IHospitalStandardService service) =>
         {
-            await service.Create(dto);
-            return TypedResults.Created();  
+            return TypedResults.Ok(await service.Create(dto));  
         });
 
         endpoints.MapGet("api/HospitalStandard", async ([FromQuery] int hospitalId, [FromQuery] int anusuchiId, IHospitalStandardService service) =>
