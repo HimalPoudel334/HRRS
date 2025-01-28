@@ -26,7 +26,7 @@
             // Return the result as JSON
             return Ok(result);
         }
-         [HttpGet("StoredProc")] // Route: api/Api/GetAll
+         [HttpGet("GetAnusuchi")] // Route: api/Api/GetAll
         public IActionResult CheckStoredProc(int anusuchi)
         {
           
