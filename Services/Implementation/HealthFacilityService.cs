@@ -104,7 +104,7 @@ namespace HRRS.Services.Implementation
                 IsRelocation = healthFacility.IsRelocation,
                 Others = healthFacility.Others
             };
-            return new ResultWithDataDto<HealthFacilityDto>(true, healthFacilityDto, "Success");
+            return new ResultWithDataDto<HealthFacilityDto>(true, healthFacilityDto, null);
         }
 
         public async Task<ResultWithDataDto<List<HealthFacilityDto>>> GetAll()
