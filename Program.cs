@@ -57,9 +57,7 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
-app.UseStaticFiles();
 
-app.MapControllers();
 
 
 app.MapOpenApi();
@@ -74,8 +72,11 @@ app.MapScalarApiReference();
 app.UseHttpsRedirection();
 app.UseCors("AllowAllOrigins");
 
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 app.MapEndPoints();
 
 app.Run();
