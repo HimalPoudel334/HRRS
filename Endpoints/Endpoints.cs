@@ -9,6 +9,7 @@ public static class Endpoints
 {
     public static IEndpointRouteBuilder MapEndPoints(this IEndpointRouteBuilder endpoints)
     {
+        endpoints.MapGet("/", () => Results.Redirect("/scalar"));
         endpoints.MapPost("api/signin", async (LoginDto dto, IAuthService authService) =>
             TypedResults.Ok(await authService.LoginUser(dto)));
 
@@ -29,9 +30,9 @@ public static class Endpoints
             return TypedResults.Created();  
         });
 
-        endpoints.MapGet("api/HospitalStandard", async ([FromQuery] int hospitalId, [FromQuery] int anusuchiId, [FromQuery] string? fiscalYear, IHospitalStandardService service) =>
+        endpoints.MapGet("api/HospitalStandard", async ([FromQuery] int hospitalId, [FromQuery] int anusuchiId, IHospitalStandardService service) =>
         {
-            return TypedResults.Ok(await service.Get(hospitalId, anusuchiId, fiscalYear));
+            return TypedResults.Ok(await service.Get(hospitalId, anusuchiId));
         });
 
 

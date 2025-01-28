@@ -11,7 +11,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
     
-    public async Task Create(HospitalStandardDto dto)
+    public async Task<ResultDto> Create(HospitalStandardDto dto)
     {
         var healthFacility = await _dbContext.HealthFacilities.FindAsync(dto.HealthFacilityId);
 
@@ -40,14 +40,15 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
         await _dbContext.HospitalStandards.AddRangeAsync(stdrs);
         await _dbContext.SaveChangesAsync();
+
+        return new ResultDto(true, null);
     }
 
-    public async Task<HospitalStandardDto> Get(int hospitalId, int anusuchiId, string? fiscalYear)
+    public async Task<ResultWithDataDto<HospitalStandardDto>> Get(int hospitalId, int anusuchiId)
     {
         var res = await _dbContext.HospitalStandards
-            .Where(x => x.HealthFacilityId == hospitalId)
-            .Where(x => x.FiscalYear == fiscalYear)
-            .Where(x => x.Mapdanda.AnusuchiNumber == anusuchiId)
+            .Include(x => x.Mapdanda)
+            .Where(x => x.HealthFacilityId == hospitalId && x.Mapdanda.AnusuchiNumber == anusuchiId)
             .GroupBy(x => x.HealthFacility.Id)
             .Select(x => new HospitalStandardDto()
             {
@@ -59,40 +60,63 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                     IsAvailable = x.IsAvailable,
                     Status = x.Status,
                     MapdandaName = x.Mapdanda.Name,
+                    SerialNumber = x.Mapdanda.SerialNumber,
                     MapdandaId = x.Mapdanda.Id,
                     Remarks = x.Remarks
                 }).ToList(),
-            })
-            .FirstOrDefaultAsync();
+            }).FirstOrDefaultAsync();
 
-        if (res is not null) return res;
+        if (res is not null) return new ResultWithDataDto<HospitalStandardDto>(true, res, null);
 
         var mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiNumber == anusuchiId).ToListAsync();
-        return new HospitalStandardDto()
+        var dtos = new HospitalStandardDto()
         {
             HealthFacilityId = hospitalId,
             HospitalMapdandas = mapdandas.Select(x => new HospitalMapdandasDto()
             {
                 FilePath = null,
-                FiscalYear = fiscalYear,
+                FiscalYear = null,
                 IsAvailable = false,
                 Status = false,
+                SerialNumber = x.SerialNumber,
                 MapdandaName = x.Name,
                 MapdandaId = x.Id,
                 Remarks = ""
             }).ToList(),
         };
+
+        return new ResultWithDataDto<HospitalStandardDto>(true, dtos, null);
     }
 
-    //public async Task<List<HospitalStandardDto>>()
-
-
-    Task<ResultWithDataDto<HospitalStandardDto>> IHospitalStandardService.GetById(int id)
+    public async Task<ResultWithDataDto<HospitalStandardDto>> GetById(int id)
     {
-        throw new NotImplementedException();
+        var hospitalStandard = await _dbContext.HospitalStandards.FindAsync(id);
+        if(hospitalStandard == null)
+        {
+            return new ResultWithDataDto<HospitalStandardDto>(false, null, "Hospital Standard not found");
+        }
+        var hospitalStandardDto = new HospitalStandardDto()
+        {
+            HealthFacilityId = hospitalStandard.HealthFacilityId,
+            HospitalMapdandas = new List<HospitalMapdandasDto>()
+            {
+                new HospitalMapdandasDto()
+                {
+                    FilePath = hospitalStandard.FilePath,
+                    FiscalYear = hospitalStandard.FiscalYear,
+                    IsAvailable = hospitalStandard.IsAvailable,
+                    Status = hospitalStandard.Status,
+                    MapdandaName = hospitalStandard.Mapdanda.Name,
+                    SerialNumber = hospitalStandard.Mapdanda.SerialNumber,
+                    MapdandaId = hospitalStandard.MapdandaId,
+                    Remarks = hospitalStandard.Remarks
+                }
+            }
+        };
+        return new ResultWithDataDto<HospitalStandardDto>(true, hospitalStandardDto, null);
     }
 
-    Task IHospitalStandardService.Update(int id, HospitalStandardDto dto)
+    public async Task Update(int id, HospitalStandardDto dto)
     {
         throw new NotImplementedException();
     }

@@ -1,18 +1,20 @@
 using HRRS.Dto;
-using HRRS.Persistence.Repositories.Interfaces;
+using HRRS.Persistence.Context;
 using HRRS.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 using Persistence.Entities;
 
 namespace HRRS.Services.Implementation
 {
     public class HealthFacilityService : IHealthFacilityService
     {
-        private readonly IHealthFacilityRepositoroy _healthFacilityRepository;
-        public HealthFacilityService(IHealthFacilityRepositoroy healthFacilityRepository)
+        private readonly ApplicationDbContext _context;
+
+        public HealthFacilityService(ApplicationDbContext context)
         {
-            _healthFacilityRepository = healthFacilityRepository;
+            _context = context;
         }
-        public async Task Create(HealthFacilityDto dto)
+        public async Task<ResultDto> Create(HealthFacilityDto dto)
         {
             var healthFacility = new HealthFacility
             {
@@ -52,15 +54,15 @@ namespace HRRS.Services.Implementation
                 Others = dto.Others
 
             };
-            await _healthFacilityRepository.Create(healthFacility);
+            await _context.HealthFacilities.AddAsync(healthFacility);
+            await _context.SaveChangesAsync();
 
-            
-
+            return new ResultDto(true, null);
         }
 
         public async Task<ResultWithDataDto<HealthFacilityDto>> GetById(int id)
         {
-            var healthFacility = await _healthFacilityRepository.GetById(id);
+            var healthFacility = await _context.HealthFacilities.FindAsync(id);
             if(healthFacility == null)
             {
                 return new ResultWithDataDto<HealthFacilityDto>(false, null, "Not found");
@@ -103,6 +105,54 @@ namespace HRRS.Services.Implementation
                 Others = healthFacility.Others
             };
             return new ResultWithDataDto<HealthFacilityDto>(true, healthFacilityDto, "Success");
+        }
+
+        public async Task<ResultWithDataDto<List<HealthFacilityDto>>> GetAll()
+        {
+            var healthFacilityDto = await _context.HealthFacilities.Select(healthFacility => new HealthFacilityDto()
+            {
+                FacilityName = healthFacility.FacilityName,
+                FacilityType = healthFacility.FacilityType,
+                BedCount = healthFacility.BedCount,
+                SpecialistCount = healthFacility.SpecialistCount,
+                AvailableServices = healthFacility.AvailableServices,
+                District = healthFacility.District,
+                LocalLevel = healthFacility.LocalLevel,
+                WardNumber = healthFacility.WardNumber,
+                Tole = healthFacility.Tole,
+                DateOfInspection = healthFacility.DateOfInspection,
+                FacilityEmail = healthFacility.FacilityEmail,
+                FacilityPhoneNumber = healthFacility.FacilityPhoneNumber,
+                FacilityHeadName = healthFacility.FacilityHeadName,
+                FacilityHeadPhone = healthFacility.FacilityHeadPhone,
+                FacilityHeadEmail = healthFacility.FacilityHeadEmail,
+                ExecutiveHeadName = healthFacility.ExecutiveHeadName,
+                ExecutiveHeadMobile = healthFacility.ExecutiveHeadMobile,
+                ExecutiveHeadEmail = healthFacility.ExecutiveHeadEmail,
+                PermissionReceivedDate = healthFacility.PermissionReceivedDate,
+                LastRenewedDate = healthFacility.LastRenewedDate,
+                ApporvingAuthority = healthFacility.ApporvingAuthority,
+                RenewingAuthority = healthFacility.RenewingAuthority,
+                ApprovalValidityTill = healthFacility.ApprovalValidityTill,
+                RenewalValidityTill = healthFacility.RenewalValidityTill,
+                UpgradeDate = healthFacility.UpgradeDate,
+                UpgradingAuthority = healthFacility.UpgradingAuthority,
+                IsLetterOfIntent = healthFacility.IsLetterOfIntent,
+                IsExecutionPermission = healthFacility.IsExecutionPermission,
+                IsRenewal = healthFacility.IsRenewal,
+                IsUpgrade = healthFacility.IsUpgrade,
+                IsServiceExtension = healthFacility.IsServiceExtension,
+                IsBranchExtension = healthFacility.IsBranchExtension,
+                IsRelocation = healthFacility.IsRelocation,
+                Others = healthFacility.Others
+            }).ToListAsync();
+
+            if(healthFacilityDto.Count == 0 || healthFacilityDto == null)
+            {
+                return new ResultWithDataDto<List<HealthFacilityDto>>(false, null, "No any health facility available");
+            }
+
+            return new ResultWithDataDto<List<HealthFacilityDto>>(true, healthFacilityDto, null);
         }
 
         Task IHealthFacilityService.Update(int id, HealthFacilityDto healthFacilityDto)

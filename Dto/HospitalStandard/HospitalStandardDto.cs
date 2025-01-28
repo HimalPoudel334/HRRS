@@ -13,6 +13,7 @@ public class HospitalStandardDto
 public class HospitalMapdandasDto
 {
     public int MapdandaId { get; set; }
+    public int SerialNumber { get; set; }
     public string? MapdandaName { get; set; }
     public bool? IsAvailable { get; set; }
     public string? Remarks { get; set; }
