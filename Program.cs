@@ -21,9 +21,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddControllers();
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddScoped<DapperHelper>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
@@ -54,6 +57,10 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+app.UseStaticFiles();
+
+app.MapControllers();
+
 
 app.MapOpenApi();
 app.MapScalarApiReference();
@@ -69,7 +76,6 @@ app.UseCors("AllowAllOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapEndPoints();
 
 app.Run();
