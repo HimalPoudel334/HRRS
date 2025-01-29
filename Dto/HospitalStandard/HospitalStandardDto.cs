@@ -5,7 +5,7 @@ namespace HRRS.Dto.HealthStandard;
 public class HospitalStandardDto
 {
     public int HealthFacilityId { get; set; }
-    public List<HospitalMapdandasDto> HospitalMapdandas { get; set; }
+    public required List<HospitalMapdandasDto> HospitalMapdandas { get; set; }
 
 }
 

@@ -21,6 +21,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+//builder.Services.AddAntiforgery();
+
 builder.Services.AddControllers();
 
 // Add services to the container.
@@ -34,6 +36,7 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<IMapdandaService, MapdandaService>();
 builder.Services.AddScoped<IHospitalStandardService, HospitalStandardService>();
 builder.Services.AddScoped<IHealthFacilityService, HealthFacilityService>();
+builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 
 builder.Services.AddScoped<IMapdandaRepository, MapdandaRepository>();
 builder.Services.AddScoped<IHospitalStandardRespository, HospitalStandardRepository>();
@@ -75,6 +78,8 @@ app.UseCors("AllowAllOrigins");
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
+
+//app.UseAntiforgery();
 
 app.MapControllers();
 app.MapEndPoints();

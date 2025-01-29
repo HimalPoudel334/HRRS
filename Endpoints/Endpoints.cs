@@ -1,4 +1,5 @@
 ﻿using HRRS.Dto.Auth;
+using HRRS.Dto.FileUpload;
 using HRRS.Dto.HealthStandard;
 using HRRS.Services.Interface;
 using Microsoft.AspNetCore.Mvc;
@@ -44,9 +45,10 @@ public static class Endpoints
             return TypedResults.Ok(await service.Get(hospitalId, anusuchiId));
         });
 
-
-
-
+        endpoints.MapPost("api/MapdandaUpload", async (IFormFile file, IFileUploadService service) =>
+        {
+            return TypedResults.Ok(await service.UploadFileAsync(file));
+        }).DisableAntiforgery();
 
         return endpoints;
     }

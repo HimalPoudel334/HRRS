@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+Media/Mapdanda/*
+UploadedFiles/*
+
 # User-specific files
 *.rsuser
 *.suo

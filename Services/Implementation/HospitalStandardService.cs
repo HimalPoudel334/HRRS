@@ -76,12 +76,12 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             {
                 FilePath = null,
                 FiscalYear = null,
-                IsAvailable = false,
+                IsAvailable = null,
                 Status = false,
                 SerialNumber = x.SerialNumber,
                 MapdandaName = x.Name,
                 MapdandaId = x.Id,
-                Remarks = ""
+                Remarks = null
             }).ToList(),
         };
 
