@@ -114,20 +114,12 @@ public class FileUploadService : IFileUploadService
     // Helper function to get MIME type (you can use a more comprehensive library if needed).
     public string GetContentType(string filename)
     {
-        string contentType = "application/octet-stream";
-
-        string ext = Path.GetExtension(filename).ToLowerInvariant();
-        switch (ext)
+        var provider = new Microsoft.AspNetCore.StaticFiles.FileExtensionContentTypeProvider();
+        if (!provider.TryGetContentType(filename, out var contentType))
         {
-            case ".txt": contentType = "text/plain"; break;
-            case ".pdf": contentType = "application/pdf"; break;
-            case ".jpg": case ".jpeg": contentType = "image/jpeg"; break;
-            case ".png": contentType = "image/png"; break;
-            case ".zip": contentType = "application/zip"; break;
-            case ".csv": contentType = "text/csv"; break;
-            case ".xlsx": contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; break;
-            case ".docx": contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"; break;
+            contentType = "application/octet-stream"; // Default type if unknown
         }
         return contentType;
+
     }
 }

@@ -58,10 +58,15 @@ public static class Endpoints
                 Results.NotFound(new ResultDto(false, "File not found."));
             }
 
+            
             var contentType = service.GetContentType(filePath);
-            string downloadFilename = Path.GetFileName(filePath);
 
-            return Results.File(filePath);
+            var fileBytes = File.ReadAllBytes(filePath);
+
+            var fileName = Path.GetFileName(filePath);
+
+            return Results.File(fileBytes, contentType, fileName);
+
         });
 
         endpoints.MapPost("api/MapdandaUpload", async ([FromQuery] int hospitalId, [FromQuery] int serialNo, [FromQuery] int anusuchiNo, [FromQuery] DateTime InspectionDate, IFormFile file, IFileUploadService service) =>
