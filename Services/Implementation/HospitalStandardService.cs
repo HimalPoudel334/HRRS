@@ -124,8 +124,11 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
     private async Task<ResultDto> Update(HospitalStandardDto dto)
     {
         var hospitalStandards = await _dbContext.HospitalStandards
-            .Where(x => x.HealthFacilityId == dto.HealthFacilityId)
-            .Where(x => dto.HospitalMapdandas.Any(y => y.MapdandaId == x.MapdandaId)).ToListAsync();
+            .Where(x => x.HealthFacilityId == dto.HealthFacilityId).ToListAsync();
+        
+        hospitalStandards = hospitalStandards.Where(x => dto.HospitalMapdandas.Any(y => y.MapdandaId == x.MapdandaId)).ToList();
+
+
 
         foreach (var standard in hospitalStandards)
         {
@@ -140,6 +143,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             }
         }
 
+        _dbContext.UpdateRange(hospitalStandards);
         await _dbContext.SaveChangesAsync();
         
         return new ResultDto(true, null);
