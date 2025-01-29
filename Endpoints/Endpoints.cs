@@ -20,17 +20,17 @@ public static class Endpoints
         //endpoints.MapGet("api/mapdanda/{anusuchi_id}", async (int anusuchi_id, IMapdandaService mapdandaService) =>
         //    TypedResults.Ok(await mapdandaService.GetByAnusuchi(anusuchi_id)));
 
-        endpoints.MapPost("api/HealthFaciltiy", async (HealthFacilityDto dto, IHealthFacilityService service) =>
+        endpoints.MapPost("api/HealthFacility", async (HealthFacilityDto dto, IHealthFacilityService service) =>
         {            
             return TypedResults.Ok(await service.Create(dto));
         });
 
-        endpoints.MapGet("api/HealthFaciltiy", async (IHealthFacilityService service) =>
+        endpoints.MapGet("api/HealthFacility", async (IHealthFacilityService service) =>
         {
             return TypedResults.Ok(await service.GetAll());
         });
 
-        endpoints.MapGet("api/HealthFaciltiy/{id}", async (int id, IHealthFacilityService service) =>
+        endpoints.MapGet("api/HealthFacility/{id}", async (int id, IHealthFacilityService service) =>
         {
             return TypedResults.Ok(await service.GetById(id));
         });

@@ -17,7 +17,8 @@ builder.Services.AddCors(options =>
     {
         policy.AllowAnyOrigin()  // Allows all origins
               .AllowAnyMethod()  // Allows all HTTP methods
-              .AllowAnyHeader(); // Allows all headers
+              .AllowAnyHeader() // Allows all headers
+        .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
     });
 });
 
@@ -71,9 +72,9 @@ app.MapScalarApiReference();
 //    app.MapOpenApi();
 //    app.MapScalarApiReference();
 //}
+app.UseCors("AllowAllOrigins");
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAllOrigins");
 
 app.UseStaticFiles();
 app.UseAuthentication();
