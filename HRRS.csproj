@@ -27,6 +27,7 @@
   <ItemGroup>
     <Folder Include="Dto\Anusuchi\" />
     <Folder Include="Dto\HealthFacility\" />
+    <Folder Include="Dto\FileUpload\" />
     <Folder Include="Persistence\EntityMappings\" />
   </ItemGroup>
 
