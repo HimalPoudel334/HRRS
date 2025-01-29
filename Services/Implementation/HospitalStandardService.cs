@@ -32,6 +32,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
             stdrs.Add(new HospitalStandard()
             {
+                
                 HealthFacility = healthFacility,
                 Mapdanda = mapdanda,
                 IsAvailable = item.IsAvailable,

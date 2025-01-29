@@ -1,4 +1,5 @@
-﻿using HRRS.Dto.Auth;
+﻿using HRRS.Dto;
+using HRRS.Dto.Auth;
 using HRRS.Dto.FileUpload;
 using HRRS.Dto.HealthStandard;
 using HRRS.Services.Interface;
@@ -45,9 +46,35 @@ public static class Endpoints
             return TypedResults.Ok(await service.Get(hospitalId, anusuchiId));
         });
 
-        endpoints.MapPost("api/MapdandaUpload", async (FIleDto file, IFileUploadService service) =>
+        endpoints.MapGet("api/GetMapdandaFile", (string filePath, IFileUploadService service) =>
         {
-            return TypedResults.Ok(await service.UploadFileAsync(file));
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return Results.BadRequest(new ResultDto(false, "Filename is required"));
+            }
+
+            if (!File.Exists(filePath))
+            {
+                Results.NotFound(new ResultDto(false, "File not found."));
+            }
+
+            var contentType = service.GetContentType(filePath);
+            string downloadFilename = Path.GetFileName(filePath);
+
+            return Results.File(filePath);
+        });
+
+        endpoints.MapPost("api/MapdandaUpload", async ([FromQuery] int hospitalId, [FromQuery] int serialNo, [FromQuery] int anusuchiNo, [FromQuery] DateTime InspectionDate, IFormFile file, IFileUploadService service) =>
+        {
+            var dto = new FIleDto()
+            {
+                HospitalId = hospitalId,
+                SerialNo = serialNo,
+                AnusuchiNo = anusuchiNo,
+                InspectionDate = InspectionDate,
+                File = file
+            };
+            return TypedResults.Ok(await service.UploadFileAsync(dto));
         }).DisableAntiforgery();
 
         return endpoints;
