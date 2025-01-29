@@ -69,7 +69,7 @@ public static class Endpoints
 
         });
 
-        endpoints.MapPost("api/MapdandaUpload", async ([FromQuery] int hospitalId, [FromQuery] int serialNo, [FromQuery] int anusuchiNo, [FromQuery] DateTime InspectionDate, IFormFile file, IFileUploadService service) =>
+        endpoints.MapPost("api/MapdandaUpload", async ([FromQuery] int hospitalId, [FromQuery] int serialNo, [FromQuery] int anusuchiNo, [FromQuery] string InspectionDate, IFormFile file, IFileUploadService service) =>
         {
             var dto = new FIleDto()
             {
