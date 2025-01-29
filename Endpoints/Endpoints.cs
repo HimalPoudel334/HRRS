@@ -45,6 +45,11 @@ public static class Endpoints
             return TypedResults.Ok(await service.Get(hospitalId, anusuchiId));
         });
 
+        endpoints.MapPut("api/HospitalStandard/{id}", async (int id, HospitalStandardDto dto, IHospitalStandardService service) =>
+        {
+            return TypedResults.Ok(await service.Update(id, dto));
+        });
+
         endpoints.MapPost("api/MapdandaUpload", async (IFormFile file, IFileUploadService service) =>
         {
             return TypedResults.Ok(await service.UploadFileAsync(file));

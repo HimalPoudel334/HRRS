@@ -1,9 +1,9 @@
 using HRRS.Dto;
 using HRRS.Dto.HealthStandard;
 using HRRS.Persistence.Context;
-using HRRS.Persistence.Repositories.Interfaces;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Entities;
 
 namespace HRRS.Services.Implementation;
 
@@ -98,8 +98,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         var hospitalStandardDto = new HospitalStandardDto()
         {
             HealthFacilityId = hospitalStandard.HealthFacilityId,
-            HospitalMapdandas = new List<HospitalMapdandasDto>()
-            {
+            HospitalMapdandas =
+            [
                 new HospitalMapdandasDto()
                 {
                     FilePath = hospitalStandard.FilePath,
@@ -111,13 +111,32 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                     MapdandaId = hospitalStandard.MapdandaId,
                     Remarks = hospitalStandard.Remarks
                 }
-            }
+            ]
         };
         return new ResultWithDataDto<HospitalStandardDto>(true, hospitalStandardDto, null);
     }
 
-    public async Task Update(int id, HospitalStandardDto dto)
+    public async Task<ResultDto> Update(int standardId, HospitalStandardDto dto)
     {
-        throw new NotImplementedException();
+        var hospitalStandards = await _dbContext.HospitalStandards
+            .Where(x => x.HealthFacilityId == dto.HealthFacilityId)
+            .Where(x => dto.HospitalMapdandas.Any(y => y.MapdandaId == x.MapdandaId)).ToListAsync();
+
+        foreach (var standard in hospitalStandards)
+        {
+            var mapdanda = dto.HospitalMapdandas.FirstOrDefault(x => x.MapdandaId == standard.MapdandaId);
+            if (mapdanda is not null)
+            {
+                standard.IsAvailable = mapdanda.IsAvailable;
+                standard.Remarks = mapdanda.Remarks;
+                standard.FilePath = mapdanda.FilePath;
+                standard.FiscalYear = mapdanda.FiscalYear;
+                standard.Status = mapdanda.Status;
+            }
+        }
+
+        await _dbContext.SaveChangesAsync();
+        
+        return new ResultDto(true, null);
     }
 }
