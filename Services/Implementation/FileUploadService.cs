@@ -37,7 +37,7 @@ public class FileUploadService : IFileUploadService
         {
             await dto.File.CopyToAsync(stream);
         }
-        return new ResultWithDataDto<string>(true, filePath, null);
+        return new ResultWithDataDto<string>(true, uniqueFileName, null);
     }
 
     public async Task<ResultWithDataDto<FileUploadDto>> RemoveFileAsync(List<String> filePaths)

@@ -46,26 +46,25 @@ public static class Endpoints
             return TypedResults.Ok(await service.Get(hospitalId, anusuchiId));
         });
 
-        endpoints.MapGet("api/GetMapdandaFile", (string filePath, IFileUploadService service) =>
+        endpoints.MapGet("api/GetMapdandaFile/{filePath}", (string filePath, IFileUploadService service, IConfiguration config) =>
         {
             if (string.IsNullOrEmpty(filePath))
             {
                 return Results.BadRequest(new ResultDto(false, "Filename is required"));
             }
 
-            if (!File.Exists(filePath))
+            var path = config["FileUploadPath"]  ?? Path.Combine("Media", "Mapdanda");
+            var fullPath = Path.Combine(path, filePath);
+
+            if (!File.Exists(fullPath))
             {
                 Results.NotFound(new ResultDto(false, "File not found."));
             }
-
             
-            var contentType = service.GetContentType(filePath);
+            var contentType = service.GetContentType(fullPath);
+            var fileBytes = File.ReadAllBytes(fullPath);
 
-            var fileBytes = File.ReadAllBytes(filePath);
-
-            var fileName = Path.GetFileName(filePath);
-
-            return Results.File(fileBytes, contentType, fileName);
+            return Results.File(fileBytes, contentType);
 
         });
 
