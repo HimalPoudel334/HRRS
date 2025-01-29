@@ -7,7 +7,6 @@ namespace HRRS.Services.Interface;
 public interface IHospitalStandardService
 {
     Task<ResultDto> Create(HospitalStandardDto dto);
-    Task<ResultDto> Update(int id, HospitalStandardDto dto);
     Task<ResultWithDataDto<HospitalStandardDto>> GetById(int id);
     Task<ResultWithDataDto<HospitalStandardDto>> Get(int hospitalId, int anusuchiId);
 }

@@ -21,12 +21,18 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             throw new Exception("Health Facility not found");
         }
 
+        if(dto.HospitalMapdandas.Any(x => x.StandardId > 0))
+        {
+           return await Update(dto);
+        }
+
         foreach(var item in dto.HospitalMapdandas)
         {
             var mapdanda = await _dbContext.Mapdandas.FindAsync(item.MapdandaId) ?? throw new Exception("Mapdanda not found");
 
             stdrs.Add(new HospitalStandard()
             {
+                
                 HealthFacility = healthFacility,
                 Mapdanda = mapdanda,
                 IsAvailable = item.IsAvailable,
@@ -43,7 +49,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
         return new ResultDto(true, null);
     }
-
     public async Task<ResultWithDataDto<HospitalStandardDto>> Get(int hospitalId, int anusuchiId)
     {
         var res = await _dbContext.HospitalStandards
@@ -55,6 +60,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 HealthFacilityId = x.Key,
                 HospitalMapdandas = x.Select(x => new HospitalMapdandasDto()
                 {
+                    StandardId = x.Id,
                     FilePath = x.FilePath,
                     FiscalYear = x.FiscalYear,
                     IsAvailable = x.IsAvailable,
@@ -74,20 +80,20 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             HealthFacilityId = hospitalId,
             HospitalMapdandas = mapdandas.Select(x => new HospitalMapdandasDto()
             {
-                FilePath = null,
+                StandardId = 0,
+                FilePath = "",
                 FiscalYear = null,
-                IsAvailable = null,
+                IsAvailable = false,
                 Status = false,
                 SerialNumber = x.SerialNumber,
                 MapdandaName = x.Name,
                 MapdandaId = x.Id,
-                Remarks = null
+                Remarks = ""
             }).ToList(),
         };
 
         return new ResultWithDataDto<HospitalStandardDto>(true, dtos, null);
     }
-
     public async Task<ResultWithDataDto<HospitalStandardDto>> GetById(int id)
     {
         var hospitalStandard = await _dbContext.HospitalStandards.FindAsync(id);
@@ -115,12 +121,14 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         };
         return new ResultWithDataDto<HospitalStandardDto>(true, hospitalStandardDto, null);
     }
-
-    public async Task<ResultDto> Update(int standardId, HospitalStandardDto dto)
+    private async Task<ResultDto> Update(HospitalStandardDto dto)
     {
         var hospitalStandards = await _dbContext.HospitalStandards
-            .Where(x => x.HealthFacilityId == dto.HealthFacilityId)
-            .Where(x => dto.HospitalMapdandas.Any(y => y.MapdandaId == x.MapdandaId)).ToListAsync();
+            .Where(x => x.HealthFacilityId == dto.HealthFacilityId).ToListAsync();
+        
+        hospitalStandards = hospitalStandards.Where(x => dto.HospitalMapdandas.Any(y => y.MapdandaId == x.MapdandaId)).ToList();
+
+
 
         foreach (var standard in hospitalStandards)
         {
@@ -135,6 +143,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             }
         }
 
+        _dbContext.UpdateRange(hospitalStandards);
         await _dbContext.SaveChangesAsync();
         
         return new ResultDto(true, null);

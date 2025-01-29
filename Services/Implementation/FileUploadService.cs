@@ -23,19 +23,19 @@ public class FileUploadService : IFileUploadService
         }
     }
 
-    public async Task<ResultWithDataDto<string>> UploadFileAsync(IFormFile file)
+    public async Task<ResultWithDataDto<string>> UploadFileAsync(FIleDto dto)
     {
-        if (file == null || file.Length == 0)
+        if (dto.File.Length == 0)
         {
             throw new Exception("File is empty");
         }
 
-        var uniqueFileName = $"{Guid.NewGuid()}{file.FileName}";  // Or $"{DateTime.Now.Ticks}{Path.GetExtension(file.FileName)}"
+        var uniqueFileName = $"H{dto.HospitalId}-A{dto.AnusuchiNo}-SN{dto.SerialNo}-{dto.File.FileName}";  // Or $"{DateTime.Now.Ticks}{Path.GetExtension(file.FileName)}"
         var filePath = Path.Combine(_fileUploadPath, uniqueFileName);
 
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
-            await file.CopyToAsync(stream);
+            await dto.File.CopyToAsync(stream);
         }
         return new ResultWithDataDto<string>(true, filePath, null);
     }
@@ -86,5 +86,48 @@ public class FileUploadService : IFileUploadService
         };
 
         return new ResultWithDataDto<FileUploadDto>(true, fileUploadDto, null);
+    }
+
+    public ResultWithDataDto<FileStream> GetFileForPath(string filePath)
+    {
+        if (string.IsNullOrEmpty(filePath))
+        {
+            return new ResultWithDataDto<FileStream>(false, null, "File path is required.");
+        }
+        if (!File.Exists(filePath))
+        {
+            return new ResultWithDataDto<FileStream>(false, null, "File not found.");
+        }
+
+        try
+        {            
+            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true); // true for async
+
+            return new ResultWithDataDto<FileStream>(true, fileStream, null);
+        }
+        catch (Exception ex)
+        {
+            return new ResultWithDataDto<FileStream>(false, null, $"Error opening file: {ex.Message}"); // Return error message
+        }
+    }
+
+    // Helper function to get MIME type (you can use a more comprehensive library if needed).
+    public string GetContentType(string filename)
+    {
+        string contentType = "application/octet-stream";
+
+        string ext = Path.GetExtension(filename).ToLowerInvariant();
+        switch (ext)
+        {
+            case ".txt": contentType = "text/plain"; break;
+            case ".pdf": contentType = "application/pdf"; break;
+            case ".jpg": case ".jpeg": contentType = "image/jpeg"; break;
+            case ".png": contentType = "image/png"; break;
+            case ".zip": contentType = "application/zip"; break;
+            case ".csv": contentType = "text/csv"; break;
+            case ".xlsx": contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; break;
+            case ".docx": contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"; break;
+        }
+        return contentType;
     }
 }
