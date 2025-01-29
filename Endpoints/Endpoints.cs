@@ -20,17 +20,17 @@ public static class Endpoints
         //endpoints.MapGet("api/mapdanda/{anusuchi_id}", async (int anusuchi_id, IMapdandaService mapdandaService) =>
         //    TypedResults.Ok(await mapdandaService.GetByAnusuchi(anusuchi_id)));
 
-        endpoints.MapPost("api/HealthFaciltiy", async (HealthFacilityDto dto, IHealthFacilityService service) =>
+        endpoints.MapPost("api/HealthFacility", async (HealthFacilityDto dto, IHealthFacilityService service) =>
         {            
             return TypedResults.Ok(await service.Create(dto));
         });
 
-        endpoints.MapGet("api/HealthFaciltiy", async (IHealthFacilityService service) =>
+        endpoints.MapGet("api/HealthFacility", async (IHealthFacilityService service) =>
         {
             return TypedResults.Ok(await service.GetAll());
         });
 
-        endpoints.MapGet("api/HealthFaciltiy/{id}", async (int id, IHealthFacilityService service) =>
+        endpoints.MapGet("api/HealthFacility/{id}", async (int id, IHealthFacilityService service) =>
         {
             return TypedResults.Ok(await service.GetById(id));
         });
@@ -45,12 +45,7 @@ public static class Endpoints
             return TypedResults.Ok(await service.Get(hospitalId, anusuchiId));
         });
 
-        endpoints.MapPut("api/HospitalStandard/{id}", async (int id, HospitalStandardDto dto, IHospitalStandardService service) =>
-        {
-            return TypedResults.Ok(await service.Update(id, dto));
-        });
-
-        endpoints.MapPost("api/MapdandaUpload", async (IFormFile file, IFileUploadService service) =>
+        endpoints.MapPost("api/MapdandaUpload", async (FIleDto file, IFileUploadService service) =>
         {
             return TypedResults.Ok(await service.UploadFileAsync(file));
         }).DisableAntiforgery();

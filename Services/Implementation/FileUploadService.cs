@@ -23,19 +23,19 @@ public class FileUploadService : IFileUploadService
         }
     }
 
-    public async Task<ResultWithDataDto<string>> UploadFileAsync(IFormFile file)
+    public async Task<ResultWithDataDto<string>> UploadFileAsync(FIleDto dto)
     {
-        if (file == null || file.Length == 0)
+        if (dto.file.Length == 0)
         {
             throw new Exception("File is empty");
         }
 
-        var uniqueFileName = $"{Guid.NewGuid()}{file.FileName}";  // Or $"{DateTime.Now.Ticks}{Path.GetExtension(file.FileName)}"
+        var uniqueFileName = $"H{dto.HospitalId}-A{dto.AnusuchiNo}-SN{dto.SerialNo}-{dto.file.FileName}";  // Or $"{DateTime.Now.Ticks}{Path.GetExtension(file.FileName)}"
         var filePath = Path.Combine(_fileUploadPath, uniqueFileName);
 
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
-            await file.CopyToAsync(stream);
+            await dto.file.CopyToAsync(stream);
         }
         return new ResultWithDataDto<string>(true, filePath, null);
     }

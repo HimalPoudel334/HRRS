@@ -6,6 +6,6 @@ namespace HRRS.Services.Interface;
 
 public interface IFileUploadService
 {
-    Task<ResultWithDataDto<string>> UploadFileAsync(IFormFile file);
+    Task<ResultWithDataDto<string>> UploadFileAsync(FIleDto file);
     Task<ResultWithDataDto<FileUploadDto>> RemoveFileAsync(List<String> filePaths);
 }

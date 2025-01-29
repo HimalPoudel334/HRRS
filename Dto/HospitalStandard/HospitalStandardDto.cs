@@ -12,6 +12,7 @@ public class HospitalStandardDto
 
 public class HospitalMapdandasDto
 {
+    public int StandardId { get; set; }
     public int MapdandaId { get; set; }
     public int SerialNumber { get; set; }
     public string? MapdandaName { get; set; }
