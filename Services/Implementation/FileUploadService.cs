@@ -7,16 +7,13 @@ namespace HRRS.Services.Implementation;
 
 public class FileUploadService : IFileUploadService
 {
-    private readonly IConfiguration _configuration;
-
     private readonly string _fileUploadPath;
 
     public FileUploadService(IConfiguration configuration, IWebHostEnvironment env)
     {
-        _configuration = configuration;
         var appRoot = env.ContentRootPath;
-        _fileUploadPath = Path.Combine(appRoot, _configuration["FileUploadPath"] ?? Path.Combine("Media", "Mapdanda"));
-
+        _fileUploadPath = Path.Combine(appRoot, configuration["FileUploadPath"] ?? Path.Combine("Media", "Mapdanda"));
+        
         if (!Directory.Exists(_fileUploadPath))
         {
             Directory.CreateDirectory(_fileUploadPath);
@@ -30,7 +27,7 @@ public class FileUploadService : IFileUploadService
             throw new Exception("File is empty");
         }
 
-        var uniqueFileName = $"H{dto.HospitalId}-A{dto.AnusuchiNo}-SN{dto.SerialNo}-{dto.File.FileName}";  // Or $"{DateTime.Now.Ticks}{Path.GetExtension(file.FileName)}"
+        var uniqueFileName = $"H{dto.HospitalId}-A{dto.AnusuchiNo}-SN{dto.SerialNo}-{dto.File.FileName}";
         var filePath = Path.Combine(_fileUploadPath, uniqueFileName);
 
         using (var stream = new FileStream(filePath, FileMode.Create))
@@ -42,7 +39,7 @@ public class FileUploadService : IFileUploadService
 
     public async Task<ResultWithDataDto<FileUploadDto>> RemoveFileAsync(List<String> filePaths)
     {
-        if (filePaths == null || filePaths.Count == 0) // Check for null or empty list
+        if (filePaths == null || filePaths.Count == 0)
         {
             throw new Exception("File paths are required.");
         }
@@ -56,7 +53,7 @@ public class FileUploadService : IFileUploadService
             if (string.IsNullOrEmpty(filePath))
             {
                 errors.Add($"File path is null or empty.");
-                continue; // Skip to the next file
+                continue;
             }
 
             try
@@ -74,7 +71,7 @@ public class FileUploadService : IFileUploadService
             catch (Exception ex)
             {
                 Console.WriteLine($"Error deleting file {filePath}: {ex.Message}");
-                errors.Add($"Error deleting {filePath}: {ex.Message}"); // Add specific error
+                errors.Add($"Error deleting {filePath}: {ex.Message}");
             }
         }
 

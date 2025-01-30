@@ -146,7 +146,8 @@ namespace HRRS.Services.Implementation
                 IsBranchExtension = healthFacility.IsBranchExtension,
                 IsRelocation = healthFacility.IsRelocation,
                 Others = healthFacility.Others
-            }).ToListAsync();
+            }).OrderByDescending(x => x.Id)
+            .ToListAsync();
 
             if(healthFacilityDto.Count == 0 || healthFacilityDto == null)
             {
