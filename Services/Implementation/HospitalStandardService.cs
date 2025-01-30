@@ -84,7 +84,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 FilePath = "",
                 FiscalYear = null,
                 IsAvailable = false,
-                Status = false,
+                Status = true,
                 SerialNumber = x.SerialNumber,
                 MapdandaName = x.Name,
                 MapdandaId = x.Id,

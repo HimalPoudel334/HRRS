@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRRS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250127114355_MakeModelFiledsNull")]
-    partial class MakeModelFiledsNull
+    [Migration("20250130034801_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -117,6 +117,12 @@ namespace HRRS.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApplicationSubmittedAuthority")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ApplicationSubmittedDate")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ApporvingAuthority")
                         .HasColumnType("nvarchar(max)");

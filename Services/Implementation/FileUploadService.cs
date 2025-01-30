@@ -27,7 +27,7 @@ public class FileUploadService : IFileUploadService
             throw new Exception("File is empty");
         }
 
-        var uniqueFileName = $"H{dto.HospitalId}-A{dto.AnusuchiNo}-SN{dto.SerialNo}-{dto.File.FileName}";
+        var uniqueFileName = $"H{dto.HospitalId}-A{dto.AnusuchiNo}-SN{dto.SerialNo}{Path.GetExtension(dto.File.FileName)}";
         var filePath = Path.Combine(_fileUploadPath, uniqueFileName);
 
         using (var stream = new FileStream(filePath, FileMode.Create))

@@ -115,6 +115,12 @@ namespace HRRS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ApplicationSubmittedAuthority")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ApplicationSubmittedDate")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ApporvingAuthority")
                         .HasColumnType("nvarchar(max)");
 

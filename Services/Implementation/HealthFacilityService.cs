@@ -51,7 +51,9 @@ namespace HRRS.Services.Implementation
                 IsServiceExtension = dto.IsServiceExtension,
                 IsBranchExtension = dto.IsBranchExtension,
                 IsRelocation = dto.IsRelocation,
-                Others = dto.Others
+                Others = dto.Others,
+                ApplicationSubmittedAuthority = dto.ApplicationSubmittedAuthority,
+                ApplicationSubmittedDate = dto.ApplicationSubmittedDate
 
             };
             await _context.HealthFacilities.AddAsync(healthFacility);
@@ -102,7 +104,9 @@ namespace HRRS.Services.Implementation
                 IsServiceExtension = healthFacility.IsServiceExtension,
                 IsBranchExtension = healthFacility.IsBranchExtension,
                 IsRelocation = healthFacility.IsRelocation,
-                Others = healthFacility.Others
+                Others = healthFacility.Others,
+                ApplicationSubmittedAuthority = healthFacility.ApplicationSubmittedAuthority,
+                ApplicationSubmittedDate = healthFacility.ApplicationSubmittedDate
             };
             return new ResultWithDataDto<HealthFacilityDto>(true, healthFacilityDto, null);
         }
@@ -145,7 +149,9 @@ namespace HRRS.Services.Implementation
                 IsServiceExtension = healthFacility.IsServiceExtension,
                 IsBranchExtension = healthFacility.IsBranchExtension,
                 IsRelocation = healthFacility.IsRelocation,
-                Others = healthFacility.Others
+                Others = healthFacility.Others,
+                ApplicationSubmittedAuthority = healthFacility.ApplicationSubmittedAuthority,
+                ApplicationSubmittedDate = healthFacility.ApplicationSubmittedDate
             }).OrderByDescending(x => x.Id)
             .ToListAsync();
 

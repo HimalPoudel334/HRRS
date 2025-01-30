@@ -78,4 +78,8 @@ public class HealthFacilityDto
 
     public string? Others { get; set; }
 
+    public string? ApplicationSubmittedDate { get; set; }
+
+    public string? ApplicationSubmittedAuthority { get; set; }
+
 }

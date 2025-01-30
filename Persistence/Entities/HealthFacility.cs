@@ -82,5 +82,9 @@ namespace Persistence.Entities
         public bool? IsRelocation { get; set; }
 
         public string? Others { get; set; }
+
+        public string? ApplicationSubmittedDate { get; set; }
+
+        public string? ApplicationSubmittedAuthority { get; set; }
     }
 }
