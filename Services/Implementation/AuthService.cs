@@ -6,6 +6,7 @@ using HRRS.Persistence.Entities;
 using HRRS.Services;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HRRS.Services.Implementation;
 
@@ -23,7 +24,7 @@ public class AuthService : IAuthService
 
     public async Task<ResultWithDataDto<AuthResponseDto>> LoginUser(LoginDto dto)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == dto.Username);
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
         if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
         {
             return ResultWithDataDto<AuthResponseDto>.Failure("Invalid Username or Password");
@@ -33,7 +34,7 @@ public class AuthService : IAuthService
 
     public async Task<ResultWithDataDto<AuthResponseDto>> RegisterAsync(RegisterDto dto)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == dto.Username);
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
         if (user is not null)
         {
             return ResultWithDataDto<AuthResponseDto>.Failure("Username already exists");
@@ -49,10 +50,57 @@ public class AuthService : IAuthService
         await _context.SaveChangesAsync();
         return GenerateAuthResponse(newUser);
     }
+
+    public async Task<ResultWithDataDto<AuthResponseDto>> RegisterHospitalAsync(RegisterHospitalDto dto)
+    {
+        var healthFacility = new HealthFacilityDto()
+        {
+            FacilityName = dto.facilityDto.FacilityName,
+            FacilityType = dto.facilityDto.FacilityType,
+            PanNumber = dto.facilityDto.PanNumber,
+            BedCount = dto.facilityDto.BedCount,
+            SpecialistCount = dto.facilityDto.SpecialistCount,
+            AvailableServices = dto.facilityDto.AvailableServices,
+            District = dto.facilityDto.District,
+            LocalLevel = dto.facilityDto.LocalLevel,
+            WardNumber = dto.facilityDto.WardNumber,
+            Tole = dto.facilityDto.Tole,
+            DateOfInspection = dto.facilityDto.DateOfInspection,
+            FacilityEmail = dto.facilityDto.FacilityEmail,
+            FacilityPhoneNumber = dto.facilityDto.FacilityPhoneNumber,
+            FacilityHeadName = dto.facilityDto.FacilityHeadName,
+            FacilityHeadPhone = dto.facilityDto.FacilityHeadPhone,
+            FacilityHeadEmail = dto.facilityDto.FacilityHeadEmail,
+            ExecutiveHeadName = dto.facilityDto.ExecutiveHeadName,
+            ExecutiveHeadMobile = dto.facilityDto.ExecutiveHeadMobile,
+            ExecutiveHeadEmail = dto.facilityDto.ExecutiveHeadEmail,
+            PermissionReceivedDate = dto.facilityDto.PermissionReceivedDate,
+            LastRenewedDate = dto.facilityDto.LastRenewedDate,
+            ApporvingAuthority = dto.facilityDto.ApporvingAuthority,
+            RenewingAuthority = dto.facilityDto.RenewingAuthority,
+            ApprovalValidityTill = dto.facilityDto.ApprovalValidityTill,
+            RenewalValidityTill = dto.facilityDto.RenewalValidityTill,
+            UpgradeDate = dto.facilityDto.UpgradeDate,
+            UpgradingAuthority = dto.facilityDto.UpgradingAuthority,
+            IsLetterOfIntent = dto.facilityDto.IsLetterOfIntent,
+            IsExecutionPermission = dto.facilityDto.IsExecutionPermission,
+            IsRenewal = dto.facilityDto.IsRenewal,
+            IsUpgrade = dto.facilityDto.IsUpgrade,
+            IsServiceExtension = dto.facilityDto.IsServiceExtension,
+            IsBranchExtension = dto.facilityDto.IsBranchExtension,
+            IsRelocation = dto.facilityDto.IsRelocation,
+            Others = dto.facilityDto.Others,
+            ApplicationSubmittedAuthority = dto.facilityDto.ApplicationSubmittedAuthority,
+            ApplicationSubmittedDate = dto.facilityDto.ApplicationSubmittedDate
+        }
+    }
+
     private string GenerateHashedPassword(string password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password, 12);
     }
+
+
     private ResultWithDataDto<AuthResponseDto> GenerateAuthResponse(User user)
     {
         var loggedInUser = new LoggedInUser(user.UserId, user.UserName, user.UserType);
