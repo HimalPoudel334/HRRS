@@ -1,6 +1,11 @@
+using System.Net.Http;
+using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Claims;
 using HRRS.Dto;
 using HRRS.Persistence.Context;
 using HRRS.Services.Interface;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Entities;
 
@@ -115,57 +120,124 @@ namespace HRRS.Services.Implementation
             return ResultWithDataDto<HealthFacilityDto>.Success(healthFacilityDto);
         }
 
-        public async Task<ResultWithDataDto<List<HealthFacilityDto>>> GetAll()
+        public async Task<ResultWithDataDto<List<HealthFacilityDto>>> GetAll(HttpContext context)
         {
-            var healthFacilityDto = await _context.HealthFacilities.Select(healthFacility => new HealthFacilityDto()
+            var role = context.User.FindFirst(ClaimTypes.Role)?.Value;
+            var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(role))
             {
-                Id = healthFacility.Id,
-                FacilityName = healthFacility.FacilityName,
-                FacilityType = healthFacility.FacilityType,
-                PanNumber = healthFacility.PanNumber,
-                BedCount = healthFacility.BedCount,
-                SpecialistCount = healthFacility.SpecialistCount,
-                AvailableServices = healthFacility.AvailableServices,
-                District = healthFacility.District,
-                LocalLevel = healthFacility.LocalLevel,
-                WardNumber = healthFacility.WardNumber,
-                Tole = healthFacility.Tole,
-                DateOfInspection = healthFacility.DateOfInspection,
-                FacilityEmail = healthFacility.FacilityEmail,
-                FacilityPhoneNumber = healthFacility.FacilityPhoneNumber,
-                FacilityHeadName = healthFacility.FacilityHeadName,
-                FacilityHeadPhone = healthFacility.FacilityHeadPhone,
-                FacilityHeadEmail = healthFacility.FacilityHeadEmail,
-                ExecutiveHeadName = healthFacility.ExecutiveHeadName,
-                ExecutiveHeadMobile = healthFacility.ExecutiveHeadMobile,
-                ExecutiveHeadEmail = healthFacility.ExecutiveHeadEmail,
-                PermissionReceivedDate = healthFacility.PermissionReceivedDate,
-                LastRenewedDate = healthFacility.LastRenewedDate,
-                ApporvingAuthority = healthFacility.ApporvingAuthority,
-                RenewingAuthority = healthFacility.RenewingAuthority,
-                ApprovalValidityTill = healthFacility.ApprovalValidityTill,
-                RenewalValidityTill = healthFacility.RenewalValidityTill,
-                UpgradeDate = healthFacility.UpgradeDate,
-                UpgradingAuthority = healthFacility.UpgradingAuthority,
-                IsLetterOfIntent = healthFacility.IsLetterOfIntent,
-                IsExecutionPermission = healthFacility.IsExecutionPermission,
-                IsRenewal = healthFacility.IsRenewal,
-                IsUpgrade = healthFacility.IsUpgrade,
-                IsServiceExtension = healthFacility.IsServiceExtension,
-                IsBranchExtension = healthFacility.IsBranchExtension,
-                IsRelocation = healthFacility.IsRelocation,
-                Others = healthFacility.Others,
-                ApplicationSubmittedAuthority = healthFacility.ApplicationSubmittedAuthority,
-                ApplicationSubmittedDate = healthFacility.ApplicationSubmittedDate
+                return ResultWithDataDto<List<HealthFacilityDto>>.Failure("Cannot find user");
+            }
+
+            var userIdInt = long.Parse(userId);
+            var user = await _context.Users.FindAsync(userIdInt);
+            if (user == null) {
+                return ResultWithDataDto<List<HealthFacilityDto>>.Failure("Cannot find user");
+            }
+
+            if (role == "Hospital")
+            {
+                var facility = await _context.HealthFacilities.Where(x=> x.Id == user.HealthFacilityId).SingleOrDefaultAsync();
+                if (facility == null) {
+                    return ResultWithDataDto<List<HealthFacilityDto>>.Failure("Cannot find Health Facility");
+                }
+                var dto = new HealthFacilityDto()
+                {
+                    Id = facility.Id,
+                    FacilityName = facility.FacilityName,
+                    FacilityType = facility.FacilityType,
+                    PanNumber = facility.PanNumber,
+                    BedCount = facility.BedCount,
+                    SpecialistCount = facility.SpecialistCount,
+                    AvailableServices = facility.AvailableServices,
+                    District = facility.District,
+                    LocalLevel = facility.LocalLevel,
+                    WardNumber = facility.WardNumber,
+                    Tole = facility.Tole,
+                    DateOfInspection = facility.DateOfInspection,
+                    FacilityEmail = facility.FacilityEmail,
+                    FacilityPhoneNumber = facility.FacilityPhoneNumber,
+                    FacilityHeadName = facility.FacilityHeadName,
+                    FacilityHeadPhone = facility.FacilityHeadPhone,
+                    FacilityHeadEmail = facility.FacilityHeadEmail,
+                    ExecutiveHeadName = facility.ExecutiveHeadName,
+                    ExecutiveHeadMobile = facility.ExecutiveHeadMobile,
+                    ExecutiveHeadEmail = facility.ExecutiveHeadEmail,
+                    PermissionReceivedDate = facility.PermissionReceivedDate,
+                    LastRenewedDate = facility.LastRenewedDate,
+                    ApporvingAuthority = facility.ApporvingAuthority,
+                    RenewingAuthority = facility.RenewingAuthority,
+                    ApprovalValidityTill = facility.ApprovalValidityTill,
+                    RenewalValidityTill = facility.RenewalValidityTill,
+                    UpgradeDate = facility.UpgradeDate,
+                    UpgradingAuthority = facility.UpgradingAuthority,
+                    IsLetterOfIntent = facility.IsLetterOfIntent,
+                    IsExecutionPermission = facility.IsExecutionPermission,
+                    IsRenewal = facility.IsRenewal,
+                    IsUpgrade = facility.IsUpgrade,
+                    IsServiceExtension = facility.IsServiceExtension,
+                    IsBranchExtension = facility.IsBranchExtension,
+                    IsRelocation = facility.IsRelocation,
+                    Others = facility.Others,
+                    ApplicationSubmittedAuthority = facility.ApplicationSubmittedAuthority,
+                    ApplicationSubmittedDate = facility.ApplicationSubmittedDate
+
+                };
+                return ResultWithDataDto<List<HealthFacilityDto>>.Success([dto]);
+
+            }
+
+
+            var facilityDto = await _context.HealthFacilities.Select(facility => new HealthFacilityDto()
+                {
+                Id = facility.Id,
+                FacilityName = facility.FacilityName,
+                FacilityType = facility.FacilityType,
+                PanNumber = facility.PanNumber,
+                BedCount = facility.BedCount,
+                SpecialistCount = facility.SpecialistCount,
+                AvailableServices = facility.AvailableServices,
+                District = facility.District,
+                LocalLevel = facility.LocalLevel,
+                WardNumber = facility.WardNumber,
+                Tole = facility.Tole,
+                DateOfInspection = facility.DateOfInspection,
+                FacilityEmail = facility.FacilityEmail,
+                FacilityPhoneNumber = facility.FacilityPhoneNumber,
+                FacilityHeadName = facility.FacilityHeadName,
+                FacilityHeadPhone = facility.FacilityHeadPhone,
+                FacilityHeadEmail = facility.FacilityHeadEmail,
+                ExecutiveHeadName = facility.ExecutiveHeadName,
+                ExecutiveHeadMobile = facility.ExecutiveHeadMobile,
+                ExecutiveHeadEmail = facility.ExecutiveHeadEmail,
+                PermissionReceivedDate = facility.PermissionReceivedDate,
+                LastRenewedDate = facility.LastRenewedDate,
+                ApporvingAuthority = facility.ApporvingAuthority,
+                RenewingAuthority = facility.RenewingAuthority,
+                ApprovalValidityTill = facility.ApprovalValidityTill,
+                RenewalValidityTill = facility.RenewalValidityTill,
+                UpgradeDate = facility.UpgradeDate,
+                UpgradingAuthority = facility.UpgradingAuthority,
+                IsLetterOfIntent = facility.IsLetterOfIntent,
+                IsExecutionPermission = facility.IsExecutionPermission,
+                IsRenewal = facility.IsRenewal,
+                IsUpgrade = facility.IsUpgrade,
+                IsServiceExtension = facility.IsServiceExtension,
+                IsBranchExtension = facility.IsBranchExtension,
+                IsRelocation = facility.IsRelocation,
+                Others = facility.Others,
+                ApplicationSubmittedAuthority = facility.ApplicationSubmittedAuthority,
+                ApplicationSubmittedDate = facility.ApplicationSubmittedDate
             }).OrderByDescending(x => x.Id)
             .ToListAsync();
 
-            if(healthFacilityDto.Count == 0 || healthFacilityDto == null)
+            if(facilityDto.Count == 0)
             {
-                return new ResultWithDataDto<List<HealthFacilityDto>>(false, null, "There are no health facilities available");
+                return ResultWithDataDto<List<HealthFacilityDto>>.Failure("There are no health facilities available");
             }
 
-            return ResultWithDataDto<List<HealthFacilityDto>>.Success(healthFacilityDto);
+            return ResultWithDataDto<List<HealthFacilityDto>>.Success(facilityDto);
         }
 
         public async Task Update(int id, HealthFacilityDto healthFacilityDto)

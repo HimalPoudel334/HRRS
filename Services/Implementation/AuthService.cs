@@ -33,7 +33,7 @@ public class AuthService : IAuthService
         return GenerateAuthResponse(user);
     }
 
-    public async Task<ResultWithDataDto<AuthResponseDto>> RegisterAsync(RegisterDto dto)
+    public async Task<ResultWithDataDto<AuthResponseDto>> RegisterAdminAsync(RegisterDto dto)
     {
         var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
         if (user is not null)
@@ -45,6 +45,7 @@ public class AuthService : IAuthService
         {
             UserName = dto.Username,
             Password = GenerateHashedPassword(dto.Password),
+            UserType = "Admin"
         };
 
         await _context.Users.AddAsync(newUser);
@@ -56,43 +57,43 @@ public class AuthService : IAuthService
     {
         var healthFacility = new HealthFacility()
         {
-            FacilityName = dto.facilityDto.FacilityName,
-            FacilityType = dto.facilityDto.FacilityType,
-            PanNumber = dto.facilityDto.PanNumber,
-            BedCount = dto.facilityDto.BedCount,
-            SpecialistCount = dto.facilityDto.SpecialistCount,
-            AvailableServices = dto.facilityDto.AvailableServices,
-            District = dto.facilityDto.District,
-            LocalLevel = dto.facilityDto.LocalLevel,
-            WardNumber = dto.facilityDto.WardNumber,
-            Tole = dto.facilityDto.Tole,
-            DateOfInspection = dto.facilityDto.DateOfInspection,
-            FacilityEmail = dto.facilityDto.FacilityEmail,
-            FacilityPhoneNumber = dto.facilityDto.FacilityPhoneNumber,
-            FacilityHeadName = dto.facilityDto.FacilityHeadName,
-            FacilityHeadPhone = dto.facilityDto.FacilityHeadPhone,
-            FacilityHeadEmail = dto.facilityDto.FacilityHeadEmail,
-            ExecutiveHeadName = dto.facilityDto.ExecutiveHeadName,
-            ExecutiveHeadMobile = dto.facilityDto.ExecutiveHeadMobile,
-            ExecutiveHeadEmail = dto.facilityDto.ExecutiveHeadEmail,
-            PermissionReceivedDate = dto.facilityDto.PermissionReceivedDate,
-            LastRenewedDate = dto.facilityDto.LastRenewedDate,
-            ApporvingAuthority = dto.facilityDto.ApporvingAuthority,
-            RenewingAuthority = dto.facilityDto.RenewingAuthority,
-            ApprovalValidityTill = dto.facilityDto.ApprovalValidityTill,
-            RenewalValidityTill = dto.facilityDto.RenewalValidityTill,
-            UpgradeDate = dto.facilityDto.UpgradeDate,
-            UpgradingAuthority = dto.facilityDto.UpgradingAuthority,
-            IsLetterOfIntent = dto.facilityDto.IsLetterOfIntent,
-            IsExecutionPermission = dto.facilityDto.IsExecutionPermission,
-            IsRenewal = dto.facilityDto.IsRenewal,
-            IsUpgrade = dto.facilityDto.IsUpgrade,
-            IsServiceExtension = dto.facilityDto.IsServiceExtension,
-            IsBranchExtension = dto.facilityDto.IsBranchExtension,
-            IsRelocation = dto.facilityDto.IsRelocation,
-            Others = dto.facilityDto.Others,
-            ApplicationSubmittedAuthority = dto.facilityDto.ApplicationSubmittedAuthority,
-            ApplicationSubmittedDate = dto.facilityDto.ApplicationSubmittedDate
+            FacilityName = dto.FacilityDto.FacilityName,
+            FacilityType = dto.FacilityDto.FacilityType,
+            PanNumber = dto.FacilityDto.PanNumber,
+            BedCount = dto.FacilityDto.BedCount,
+            SpecialistCount = dto.FacilityDto.SpecialistCount,
+            AvailableServices = dto.FacilityDto.AvailableServices,
+            District = dto.FacilityDto.District,
+            LocalLevel = dto.FacilityDto.LocalLevel,
+            WardNumber = dto.FacilityDto.WardNumber,
+            Tole = dto.FacilityDto.Tole,
+            DateOfInspection = dto.FacilityDto.DateOfInspection,
+            FacilityEmail = dto.FacilityDto.FacilityEmail,
+            FacilityPhoneNumber = dto.FacilityDto.FacilityPhoneNumber,
+            FacilityHeadName = dto.FacilityDto.FacilityHeadName,
+            FacilityHeadPhone = dto.FacilityDto.FacilityHeadPhone,
+            FacilityHeadEmail = dto.FacilityDto.FacilityHeadEmail,
+            ExecutiveHeadName = dto.FacilityDto.ExecutiveHeadName,
+            ExecutiveHeadMobile = dto.FacilityDto.ExecutiveHeadMobile,
+            ExecutiveHeadEmail = dto.FacilityDto.ExecutiveHeadEmail,
+            PermissionReceivedDate = dto.FacilityDto.PermissionReceivedDate,
+            LastRenewedDate = dto.FacilityDto.LastRenewedDate,
+            ApporvingAuthority = dto.FacilityDto.ApporvingAuthority,
+            RenewingAuthority = dto.FacilityDto.RenewingAuthority,
+            ApprovalValidityTill = dto.FacilityDto.ApprovalValidityTill,
+            RenewalValidityTill = dto.FacilityDto.RenewalValidityTill,
+            UpgradeDate = dto.FacilityDto.UpgradeDate,
+            UpgradingAuthority = dto.FacilityDto.UpgradingAuthority,
+            IsLetterOfIntent = dto.FacilityDto.IsLetterOfIntent,
+            IsExecutionPermission = dto.FacilityDto.IsExecutionPermission,
+            IsRenewal = dto.FacilityDto.IsRenewal,
+            IsUpgrade = dto.FacilityDto.IsUpgrade,
+            IsServiceExtension = dto.FacilityDto.IsServiceExtension,
+            IsBranchExtension = dto.FacilityDto.IsBranchExtension,
+            IsRelocation = dto.FacilityDto.IsRelocation,
+            Others = dto.FacilityDto.Others,
+            ApplicationSubmittedAuthority = dto.FacilityDto.ApplicationSubmittedAuthority,
+            ApplicationSubmittedDate = dto.FacilityDto.ApplicationSubmittedDate
         };
 
         var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
@@ -105,10 +106,10 @@ public class AuthService : IAuthService
         {
             UserName = dto.Username,
             Password = GenerateHashedPassword(dto.Password),
-            UserType = "Hospital",
             HealthFacility = healthFacility
         };
 
+        await _context.HealthFacilities.AddAsync(healthFacility);
         await _context.Users.AddAsync(newUser);
         await _context.SaveChangesAsync();
         return GenerateAuthResponse(newUser);

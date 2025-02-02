@@ -1,3 +1,3 @@
 ﻿namespace HRRS.Dto.Auth;
 
-public record RegisterDto(string Username, string Password);
+public record RegisterHospitalDto(string Username, string Password, HealthFacilityDto FacilityDto);
