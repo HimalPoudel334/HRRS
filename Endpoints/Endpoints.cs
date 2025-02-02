@@ -1,4 +1,5 @@
 ﻿using HRRS.Dto;
+using HRRS.Dto.Anusuchi;
 using HRRS.Dto.Auth;
 using HRRS.Dto.FileUpload;
 using HRRS.Dto.HealthStandard;
@@ -19,11 +20,14 @@ public static class Endpoints
         //endpoints.MapPost("api/signup", async (RegisterDto dto, IAuthService authService) =>
         //    TypedResults.Ok(await authService.RegisterAsync(dto)));
 
-        endpoints.MapGet("api/mapdanda/{anusuchi_id}", async (int anusuchi_id, IMapdandaService mapdandaService) =>
-            TypedResults.Ok(await mapdandaService.GetByAnusuchi(anusuchi_id)));
+        //endpoints.MapGet("api/mapdanda/{anusuchi_id}", async (int anusuchi_id, IMapdandaService mapdandaService) =>
+        //    TypedResults.Ok(await mapdandaService.GetByAnusuchi(anusuchi_id)));
 
-        endpoints.MapPost("api/mapdanda/", [Authorize(Roles = "Admin")] async (MapdandaDto dto, IMapdandaService mapdandaService) =>
-            TypedResults.Ok(await mapdandaService.Add(dto)));
+        endpoints.MapPost("api/mapdanda/", async (MapdandaDto dto, IMapdandaService mapdandaService) =>
+            TypedResults.Ok(await mapdandaService.AddNewMapdanda(dto)));
+
+        endpoints.MapPost("api/anusuchi/", async (AnusuchiDto dto, IAnusuchiService service) =>
+            TypedResults.Ok(await service.Add(dto)));
 
         endpoints.MapPost("api/HealthFacility", async (HealthFacilityDto dto, IHealthFacilityService service) =>
         {            

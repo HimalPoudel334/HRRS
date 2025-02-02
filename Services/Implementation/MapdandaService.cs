@@ -1,5 +1,6 @@
 using HRRS.Dto;
 using HRRS.Persistence.Context;
+using HRRS.Persistence.Entities;
 using HRRS.Persistence.Repositories.Interfaces;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -13,35 +14,41 @@ public class MapdandaService : IMapdandaService
         _dbContext = dbContext;
     }
 
-    public async Task<ResultDto> Add(MapdandaDto dto)
+    public async Task<ResultDto> AddNewMapdanda(MapdandaDto dto)
     {
-        var serialNo = await _dbContext.Mapdandas.Where(x => x.AnusuchiNumber == dto.AnusuchiNumber).MaxAsync(x => x.AnusuchiNumber);
         var mapdanda = new Mapdanda()
         {
             Name = dto.Name,
-            SerialNumber = serialNo,
-            AnusuchiNumber = dto.AnusuchiNumber
+            SerialNumber = dto.SerialNumber,
+            AnusuchiId = dto.AnusuchiId,
+            ParichhedId = dto.ParichhedId,
+            Parichhed = new Parichhed()
+            {
+                ParichhedName = dto.Parichhed?.ParichhedName,
+                SubParichheds = dto.Parichhed?.SubParichheds?.Select(x => new Parichhed()
+                {
+                    ParichhedName = x.ParichhedName,
+                    AnusuchiId = dto.AnusuchiId.ToString()
+
+                }).ToList(),
+                AnusuchiId = dto.Parichhed?.AnusuchiId
+            },
+            SubParichhedId = dto.SubParichhedId,
+            SubMapdandas = dto.SubMapdandas?.Select(x => new Mapdanda()
+            {
+                Name = x.Name,
+                SerialNumber = x.SerialNumber,
+                AnusuchiId = x.AnusuchiId,
+                ParichhedId = x.ParichhedId,
+                SubParichhedId = x.SubParichhedId
+            }).ToList()
+
         };
 
-        await _dbContext.Mapdandas.AddAsync(mapdanda);
+        await _dbContext.AddAsync(mapdanda);
+        await _dbContext.SaveChangesAsync();
+
         return ResultDto.Success();
-
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int anusuchi_id)
-    {
-        var mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiNumber == anusuchi_id).Select(x => new MapdandaDto()
-        {
-            Name = x.Name,
-            SerialNumber = x.SerialNumber,
-            AnusuchiNumber = x.AnusuchiNumber
-        }).ToListAsync();
-
-        if (mapdandas == null)
-        {
-            return ResultWithDataDto<List<MapdandaDto>>.Failure($"No mapdandas found for Anusuchi {anusuchi_id}");
-        }
-
-        return ResultWithDataDto<List<MapdandaDto>>.Success(mapdandas);
-    }
 }

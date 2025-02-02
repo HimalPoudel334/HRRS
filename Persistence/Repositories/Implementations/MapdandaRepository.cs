@@ -49,7 +49,7 @@ public class MapdandaRepository : IMapdandaRepository
 
     public Task<List<Mapdanda>> GetByAnusuchiId(int anusuchi_id)
     {
-        return _context.Mapdandas.Where(x => x.AnusuchiNumber == anusuchi_id).ToListAsync();
+        return _context.Mapdandas.Where(x => x.AnusuchiId == anusuchi_id).ToListAsync();
     }
 }
 
