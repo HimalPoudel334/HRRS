@@ -16,10 +16,11 @@ namespace HRRS.Services.Implementation
         }
         public async Task<ResultDto> Create(HealthFacilityDto dto)
         {
-            var healthFacility = new HealthFacility
+            var facility = new HealthFacility
             {
                 FacilityName = dto.FacilityName,
                 FacilityType = dto.FacilityType,
+                PanNumber = dto.PanNumber,
                 BedCount = dto.BedCount,
                 SpecialistCount = dto.SpecialistCount,
                 AvailableServices = dto.AvailableServices,
@@ -56,10 +57,10 @@ namespace HRRS.Services.Implementation
                 ApplicationSubmittedDate = dto.ApplicationSubmittedDate
 
             };
-            await _context.HealthFacilities.AddAsync(healthFacility);
+            await _context.HealthFacilities.AddAsync(facility);
             await _context.SaveChangesAsync();
 
-            return new ResultDto(true, null);
+            return ResultDto.Success();
         }
 
         public async Task<ResultWithDataDto<HealthFacilityDto>> GetById(int id)
@@ -67,12 +68,13 @@ namespace HRRS.Services.Implementation
             var healthFacility = await _context.HealthFacilities.FindAsync(id);
             if(healthFacility == null)
             {
-                return new ResultWithDataDto<HealthFacilityDto>(false, null, "Not found");
+                return ResultWithDataDto<HealthFacilityDto>.Failure("Not found");
             }
             var healthFacilityDto = new HealthFacilityDto
             {
                 FacilityName = healthFacility.FacilityName,
                 FacilityType = healthFacility.FacilityType,
+                PanNumber = healthFacility.PanNumber,
                 BedCount = healthFacility.BedCount,
                 SpecialistCount = healthFacility.SpecialistCount,
                 AvailableServices = healthFacility.AvailableServices,
@@ -108,7 +110,7 @@ namespace HRRS.Services.Implementation
                 ApplicationSubmittedAuthority = healthFacility.ApplicationSubmittedAuthority,
                 ApplicationSubmittedDate = healthFacility.ApplicationSubmittedDate
             };
-            return new ResultWithDataDto<HealthFacilityDto>(true, healthFacilityDto, null);
+            return ResultWithDataDto<HealthFacilityDto>.Success(healthFacilityDto);
         }
 
         public async Task<ResultWithDataDto<List<HealthFacilityDto>>> GetAll()
@@ -118,6 +120,7 @@ namespace HRRS.Services.Implementation
                 Id = healthFacility.Id,
                 FacilityName = healthFacility.FacilityName,
                 FacilityType = healthFacility.FacilityType,
+                PanNumber = healthFacility.PanNumber,
                 BedCount = healthFacility.BedCount,
                 SpecialistCount = healthFacility.SpecialistCount,
                 AvailableServices = healthFacility.AvailableServices,
@@ -160,10 +163,10 @@ namespace HRRS.Services.Implementation
                 return new ResultWithDataDto<List<HealthFacilityDto>>(false, null, "There are no health facilities available");
             }
 
-            return new ResultWithDataDto<List<HealthFacilityDto>>(true, healthFacilityDto, null);
+            return ResultWithDataDto<List<HealthFacilityDto>>.Success(healthFacilityDto);
         }
 
-        Task IHealthFacilityService.Update(int id, HealthFacilityDto healthFacilityDto)
+        public async Task Update(int id, HealthFacilityDto healthFacilityDto)
         {
             throw new NotImplementedException();
         }

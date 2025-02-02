@@ -30,6 +30,7 @@ public class TokenService(IConfiguration configuration)
         Claim[] claims = [
                 new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, user.UserRole)
             ];
 
         var token = new JwtSecurityToken(

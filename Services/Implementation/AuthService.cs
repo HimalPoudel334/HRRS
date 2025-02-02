@@ -55,7 +55,7 @@ public class AuthService : IAuthService
     }
     private ResultWithDataDto<AuthResponseDto> GenerateAuthResponse(User user)
     {
-        var loggedInUser = new LoggedInUser(user.UserId, user.UserName);
+        var loggedInUser = new LoggedInUser(user.UserId, user.UserName, user.UserType);
         var token = _tokenService.GenerateJwt(loggedInUser);
 
         var authResponse = new AuthResponseDto(loggedInUser, token);

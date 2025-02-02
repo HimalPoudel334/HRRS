@@ -1,15 +1,20 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using System.Net.Mail;
 
 namespace Persistence.Entities
 {
+    [Index(nameof(PanNumber), IsUnique = true)]
     public class HealthFacility
     {
         public int Id { get; set; }
         public string FacilityName { get; set; }
 
         public string FacilityType { get; set; }
+
+        public string PanNumber { get; set; }
 
         public int BedCount { get; set; }
 

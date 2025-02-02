@@ -6,6 +6,8 @@ public class HealthFacilityDto
 
     public string FacilityType { get; set; }
 
+    public string PanNumber { get; set; }
+
     public int BedCount { get; set; }
 
     public int SpecialistCount { get; set; }

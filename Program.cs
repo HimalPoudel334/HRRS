@@ -58,7 +58,8 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(jwtOptions =>
     jwtOptions.TokenValidationParameters = TokenService.GetTokenValidationParameter(builder.Configuration));
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin")));
 
 var app = builder.Build();
 
