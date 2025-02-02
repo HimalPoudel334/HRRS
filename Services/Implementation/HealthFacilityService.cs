@@ -57,6 +57,8 @@ namespace HRRS.Services.Implementation
                 ApplicationSubmittedDate = dto.ApplicationSubmittedDate
 
             };
+
+
             await _context.HealthFacilities.AddAsync(facility);
             await _context.SaveChangesAsync();
 

@@ -19,7 +19,7 @@ public static class Endpoints
         //endpoints.MapPost("api/signup", async (RegisterDto dto, IAuthService authService) =>
         //    TypedResults.Ok(await authService.RegisterAsync(dto)));
 
-        endpoints.MapGet("api/mapdanda/{anusuchi_id}", async (int anusuchi_id, IMapdandaService mapdandaService) =>
+        endpoints.MapGet("api/mapdanda/", async ([FromQuery] int? anusuchi_id, IMapdandaService mapdandaService) =>
             TypedResults.Ok(await mapdandaService.GetByAnusuchi(anusuchi_id)));
 
         endpoints.MapPost("api/mapdanda/", [Authorize(Roles = "Admin")] async (MapdandaDto dto, IMapdandaService mapdandaService) =>

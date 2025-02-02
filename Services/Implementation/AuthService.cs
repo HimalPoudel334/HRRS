@@ -7,6 +7,7 @@ using HRRS.Services;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Persistence.Entities;
 
 namespace HRRS.Services.Implementation;
 
@@ -53,7 +54,7 @@ public class AuthService : IAuthService
 
     public async Task<ResultWithDataDto<AuthResponseDto>> RegisterHospitalAsync(RegisterHospitalDto dto)
     {
-        var healthFacility = new HealthFacilityDto()
+        var healthFacility = new HealthFacility()
         {
             FacilityName = dto.facilityDto.FacilityName,
             FacilityType = dto.facilityDto.FacilityType,
@@ -92,7 +93,26 @@ public class AuthService : IAuthService
             Others = dto.facilityDto.Others,
             ApplicationSubmittedAuthority = dto.facilityDto.ApplicationSubmittedAuthority,
             ApplicationSubmittedDate = dto.facilityDto.ApplicationSubmittedDate
+        };
+
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
+        if (user is not null)
+        {
+            return ResultWithDataDto<AuthResponseDto>.Failure("Username already exists");
         }
+
+        User newUser = new User
+        {
+            UserName = dto.Username,
+            Password = GenerateHashedPassword(dto.Password),
+            UserType = "Hospital",
+            HealthFacility = healthFacility
+        };
+
+        await _context.Users.AddAsync(newUser);
+        await _context.SaveChangesAsync();
+        return GenerateAuthResponse(newUser);
+
     }
 
     private string GenerateHashedPassword(string password)

@@ -28,20 +28,24 @@ public class MapdandaService : IMapdandaService
 
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int anusuchi_id)
+    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int? anusuchi_id)
     {
-        var mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiNumber == anusuchi_id).Select(x => new MapdandaDto()
+
+        var mapdandas = _dbContext.Mapdandas.AsQueryable();
+
+        if (anusuchi_id != null)
         {
+            mapdandas = mapdandas.Where(x => x.AnusuchiNumber == anusuchi_id);
+        }
+
+        var res = await mapdandas.Select(x => new MapdandaDto()
+        {
+            Id = x.Id,
             Name = x.Name,
             SerialNumber = x.SerialNumber,
             AnusuchiNumber = x.AnusuchiNumber
         }).ToListAsync();
 
-        if (mapdandas == null)
-        {
-            return ResultWithDataDto<List<MapdandaDto>>.Failure($"No mapdandas found for Anusuchi {anusuchi_id}");
-        }
-
-        return ResultWithDataDto<List<MapdandaDto>>.Success(mapdandas);
+        return ResultWithDataDto<List<MapdandaDto>>.Success(res);
     }
 }
