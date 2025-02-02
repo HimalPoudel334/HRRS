@@ -12,7 +12,7 @@ public class Parichhed
 
 
     public Anusuchi Anusuchi { get; set; }
-    public string AnusuchiId { get; set; }
+    public int AnusuchiId { get; set; }
     public ICollection<Parichhed>? SubParichheds { get; set; }
 
     public ICollection<Mapdanda>? Mapdandas { get; set; }

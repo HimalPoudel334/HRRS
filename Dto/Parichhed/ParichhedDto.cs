@@ -9,7 +9,7 @@ public class ParichhedDto
     public string ParichhedName { get; set; }
 
     public AnusuchiDto? Anusuchi { get; set; }
-    public string? AnusuchiId { get; set; }
+    public int AnusuchiId { get; set; }
 
     public ICollection<ParichhedDto>? SubParichheds { get; set; }
     public ICollection<MapdandaDto>? Mapdandas { get; set; }

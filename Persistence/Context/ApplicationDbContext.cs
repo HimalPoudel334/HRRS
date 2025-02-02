@@ -19,6 +19,50 @@ public class ApplicationDbContext : DbContext
     public DbSet<Anusuchi> Anusuchis { get; set; }
     public DbSet<Parichhed> Parichheds { get; set; }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Anusuchi -> Parichheds (One-to-Many)
+        modelBuilder.Entity<Parichhed>()
+            .HasOne(p => p.Anusuchi)
+            .WithMany(a => a.Parichheds)
+            .HasForeignKey(p => p.AnusuchiId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Anusuchi -> Mapdandas (One-to-Many)
+        modelBuilder.Entity<Mapdanda>()
+            .HasOne(m => m.Anusuchi)
+            .WithMany(a => a.Mapdandas)
+            .HasForeignKey(m => m.AnusuchiId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Parichhed -> Mapdandas (One-to-Many)
+        modelBuilder.Entity<Mapdanda>()
+            .HasOne(m => m.Parichhed)
+            .WithMany(p => p.Mapdandas)
+            .HasForeignKey(m => m.ParichhedId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Parichhed -> SubParichheds (Self-referencing One-to-Many)
+        modelBuilder.Entity<Parichhed>()
+            .HasMany(p => p.SubParichheds)
+            .WithOne()
+            .HasForeignKey(p => p.AnusuchiId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Parichhed -> SubParichhed (Self-referencing One-to-Many in Mapdanda)
+        modelBuilder.Entity<Mapdanda>()
+            .HasOne(m => m.SubParichhed)
+            .WithMany()
+            .HasForeignKey(m => m.SubParichhedId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Mapdanda -> SubMapdandas (Self-referencing One-to-Many)
+        modelBuilder.Entity<Mapdanda>()
+            .HasMany(m => m.SubMapdandas)
+            .WithOne()
+            .HasForeignKey(m => m.SubParichhedId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         optionsBuilder.UseSeeding((context, _) =>
