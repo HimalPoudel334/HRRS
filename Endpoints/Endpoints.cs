@@ -31,6 +31,9 @@ public static class Endpoints
         endpoints.MapPost("api/mapdanda/", [Authorize(Roles = "SuperAdmin")] async (MapdandaDto dto, IMapdandaService mapdandaService) =>
             TypedResults.Ok(await mapdandaService.Add(dto)));
 
+        endpoints.MapPut("api/mapdanda/", [Authorize(Roles = "SuperAdmin")] async (int mapdandaId, MapdandaDto dto, IMapdandaService mapdandaService) =>
+            TypedResults.Ok(await mapdandaService.UpdateMapdanda(mapdandaId, dto)));
+
 
         endpoints.MapGet("api/HealthFacility", async (IHealthFacilityService service, HttpContext context) =>
         {

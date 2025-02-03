@@ -15,7 +15,7 @@ public class MapdandaService : IMapdandaService
 
     public async Task<ResultDto> Add(MapdandaDto dto)
     {
-        var serialNo = await _dbContext.Mapdandas.Where(x => x.AnusuchiNumber == dto.AnusuchiNumber).MaxAsync(x => x.AnusuchiNumber);
+        var serialNo = await _dbContext.Mapdandas.Where(x => x.AnusuchiNumber == dto.AnusuchiNumber).MaxAsync(x => x.SerialNumber);
         var mapdanda = new Mapdanda()
         {
             Name = dto.Name,
@@ -24,8 +24,23 @@ public class MapdandaService : IMapdandaService
         };
 
         await _dbContext.Mapdandas.AddAsync(mapdanda);
+        await _dbContext.SaveChangesAsync();
         return ResultDto.Success();
 
+    }
+
+    public async Task<ResultDto> UpdateMapdanda(int mapdandaId, MapdandaDto dto)
+    {
+        var mapdanda = await _dbContext.Mapdandas.FindAsync(mapdandaId);
+        if (mapdanda == null)
+        {
+            return ResultDto.Failure("Mapdanda not found");
+        }
+        mapdanda.Name = dto.Name;
+        mapdanda.SerialNumber = dto.SerialNumber;
+        mapdanda.AnusuchiNumber = dto.AnusuchiNumber;
+        await _dbContext.SaveChangesAsync();
+        return ResultDto.Success();
     }
 
     public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int? anusuchi_id)
