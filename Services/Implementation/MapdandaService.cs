@@ -25,7 +25,7 @@ public class MapdandaService : IMapdandaService
         var mapdanda = new Mapdanda()
         {
             Name = dto.Name,
-            SerialNumber = serialNo,
+            SerialNumber = serialNo + 1,
             AnusuchiNumber = dto.AnusuchiNumber
         };
 
@@ -44,8 +44,8 @@ public class MapdandaService : IMapdandaService
         }
 
         mapdanda.Name = dto.Name;
-        mapdanda.SerialNumber = dto.SerialNumber;
-        mapdanda.AnusuchiNumber = dto.AnusuchiNumber;
+        //mapdanda.SerialNumber = dto.SerialNumber;
+        //mapdanda.AnusuchiNumber = dto.AnusuchiNumber;
         await _dbContext.SaveChangesAsync();
         return ResultDto.Success();
     }
@@ -66,7 +66,9 @@ public class MapdandaService : IMapdandaService
             Name = x.Name,
             SerialNumber = x.SerialNumber,
             AnusuchiNumber = x.AnusuchiNumber
-        }).ToListAsync();
+        }).OrderBy(x=> x.SerialNumber)
+        .OrderBy(x=> x.AnusuchiNumber)
+        .ToListAsync();
 
         return ResultWithDataDto<List<MapdandaDto>>.Success(res);
     }
