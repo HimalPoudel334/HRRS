@@ -55,7 +55,6 @@ public class AuthService : IAuthService
 
     public async Task<ResultWithDataDto<AuthResponseDto>> RegisterHospitalAsync(RegisterHospitalDto dto)
     {
-
         
         if (await _context.HealthFacilities.AnyAsync(x => x.PanNumber == dto.FacilityDto.PanNumber))
         {

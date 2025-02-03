@@ -16,6 +16,12 @@ public class MapdandaService : IMapdandaService
     public async Task<ResultDto> Add(MapdandaDto dto)
     {
         var serialNo = await _dbContext.Mapdandas.Where(x => x.AnusuchiNumber == dto.AnusuchiNumber).MaxAsync(x => x.SerialNumber);
+        var maxAnusuchiNo = await _dbContext.Mapdandas.MaxAsync(x => x.AnusuchiNumber);
+        if (dto.AnusuchiNumber > (maxAnusuchiNo + 1))
+        {
+            return ResultDto.Failure($"Anusuchi number should not be greater than {maxAnusuchiNo + 1}");
+
+        }
         var mapdanda = new Mapdanda()
         {
             Name = dto.Name,
@@ -36,6 +42,7 @@ public class MapdandaService : IMapdandaService
         {
             return ResultDto.Failure("Mapdanda not found");
         }
+
         mapdanda.Name = dto.Name;
         mapdanda.SerialNumber = dto.SerialNumber;
         mapdanda.AnusuchiNumber = dto.AnusuchiNumber;
