@@ -55,6 +55,19 @@ public class AuthService : IAuthService
 
     public async Task<ResultWithDataDto<AuthResponseDto>> RegisterHospitalAsync(RegisterHospitalDto dto)
     {
+
+        var hf = await _context.HealthFacilities.SingleOrDefaultAsync(x => x.PanNumber == dto.FacilityDto.PanNumber);
+        if (hf is not null)
+        {
+            return ResultWithDataDto<AuthResponseDto>.Failure("Health Facility already exists");
+        }
+
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
+        if (user is not null)
+        {
+            return ResultWithDataDto<AuthResponseDto>.Failure("Username already exists");
+        }
+
         var healthFacility = new HealthFacility()
         {
             FacilityName = dto.FacilityDto.FacilityName,
@@ -95,12 +108,6 @@ public class AuthService : IAuthService
             ApplicationSubmittedAuthority = dto.FacilityDto.ApplicationSubmittedAuthority,
             ApplicationSubmittedDate = dto.FacilityDto.ApplicationSubmittedDate
         };
-
-        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
-        if (user is not null)
-        {
-            return ResultWithDataDto<AuthResponseDto>.Failure("Username already exists");
-        }
 
         User newUser = new User
         {

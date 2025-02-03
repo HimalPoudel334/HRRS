@@ -20,13 +20,16 @@ public static class Endpoints
         endpoints.MapPost("api/signup", [Authorize(Roles = "SuperAdmin")] async (RegisterDto dto, IAuthService authService) =>
             TypedResults.Ok(await authService.RegisterAdminAsync(dto)));
 
-        endpoints.MapPost("api/HealthFacility", async (RegisterHospitalDto dto, IAuthService service) =>
+        endpoints.MapPost("api/healthfacility/register", async (RegisterHospitalDto dto, IAuthService service) =>
         {
             return TypedResults.Ok(await service.RegisterHospitalAsync(dto));
         });
 
-        endpoints.MapGet("api/mapdanda/", async ([FromQuery] int? anusuchi_id, IMapdandaService mapdandaService) =>
-            TypedResults.Ok(await mapdandaService.GetByAnusuchi(anusuchi_id)));
+        endpoints.MapGet("api/mapdanda/", async ([FromQuery] string? anusuchi_id, IMapdandaService mapdandaService) =>
+        {
+            int? parsedId = string.IsNullOrWhiteSpace(anusuchi_id) ? null : int.Parse(anusuchi_id);
+            return TypedResults.Ok(await mapdandaService.GetByAnusuchi(parsedId));
+        });
 
         endpoints.MapPost("api/mapdanda/", [Authorize(Roles = "SuperAdmin")] async (MapdandaDto dto, IMapdandaService mapdandaService) =>
             TypedResults.Ok(await mapdandaService.Add(dto)));
@@ -38,6 +41,11 @@ public static class Endpoints
         endpoints.MapGet("api/HealthFacility", async (IHealthFacilityService service, HttpContext context) =>
         {
             return TypedResults.Ok(await service.GetAll(context));
+        }).RequireAuthorization();
+
+        endpoints.MapPost("api/HealthFacility", [Authorize(Roles = "SuperAdmin")] async (RegisterHospitalDto dto, IAuthService service) =>
+        {
+            return TypedResults.Ok(await service.RegisterHospitalAsync(dto));
         }).RequireAuthorization();
 
 
