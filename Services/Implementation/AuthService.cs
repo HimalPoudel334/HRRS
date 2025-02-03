@@ -56,14 +56,13 @@ public class AuthService : IAuthService
     public async Task<ResultWithDataDto<AuthResponseDto>> RegisterHospitalAsync(RegisterHospitalDto dto)
     {
 
-        var hf = await _context.HealthFacilities.SingleOrDefaultAsync(x => x.PanNumber == dto.FacilityDto.PanNumber);
-        if (hf is not null)
+        
+        if (await _context.HealthFacilities.AnyAsync(x => x.PanNumber == dto.FacilityDto.PanNumber))
         {
             return ResultWithDataDto<AuthResponseDto>.Failure("Health Facility already exists");
         }
 
-        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
-        if (user is not null)
+        if (await _context.Users.AnyAsync(x => x.UserName == dto.Username))
         {
             return ResultWithDataDto<AuthResponseDto>.Failure("Username already exists");
         }
