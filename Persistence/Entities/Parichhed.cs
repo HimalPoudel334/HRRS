@@ -13,9 +13,12 @@ public class Parichhed
 
     public Anusuchi Anusuchi { get; set; }
     public int AnusuchiId { get; set; }
-    public ICollection<Parichhed>? SubParichheds { get; set; }
 
-    public ICollection<Mapdanda>? Mapdandas { get; set; }
+    [ForeignKey(nameof(Parichhed))]
+    public int? ParichhedId { get; set; }
+    public virtual ICollection<Parichhed> SubParichheds { get; set; }
+
+    public virtual ICollection<Mapdanda>? Mapdandas { get; set; }
 }
 
 

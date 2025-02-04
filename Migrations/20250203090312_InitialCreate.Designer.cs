@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRRS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250130034801_InitialCreate")]
+    [Migration("20250203090312_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -23,6 +23,54 @@ namespace HRRS.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.Anusuchi", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AnusuchiName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RelatedToDafaNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Anusuchis");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.Parichhed", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AnusuchiId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParichhedId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ParichhedName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnusuchiId");
+
+                    b.HasIndex("ParichhedId");
+
+                    b.ToTable("Parichheds");
+                });
 
             modelBuilder.Entity("HRRS.Persistence.Entities.User", b =>
                 {
@@ -95,17 +143,29 @@ namespace HRRS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AnusuchiNumber")
+                    b.Property<int>("AnusuchiId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MapdandaId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ParichhedId")
+                        .HasColumnType("int");
+
                     b.Property<int>("SerialNumber")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AnusuchiId");
+
+                    b.HasIndex("MapdandaId");
+
+                    b.HasIndex("ParichhedId");
 
                     b.ToTable("Mapdandas");
                 });
@@ -208,6 +268,10 @@ namespace HRRS.Migrations
                     b.Property<string>("Others")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PanNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("PermissionReceivedDate")
                         .HasColumnType("nvarchar(max)");
 
@@ -235,7 +299,25 @@ namespace HRRS.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PanNumber")
+                        .IsUnique();
+
                     b.ToTable("HealthFacilities");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.Parichhed", b =>
+                {
+                    b.HasOne("HRRS.Persistence.Entities.Anusuchi", "Anusuchi")
+                        .WithMany("Parichheds")
+                        .HasForeignKey("AnusuchiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRRS.Persistence.Entities.Parichhed", null)
+                        .WithMany("SubParichheds")
+                        .HasForeignKey("ParichhedId");
+
+                    b.Navigation("Anusuchi");
                 });
 
             modelBuilder.Entity("HospitalStandard", b =>
@@ -255,6 +337,46 @@ namespace HRRS.Migrations
                     b.Navigation("HealthFacility");
 
                     b.Navigation("Mapdanda");
+                });
+
+            modelBuilder.Entity("Mapdanda", b =>
+                {
+                    b.HasOne("HRRS.Persistence.Entities.Anusuchi", "Anusuchi")
+                        .WithMany("Mapdandas")
+                        .HasForeignKey("AnusuchiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Mapdanda", null)
+                        .WithMany("SubMapdandas")
+                        .HasForeignKey("MapdandaId");
+
+                    b.HasOne("HRRS.Persistence.Entities.Parichhed", "Parichhed")
+                        .WithMany("Mapdandas")
+                        .HasForeignKey("ParichhedId");
+
+                    b.Navigation("Anusuchi");
+
+                    b.Navigation("Parichhed");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.Anusuchi", b =>
+                {
+                    b.Navigation("Mapdandas");
+
+                    b.Navigation("Parichheds");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.Parichhed", b =>
+                {
+                    b.Navigation("Mapdandas");
+
+                    b.Navigation("SubParichheds");
+                });
+
+            modelBuilder.Entity("Mapdanda", b =>
+                {
+                    b.Navigation("SubMapdandas");
                 });
 #pragma warning restore 612, 618
         }

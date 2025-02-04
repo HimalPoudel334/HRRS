@@ -9,8 +9,8 @@ namespace HRRS.Persistence.Entities
         public string AnusuchiName { get; set; }
         public string RelatedToDafaNo { get; set; }
 
-        public ICollection<Parichhed>? Parichheds { get; set; }
-        public ICollection<Mapdanda>? Mapdandas { get; set; }
+        public virtual ICollection<Parichhed>? Parichheds { get; set; }
+        public virtual ICollection<Mapdanda> Mapdandas { get; set; }
 
     }
 }

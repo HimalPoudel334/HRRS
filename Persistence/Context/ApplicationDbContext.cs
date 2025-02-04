@@ -19,50 +19,50 @@ public class ApplicationDbContext : DbContext
     public DbSet<Anusuchi> Anusuchis { get; set; }
     public DbSet<Parichhed> Parichheds { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        // Anusuchi -> Parichheds (One-to-Many)
-        modelBuilder.Entity<Parichhed>()
-            .HasOne(p => p.Anusuchi)
-            .WithMany(a => a.Parichheds)
-            .HasForeignKey(p => p.AnusuchiId)
-            .OnDelete(DeleteBehavior.Cascade);
+    //protected override void OnModelCreating(ModelBuilder modelBuilder)
+    //{
+    //    // Anusuchi -> Parichheds (One-to-Many)
+    //    modelBuilder.Entity<Parichhed>()
+    //        .HasOne(p => p.Anusuchi)
+    //        .WithMany(a => a.Parichheds)
+    //        .HasForeignKey(p => p.AnusuchiId)
+    //        .OnDelete(DeleteBehavior.Cascade);
 
-        // Anusuchi -> Mapdandas (One-to-Many)
-        modelBuilder.Entity<Mapdanda>()
-            .HasOne(m => m.Anusuchi)
-            .WithMany(a => a.Mapdandas)
-            .HasForeignKey(m => m.AnusuchiId)
-            .OnDelete(DeleteBehavior.Cascade);
+    //    // Anusuchi -> Mapdandas (One-to-Many)
+    //    modelBuilder.Entity<Mapdanda>()
+    //        .HasOne(m => m.Anusuchi)
+    //        .WithMany(a => a.Mapdandas)
+    //        .HasForeignKey(m => m.AnusuchiId)
+    //        .OnDelete(DeleteBehavior.Cascade);
 
-        // Parichhed -> Mapdandas (One-to-Many)
-        modelBuilder.Entity<Mapdanda>()
-            .HasOne(m => m.Parichhed)
-            .WithMany(p => p.Mapdandas)
-            .HasForeignKey(m => m.ParichhedId)
-            .OnDelete(DeleteBehavior.Restrict);
+    //    // Parichhed -> Mapdandas (One-to-Many)
+    //    modelBuilder.Entity<Mapdanda>()
+    //        .HasOne(m => m.Parichhed)
+    //        .WithMany(p => p.Mapdandas)
+    //        .HasForeignKey(m => m.ParichhedId)
+    //        .OnDelete(DeleteBehavior.Restrict);
 
-        // Parichhed -> SubParichheds (Self-referencing One-to-Many)
-        modelBuilder.Entity<Parichhed>()
-            .HasMany(p => p.SubParichheds)
-            .WithOne()
-            .HasForeignKey(p => p.AnusuchiId)
-            .OnDelete(DeleteBehavior.Restrict);
+    //    // Parichhed -> SubParichheds (Self-referencing One-to-Many)
+    //    modelBuilder.Entity<Parichhed>()
+    //        .HasMany(p => p.SubParichheds)
+    //        .WithOne()
+    //        .HasForeignKey(p => p.AnusuchiId)
+    //        .OnDelete(DeleteBehavior.Restrict);
 
-        // Parichhed -> SubParichhed (Self-referencing One-to-Many in Mapdanda)
-        modelBuilder.Entity<Mapdanda>()
-            .HasOne(m => m.SubParichhed)
-            .WithMany()
-            .HasForeignKey(m => m.SubParichhedId)
-            .OnDelete(DeleteBehavior.Restrict);
+    //    // Parichhed -> SubParichhed (Self-referencing One-to-Many in Mapdanda)
+    //    modelBuilder.Entity<Mapdanda>()
+    //        .HasOne(m => m.SubParichhed)
+    //        .WithMany()
+    //        .HasForeignKey(m => m.SubParichhedId)
+    //        .OnDelete(DeleteBehavior.Restrict);
 
-        // Mapdanda -> SubMapdandas (Self-referencing One-to-Many)
-        modelBuilder.Entity<Mapdanda>()
-            .HasMany(m => m.SubMapdandas)
-            .WithOne()
-            .HasForeignKey(m => m.SubParichhedId)
-            .OnDelete(DeleteBehavior.Restrict);
-    }
+    //    // Mapdanda -> SubMapdandas (Self-referencing One-to-Many)
+    //    modelBuilder.Entity<Mapdanda>()
+    //        .HasMany(m => m.SubMapdandas)
+    //        .WithOne()
+    //        .HasForeignKey(m => m.SubParichhedId)
+    //        .OnDelete(DeleteBehavior.Restrict);
+    //}
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         optionsBuilder.UseSeeding((context, _) =>
@@ -86,10 +86,11 @@ public class ApplicationDbContext : DbContext
             if(anusuchi is null)
             {
                 List<Anusuchi> anusuchis = [
-                    new() { RelatedToDafaNo = "दफा ३ सँग सÌबिÆधत", AnusuchiName = "नयाँ ÖवाÖÃय सÖं थाको सेवा स¼ चालन पूवाªधार Öवीकृितको आशय पý (लेटर अफ इÆटेÆट) ÿदान गनªका लािग वÖतगुत मापदÁड" },
-                    new() { RelatedToDafaNo = "दफा ३ सँग सÌबिÆधत", AnusuchiName = "ÖवाÖÃय सÖं थाको ÖतरोÆ नितका लािग पवूाªधार Öवीकृितको आशय पý (लेटर अफ इÆटेÆट) ÿदान गनªका लािग\r\nवÖतुगत मापदÁड" },
-                    new() { RelatedToDafaNo = "दफा ४ सँग सÌबिÆधत", AnusuchiName = "ÖवाÖÃय सÖं थाको वैधािनक ÓयवÖथा सÌबÆधी मापदÁड" },
+                    new() { RelatedToDafaNo = "दफा ३ सँग सम्बन्धित", AnusuchiName = "नयाँ स्वास्थ्य संस्थाको सेवा सञ्चालन पूर्वाधार स्वीकृतिको आशय पत्र (लेटर अफ इन्टेन्ट) प्रदान गर्नका लागि वस्तुगत मापदण्ड" },
+                    new() { RelatedToDafaNo = "दफा ३ सँग सम्बन्धित", AnusuchiName = "स्वास्थ्य संस्थाको स्तर निर्धारण नीतिका लागि पूर्वाधार स्वीकृतिको आशय पत्र (लेटर अफ इन्टेन्ट) प्रदान गर्नका लागि वस्तुगत मापदण्ड" },
+                    new() { RelatedToDafaNo = "दफा ४ सँग सम्बन्धित", AnusuchiName = "स्वास्थ्य संस्थाको वैधानिक व्यवस्था सम्बन्धी मापदण्ड" },
                 ];
+
 
                 context.Set<Anusuchi>().AddRange(anusuchis);
                 context.SaveChanges();

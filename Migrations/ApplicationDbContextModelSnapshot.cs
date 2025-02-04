@@ -53,6 +53,9 @@ namespace HRRS.Migrations
                     b.Property<int>("AnusuchiId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ParichhedId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ParichhedName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -60,6 +63,8 @@ namespace HRRS.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AnusuchiId");
+
+                    b.HasIndex("ParichhedId");
 
                     b.ToTable("Parichheds");
                 });
@@ -138,6 +143,9 @@ namespace HRRS.Migrations
                     b.Property<int>("AnusuchiId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("MapdandaId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -148,16 +156,13 @@ namespace HRRS.Migrations
                     b.Property<int>("SerialNumber")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SubParichhedId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AnusuchiId");
 
-                    b.HasIndex("ParichhedId");
+                    b.HasIndex("MapdandaId");
 
-                    b.HasIndex("SubParichhedId");
+                    b.HasIndex("ParichhedId");
 
                     b.ToTable("Mapdandas");
                 });
@@ -307,9 +312,7 @@ namespace HRRS.Migrations
 
                     b.HasOne("HRRS.Persistence.Entities.Parichhed", null)
                         .WithMany("SubParichheds")
-                        .HasForeignKey("AnusuchiId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .HasForeignKey("ParichhedId");
 
                     b.Navigation("Anusuchi");
                 });
@@ -341,26 +344,17 @@ namespace HRRS.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HRRS.Persistence.Entities.Parichhed", "Parichhed")
-                        .WithMany("Mapdandas")
-                        .HasForeignKey("ParichhedId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("HRRS.Persistence.Entities.Parichhed", "SubParichhed")
-                        .WithMany()
-                        .HasForeignKey("SubParichhedId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("Mapdanda", null)
                         .WithMany("SubMapdandas")
-                        .HasForeignKey("SubParichhedId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("MapdandaId");
+
+                    b.HasOne("HRRS.Persistence.Entities.Parichhed", "Parichhed")
+                        .WithMany("Mapdandas")
+                        .HasForeignKey("ParichhedId");
 
                     b.Navigation("Anusuchi");
 
                     b.Navigation("Parichhed");
-
-                    b.Navigation("SubParichhed");
                 });
 
             modelBuilder.Entity("HRRS.Persistence.Entities.Anusuchi", b =>

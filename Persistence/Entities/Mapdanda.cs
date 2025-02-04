@@ -14,10 +14,9 @@ public class Mapdanda
     
     public Parichhed? Parichhed { get; set; }
 
-    public int? SubParichhedId { get; set; }
-
-    public Parichhed? SubParichhed { get; set; }
-    public ICollection<Mapdanda>? SubMapdandas { get; set; }
+    [ForeignKey(nameof(Mapdanda))]
+    public int? MapdandaId { get; set; }
+    public virtual ICollection<Mapdanda> SubMapdandas { get; set; }
 
 }
 

@@ -14,3 +14,10 @@ public class AnusuchiDto
 
 }
 
+public class AnusuchiUpdateDto
+{
+    public string AnusuchiName { get; set; }
+    public string RelatedToDafaNo { get; set; }
+
+}
+
