@@ -10,6 +10,10 @@ public class HospitalStandard
     public string? FilePath { get; set; }
     public string? FiscalYear { get; set; }
     public bool? Status { get; set; }
+    public bool? Has25 { get; set; }
+    public bool? Has50 { get; set; }
+    public bool? Has100 { get; set; }
+    public bool? Has200 { get; set; }
 
     public HealthFacility HealthFacility { get; set; }
     public Mapdanda Mapdanda { get; set; }

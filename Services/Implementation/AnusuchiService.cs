@@ -111,7 +111,12 @@ public class AnusuchiService : IAnusuchiService
             Id = mapdanda.Id,
             Name = mapdanda.Name,
             SerialNumber = mapdanda.SerialNumber,
-            AnusuchiId = mapdanda.AnusuchiId
+            AnusuchiId = mapdanda.AnusuchiId,
+            Has25Enabled = mapdanda.Has25Enabled,
+            Has50Enabled = mapdanda.Has50Enabled,
+            Has100Enabled = mapdanda.Has100Enabled,
+            Has200Enabled = mapdanda.Has200Enabled,
+            IsAvailableDivided = mapdanda.IsAvailableDivided,
         };
 
         if (mapdanda.SubMapdandas != null)
