@@ -8,7 +8,7 @@ public class Mapdanda
     public int SerialNumber { get; set; }
     public string Name { get; set; }
 
-    public bool IsAvailableDivided { get; set; } = false;
+    public bool IsAvailableDivided { get; set; } = true;
 
     public bool? Has25Enabled { get; set; } = true;
     public bool? Has50Enabled { get; set; } = true;

@@ -1,6 +1,7 @@
 
 using HRRS.Dto;
 using HRRS.Dto.Anusuchi;
+using HRRS.Persistence.Entities;
 
 namespace HRRS.Services.Interface;
 

@@ -5,7 +5,7 @@ namespace HRRS.Dto.Anusuchi;
 
 public class AnusuchiDto
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
     public string AnusuchiName { get; set; }
     public string RelatedToDafaNo { get; set; }
 

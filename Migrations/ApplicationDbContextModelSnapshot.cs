@@ -108,6 +108,18 @@ namespace HRRS.Migrations
                     b.Property<string>("FiscalYear")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("Has100")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Has200")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Has25")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Has50")
+                        .HasColumnType("bit");
+
                     b.Property<int>("HealthFacilityId")
                         .HasColumnType("int");
 
@@ -142,6 +154,21 @@ namespace HRRS.Migrations
 
                     b.Property<int>("AnusuchiId")
                         .HasColumnType("int");
+
+                    b.Property<bool?>("Has100Enabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Has200Enabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Has25Enabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("Has50Enabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsAvailableDivided")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("MapdandaId")
                         .HasColumnType("int");

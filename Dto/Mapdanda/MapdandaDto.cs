@@ -5,7 +5,7 @@ using HRRS.Dto.Parichhed;
 
 public class MapdandaDto
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
     public int SerialNumber { get; set; }
     public string Name { get; set; }
     public bool IsAvailableDivided { get; set; }

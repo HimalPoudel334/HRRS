@@ -122,6 +122,11 @@ namespace HRRS.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SerialNumber = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsAvailableDivided = table.Column<bool>(type: "bit", nullable: false),
+                    Has25Enabled = table.Column<bool>(type: "bit", nullable: true),
+                    Has50Enabled = table.Column<bool>(type: "bit", nullable: true),
+                    Has100Enabled = table.Column<bool>(type: "bit", nullable: true),
+                    Has200Enabled = table.Column<bool>(type: "bit", nullable: true),
                     AnusuchiId = table.Column<int>(type: "int", nullable: false),
                     ParichhedId = table.Column<int>(type: "int", nullable: true),
                     MapdandaId = table.Column<int>(type: "int", nullable: true)
@@ -159,7 +164,11 @@ namespace HRRS.Migrations
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FiscalYear = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<bool>(type: "bit", nullable: true)
+                    Status = table.Column<bool>(type: "bit", nullable: true),
+                    Has25 = table.Column<bool>(type: "bit", nullable: true),
+                    Has50 = table.Column<bool>(type: "bit", nullable: true),
+                    Has100 = table.Column<bool>(type: "bit", nullable: true),
+                    Has200 = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
