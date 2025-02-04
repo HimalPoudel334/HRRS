@@ -23,7 +23,7 @@ public class Mapdanda
 
     [ForeignKey(nameof(Mapdanda))]
     public int? MapdandaId { get; set; }
-    public virtual ICollection<Mapdanda> SubMapdandas { get; set; }
+    public virtual ICollection<Mapdanda> SubMapdandas { get; set; } = [];
 
 }
 

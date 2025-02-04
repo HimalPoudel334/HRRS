@@ -27,7 +27,7 @@ public class AnusuchiService : IAnusuchiService
             RelatedToDafaNo = dto.RelatedToDafaNo,    
         };
 
-        if(dto.Parichheds != null)
+        if(dto.Parichheds.Count >  0)
         {
             anusuchi.Parichheds = [];
             foreach (var parichhed in dto.Parichheds)
@@ -37,7 +37,7 @@ public class AnusuchiService : IAnusuchiService
 
         }
 
-        if(dto.Mapdandas != null)
+        if(dto.Mapdandas.Count > 0)
         {
             anusuchi.Mapdandas = [];
             foreach (var mapdanda in dto.Mapdandas)
@@ -50,6 +50,53 @@ public class AnusuchiService : IAnusuchiService
         await _context.Anusuchis.AddAsync(anusuchi);
         await _context.SaveChangesAsync();
         return ResultDto.Success();
+    }
+
+    public async Task<ResultDto> Delete(int id)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public async Task<ResultDto> Update(int id, AnusuchiUpdateDto dto)
+    {
+        var anusuchi = await _context.Anusuchis.FindAsync(id);
+        if (anusuchi == null)
+        {
+            return ResultDto.Failure("Anusuchi not found");
+        }
+
+        anusuchi.AnusuchiName = dto.AnusuchiName;
+        anusuchi.RelatedToDafaNo = dto.RelatedToDafaNo;
+        
+        await _context.SaveChangesAsync();
+
+        return ResultDto.Success();
+    }
+
+    public async Task<ResultWithDataDto<AnusuchiDto?>> GetById(int id)
+    {
+        var anusuchi = await _context.Anusuchis.Include(x => x.Parichheds).Include(p => p.Mapdandas).FirstOrDefaultAsync(a => a.Id == id);
+        if (anusuchi == null)
+        {
+            return ResultWithDataDto<AnusuchiDto?>.Failure("Anusuchi not found");
+        }
+
+        var anusuchiDto = ReturnAnusuchiDto(anusuchi);
+
+        return ResultWithDataDto<AnusuchiDto?>.Success(anusuchiDto);
+
+    }
+
+    public async Task<ResultWithDataDto<IEnumerable<AnusuchiDto>>> GetAll()
+    {
+        var anusuchis = await _context.Anusuchis.Include(x => x.Parichheds).Include(p => p.Mapdandas).ToListAsync();
+        var anusuchiDtos = new List<AnusuchiDto>();
+
+        foreach (var anusuchi in anusuchis)
+        {
+            anusuchiDtos.Add(ReturnAnusuchiDto(anusuchi));
+        }
+        return ResultWithDataDto<IEnumerable<AnusuchiDto>>.Success(anusuchiDtos);
     }
 
     private static Parichhed AttachParichheds(ParichhedDto dto, Anusuchi anusuchi)
@@ -109,38 +156,37 @@ public class AnusuchiService : IAnusuchiService
 
     }
 
-    public async Task<ResultDto> Delete(int id)
+    private static AnusuchiDto ReturnAnusuchiDto(Anusuchi anusuchi)
     {
-        throw new System.NotImplementedException();
-    }
-
-    public async Task<ResultDto> Update(int id, AnusuchiUpdateDto dto)
-    {
-        var anusuchi = await _context.Anusuchis.FindAsync(id);
-        if (anusuchi == null)
+        var anusuchiDto = new AnusuchiDto
         {
-            return ResultDto.Failure("Anusuchi not found");
+            Id = anusuchi.Id,
+            AnusuchiName = anusuchi.AnusuchiName,
+            RelatedToDafaNo = anusuchi.RelatedToDafaNo,
+        };
+        if (anusuchi.Parichheds.Count > 0)
+        {
+            anusuchiDto.Parichheds = [];
+            foreach (var parichhed in anusuchi.Parichheds)
+            {
+                anusuchiDto.Parichheds.Add(AttachParichhedDto(parichhed));
+            }
+        }
+        else
+        {
+            if (anusuchi.Mapdandas.Count > 0)
+            {
+                anusuchiDto.Mapdandas = [];
+                foreach (var mapdanda in anusuchi.Mapdandas)
+                {
+                    anusuchiDto.Mapdandas.Add(AttachMapdandaDto(mapdanda));
+                }
+                
+            }
+
         }
 
-        anusuchi.AnusuchiName = dto.AnusuchiName;
-        anusuchi.RelatedToDafaNo = dto.RelatedToDafaNo;
-        
-        await _context.SaveChangesAsync();
-
-        return ResultDto.Success();
-    }
-
-    public async Task<ResultWithDataDto<AnusuchiDto?>> GetById(int id)
-    {
-        var anusuchi = await _context.Anusuchis.Include(x => x.Parichheds).Include(p => p.Mapdandas).FirstOrDefaultAsync(a => a.Id == id);
-        if (anusuchi == null)
-        {
-            return ResultWithDataDto<AnusuchiDto?>.Failure("Anusuchi not found");
-        }
-
-        var anusuchiDto = ReturnAnusuchiDto(anusuchi);
-
-        return ResultWithDataDto<AnusuchiDto?>.Success(anusuchiDto);
+        return anusuchiDto;
 
     }
 
@@ -153,7 +199,7 @@ public class AnusuchiService : IAnusuchiService
             ParichhedName = parichhed.ParichhedName,
         };
 
-        if (parichhed.SubParichheds != null)
+        if (parichhed.SubParichheds.Count > 0)
         {
             dto.SubParichheds = [];
             foreach (var subParichhed in parichhed.SubParichheds)
@@ -162,7 +208,7 @@ public class AnusuchiService : IAnusuchiService
             }
         }
 
-        if (parichhed.Mapdandas != null)
+        if (parichhed.Mapdandas.Count > 0)
         {
             dto.Mapdandas = [];
             foreach (var mapdanda in parichhed.Mapdandas)
@@ -188,7 +234,7 @@ public class AnusuchiService : IAnusuchiService
             IsAvailableDivided = mapdanda.IsAvailableDivided,
         };
 
-        if (mapdanda.SubMapdandas != null)
+        if (mapdanda.SubMapdandas.Count > 0)
         {
             dto.SubMapdandas = [];
             foreach (var subMapdanda in mapdanda.SubMapdandas)
@@ -197,70 +243,5 @@ public class AnusuchiService : IAnusuchiService
             }
         }
         return dto;
-    }
-
-
-
-    public async Task<ResultWithDataDto<IEnumerable<AnusuchiDto>>> GetAll()
-    {
-        var anusuchis = await _context.Anusuchis.Include(x => x.Parichheds).Include(p => p.Mapdandas).ToListAsync();
-        var anusuchiDtos = new List<AnusuchiDto>();
-
-        foreach (var anusuchi in anusuchis)
-        {
-            var anusuchiDto = new AnusuchiDto
-            {
-                Id = anusuchi.Id,
-                AnusuchiName = anusuchi.AnusuchiName,
-                RelatedToDafaNo = anusuchi.RelatedToDafaNo,
-            };
-            if (anusuchi.Parichheds != null)
-            {
-                anusuchiDto.Parichheds = [];
-                foreach (var parichhed in anusuchi.Parichheds)
-                {
-                    anusuchiDto.Parichheds.Add(AttachParichhedDto(parichhed));
-                }
-            }
-            else if (anusuchi.Mapdandas != null)
-            {
-                anusuchiDto.Mapdandas = [];
-                foreach (var mapdanda in anusuchi.Mapdandas)
-                {
-                    anusuchiDto.Mapdandas.Add(AttachMapdandaDto(mapdanda));
-                }
-            }
-            anusuchiDtos.Add(anusuchiDto);
-        }
-        return ResultWithDataDto<IEnumerable<AnusuchiDto>>.Success(anusuchiDtos);
-    }
-
-    private static AnusuchiDto ReturnAnusuchiDto(Anusuchi anusuchi)
-    {
-        var anusuchiDto = new AnusuchiDto
-        {
-            Id = anusuchi.Id,
-            AnusuchiName = anusuchi.AnusuchiName,
-            RelatedToDafaNo = anusuchi.RelatedToDafaNo,
-        };
-        if (anusuchi.Parichheds != null)
-        {
-            anusuchiDto.Parichheds = [];
-            foreach (var parichhed in anusuchi.Parichheds)
-            {
-                anusuchiDto.Parichheds.Add(AttachParichhedDto(parichhed));
-            }
-        }
-        else
-        {
-            anusuchiDto.Mapdandas = [];
-            foreach (var mapdanda in anusuchi.Mapdandas)
-            {
-                anusuchiDto.Mapdandas?.Add(AttachMapdandaDto(mapdanda));
-            }
-        }
-
-        return anusuchiDto;
-
     }
 }

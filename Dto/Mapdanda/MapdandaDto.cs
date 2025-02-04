@@ -21,5 +21,5 @@ public class MapdandaDto
     public int? SubParichhedId { get; set; }
     public ParichhedDto? SubParichhed { get; set; }
 
-    public ICollection<MapdandaDto>? SubMapdandas { get; set; }
+    public ICollection<MapdandaDto> SubMapdandas { get; set; } = [];
 }

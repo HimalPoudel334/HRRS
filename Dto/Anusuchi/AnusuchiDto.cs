@@ -9,8 +9,8 @@ public class AnusuchiDto
     public string AnusuchiName { get; set; }
     public string RelatedToDafaNo { get; set; }
 
-    public ICollection<ParichhedDto>? Parichheds { get; set; }
-    public ICollection<MapdandaDto>? Mapdandas { get; set; }
+    public ICollection<ParichhedDto> Parichheds { get; set; } = [];
+    public ICollection<MapdandaDto> Mapdandas { get; set; } = [];
 
 }
 

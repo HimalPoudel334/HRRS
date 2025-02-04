@@ -11,6 +11,6 @@ public class ParichhedDto
     public AnusuchiDto? Anusuchi { get; set; }
     public int AnusuchiId { get; set; }
 
-    public ICollection<ParichhedDto>? SubParichheds { get; set; }
-    public ICollection<MapdandaDto>? Mapdandas { get; set; }
+    public ICollection<ParichhedDto> SubParichheds { get; set; } = [];
+    public ICollection<MapdandaDto> Mapdandas { get; set; } = [];
 }
