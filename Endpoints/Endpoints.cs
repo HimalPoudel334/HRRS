@@ -27,7 +27,7 @@ public static class Endpoints
             TypedResults.Ok(await mapdandaService.AddNewMapdanda(dto)));
 
         endpoints.MapPost("api/anusuchi/", async (AnusuchiDto dto, IAnusuchiService service) =>
-            TypedResults.Ok(await service.Add(dto)));
+            TypedResults.Ok(await service.Create(dto)));
 
         endpoints.MapPost("api/HealthFacility", async (HealthFacilityDto dto, IHealthFacilityService service) =>
         {            

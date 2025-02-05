@@ -19,7 +19,7 @@ public class AnusuchiService : IAnusuchiService
         _context = context;
     }
 
-    public async Task<ResultDto> Add(AnusuchiDto dto)
+    public async Task<ResultDto> Create(AnusuchiDto dto)
     {
         var anusuchi = new Anusuchi()
         {
