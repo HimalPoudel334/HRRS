@@ -28,7 +28,7 @@
                 })
                 .then(res => {
                     console.log(res);
-                    showAnusuchiHeaders(res.data);
+                    showAnusuchiHeaders1(res.data);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
@@ -105,14 +105,29 @@
                                 const td2 = document.createElement('td');
                                 tr2.appendChild(td2);
                             });
-                            
-                            console.log(tr2);
-                            Object.keys(mapd).forEach((k, i) => {
-                                if (k === 'serialNumber' || k === 'name') {
-                                    tr2.children[i].textContent = mapd[k];
+
+                            anusuchi.mapdandaTableHeaders?.forEach(header => {
+                                const headerKey = header.cellName.toLowerCase();
+                                const tdIndex = anusuchi?.mapdandaTableHeaders.indexOf(header);
+                                if (tdIndex !== -1) {
+                                    const td = tr2.children[tdIndex];
+                                    if (mapd.hasOwnProperty(headerKey)) {
+                                        td.textContent = mapd[headerKey];
+                                    }
                                 }
-                                table1.appendChild(tr2);
                             });
+                            table1.appendChild(tr2);
+
+                            // Object.keys(mapd).forEach((k, i) => {
+                            //     if (mapd[k] === null || mapd[k] === undefined || mapd[k].length === 0) {
+                            //         return;
+                            //     }
+                            //     console.log(i);
+                            //     if (k === 'serialNumber' || k === 'name') {
+                            //         tr2.children[i - 1].textContent = mapd[k];
+                            //     }
+                            //     table1.appendChild(tr2);
+                            // });
                         });
                     }
 
@@ -120,6 +135,90 @@
                     p.textContent = `${value}`;
                     div.appendChild(p);
                 });
+                dataContainer.appendChild(div);
+            });
+
+        }
+
+        function showAnusuchiHeaders1(anusuchis) {
+            anusuchis.forEach(anusuchi => {
+                const div = document.createElement('div');
+                const table1 = document.createElement('table');
+                table1.border = '1px solid black';
+                table1.cellSpacing = '0';
+                const thead1 = document.createElement('thead');
+                const tr1 = document.createElement('tr');
+
+                // Add Anusuchi Name:
+                const anusuchiNumberElement = document.createElement('p');
+                anusuchiNumberElement.textContent = `Anusuchi ${anusuchi.id}`;
+                div.appendChild(anusuchiNumberElement);
+
+                // Add Anusuchi Name:
+                const anusuchiNameElement = document.createElement('p');
+                anusuchiNameElement.textContent = anusuchi.anusuchiName;
+                div.appendChild(anusuchiNameElement);
+
+                // Add Anusuchi Name:
+                const anusuchiRelatedDafaElement = document.createElement('p');
+                anusuchiRelatedDafaElement.textContent = anusuchi.relatedToDafaNo;;
+                div.appendChild(anusuchiRelatedDafaElement);
+
+
+
+                // Create table headers:
+                anusuchi.mapdandaTableHeaders?.forEach(header => {
+                    const th1 = document.createElement('th');
+                    th1.textContent = header.cellName;
+                    tr1.appendChild(th1);
+                });
+                thead1.appendChild(tr1);
+                table1.appendChild(thead1);
+
+                // Create table rows and populate with data:
+                anusuchi.mapdandas?.forEach(mapdanda => {
+                    const tr2 = document.createElement('tr');
+
+                    // Correct way to populate cells based on headers:
+                    anusuchi.mapdandaTableHeaders.forEach(header => {
+                        const headerKey = header.cellName.toLowerCase();
+                        const td = document.createElement('td');
+                        tr2.appendChild(td);
+                    });
+
+                    let mapdandaKeys = Object.keys(mapdanda);
+                    let mapdandaIndex = 0;
+
+                    anusuchi?.mapdandaTableHeaders.forEach((header, headerIndex) => {
+                        const td = tr2.children[headerIndex];
+
+                        while (
+                            mapdandaKeys[mapdandaIndex] === 'id' ||
+                            mapdandaKeys[mapdandaIndex] === 'anusuchiId' ||
+                            mapdandaKeys[mapdandaIndex] === 'parichhedId' ||
+                            mapdandaKeys[mapdandaIndex] === 'isAvailableDivided' ||
+                            mapdandaKeys[mapdandaIndex] === 'anusuchi' ||
+                            mapdandaKeys[mapdandaIndex] === 'parichhed' ||
+                            mapdandaKeys[mapdandaIndex] === 'subParichhedId' ||
+                            mapdandaKeys[mapdandaIndex] === 'subParichhed' ||
+                            mapdandaKeys[mapdandaIndex] === 'subMapdandas' ||
+                            mapdandaKeys[mapdandaIndex] === 'relatedToDafaNo'
+                        ) {
+                            mapdandaIndex++;
+                        }
+
+                        const mapdandaKey = mapdandaKeys[mapdandaIndex];
+
+                        if (mapdandaKey && mapdanda.hasOwnProperty(mapdandaKey)) {
+                            td.textContent = mapdanda[mapdandaKey];
+                        } else {
+                            td.textContent = "";
+                        }
+                        mapdandaIndex++;
+                    });
+                    table1.appendChild(tr2);
+                });
+                div.appendChild(table1);
                 dataContainer.appendChild(div);
             });
 
