@@ -9,10 +9,6 @@ public class MapdandaDto
     public int SerialNumber { get; set; }
     public string Name { get; set; }
     public bool IsAvailableDivided { get; set; }
-    public bool? Has25Enabled { get; set; }
-    public bool? Has50Enabled { get; set; }
-    public bool? Has100Enabled { get; set; }
-    public bool? Has200Enabled { get; set; }
     public int AnusuchiId { get; set; }
     public AnusuchiDto Anusuchi { get; set; }
     public int? ParichhedId { get; set; }

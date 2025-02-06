@@ -1,5 +1,6 @@
 
 using HRRS.Dto.Anusuchi;
+using HRRS.Dto.MapdandaTableHeader;
 
 namespace HRRS.Dto.Parichhed;
 
@@ -13,4 +14,5 @@ public class ParichhedDto
 
     public ICollection<ParichhedDto> SubParichheds { get; set; } = [];
     public ICollection<MapdandaDto> Mapdandas { get; set; } = [];
+    public ICollection<MapdandaTableHeaderDto> TableHeaders { get; set; } = [];
 }

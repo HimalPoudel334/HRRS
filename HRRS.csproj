@@ -28,6 +28,7 @@
     <Folder Include="Dto\Anusuchi\" />
     <Folder Include="Dto\HealthFacility\" />
     <Folder Include="Dto\Anusuchi\" />
+    <Folder Include="Dto\MapdandaTableHeader\" />
     <Folder Include="Dto\Parichhed\" />
     <Folder Include="Persistence\EntityMappings\" />
   </ItemGroup>

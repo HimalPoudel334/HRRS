@@ -1,6 +1,7 @@
 
 using HRRS.Dto;
 using HRRS.Dto.Anusuchi;
+using HRRS.Dto.MapdandaTableHeader;
 using HRRS.Dto.Parichhed;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Entities;
@@ -75,7 +76,7 @@ public class AnusuchiService : IAnusuchiService
 
     public async Task<ResultWithDataDto<AnusuchiDto?>> GetById(int id)
     {
-        var anusuchi = await _context.Anusuchis.Include(x => x.Parichheds).Include(p => p.Mapdandas).FirstOrDefaultAsync(a => a.Id == id);
+        var anusuchi = await _context.Anusuchis.Include(x => x.Parichheds).Include(p => p.Mapdandas).Include(x => x.TableHeaders).FirstOrDefaultAsync(a => a.Id == id);
         if (anusuchi == null)
         {
             return ResultWithDataDto<AnusuchiDto?>.Failure("Anusuchi not found");
@@ -89,7 +90,7 @@ public class AnusuchiService : IAnusuchiService
 
     public async Task<ResultWithDataDto<IEnumerable<AnusuchiDto>>> GetAll()
     {
-        var anusuchis = await _context.Anusuchis.Include(x => x.Parichheds).Include(p => p.Mapdandas).ToListAsync();
+        var anusuchis = await _context.Anusuchis.Include(x => x.Parichheds).Include(p => p.Mapdandas).Include(x => x.TableHeaders).AsSplitQuery().ToListAsync();
         var anusuchiDtos = new List<AnusuchiDto>();
 
         foreach (var anusuchi in anusuchis)
@@ -135,10 +136,6 @@ public class AnusuchiService : IAnusuchiService
             SerialNumber = dto.SerialNumber,
             //AnusuchiId = dto.AnusuchiId,
             IsAvailableDivided = dto.IsAvailableDivided,
-            Has25Enabled = dto.IsAvailableDivided ? dto.Has25Enabled : null,
-            Has50Enabled = dto.IsAvailableDivided ? dto.Has50Enabled : null,
-            Has100Enabled = dto.IsAvailableDivided ? dto.Has100Enabled : null,
-            Has200Enabled = dto.IsAvailableDivided ? dto.Has200Enabled : null,
             Anusuchi = anusuchi,
             Parichhed = parichhed,
         };
@@ -164,6 +161,16 @@ public class AnusuchiService : IAnusuchiService
             AnusuchiName = anusuchi.AnusuchiName,
             RelatedToDafaNo = anusuchi.RelatedToDafaNo,
         };
+
+        if(anusuchi.TableHeaders.Count > 0)
+        {
+            foreach(var tableHeader in anusuchi.TableHeaders)
+            {
+                anusuchiDto.MapdandaTableHeaders.Add(AttachMapdandaTableHeaderDto(tableHeader));
+            }
+
+        }
+
         if (anusuchi.Parichheds.Count > 0)
         {
             anusuchiDto.Parichheds = [];
@@ -216,6 +223,15 @@ public class AnusuchiService : IAnusuchiService
                 dto.Mapdandas.Add(AttachMapdandaDto(mapdanda));
             }
         }
+
+        if(parichhed.TableHeaders.Count > 0)
+        {
+            dto.TableHeaders = [];
+            foreach (var tableHeader in parichhed.TableHeaders)
+            {
+                dto.TableHeaders.Add(AttachMapdandaTableHeaderDto(tableHeader));
+            }
+        }
         return dto;
     }
 
@@ -227,10 +243,6 @@ public class AnusuchiService : IAnusuchiService
             Name = mapdanda.Name,
             SerialNumber = mapdanda.SerialNumber,
             AnusuchiId = mapdanda.AnusuchiId,
-            Has25Enabled = mapdanda.Has25Enabled,
-            Has50Enabled = mapdanda.Has50Enabled,
-            Has100Enabled = mapdanda.Has100Enabled,
-            Has200Enabled = mapdanda.Has200Enabled,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
         };
 
@@ -242,6 +254,28 @@ public class AnusuchiService : IAnusuchiService
                 dto.SubMapdandas.Add(AttachMapdandaDto(subMapdanda));
             }
         }
+        return dto;
+    }
+
+    private static MapdandaTableHeaderDto AttachMapdandaTableHeaderDto(MapdandaTableHeader header)
+    {
+        var dto = new MapdandaTableHeaderDto()
+        {
+            Id = header.Id,
+            CellName = header.CellName,
+            ParentCellId = header.ParentCellId,
+            AnusuchiId = header.AnusuchiId,
+            ParichhedId = header.ParichhedId
+        };
+        if (header.SubCells.Count > 0)
+        {
+            dto.SubCells = [];
+            foreach (var subCell in header.SubCells)
+            {
+                dto.SubCells.Add(AttachMapdandaTableHeaderDto(subCell));
+            }
+        }
+
         return dto;
     }
 }

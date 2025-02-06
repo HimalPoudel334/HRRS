@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Request Example</title>
+</head>
+
+<body>
+    <button id="fetch-button">Fetch Data</button>
+    <div id="data-container"></div>
+
+    <script>
+        const port = 7148; // Replace with your actual port number
+        const port2 = 5236; // Replace with your actual port number
+        const url = `http://localhost:${port2}/api/getanusuchis`;
+        const fetchButton = document.getElementById('fetch-button');
+        const dataContainer = document.getElementById('data-container');
+
+        fetchButton.addEventListener('click', () => {
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(res => {
+                    console.log(res);
+                    showAnusuchiHeaders(res.data);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    dataContainer.innerText = `Error: ${error.message}`;
+                });
+        });
+
+        function showAnusuchiHeaders(anusuchis) {
+            anusuchis.forEach(anusuchi => {
+                const div = document.createElement('div');
+                const table1 = document.createElement('table');
+                table1.border = '1px solid black';
+                table1.cellSpacing = '0';
+                const thead1 = document.createElement('thead');
+                const tr1 = document.createElement('tr');
+                Object.keys(anusuchi).forEach(key => {
+                    let value = anusuchi[key];
+                    if (key === 'id') {
+                        value = `Anusuchi Number ${value}`;
+                    }
+                    if (key === 'mapdandaTableHeaders') {
+                        value.forEach(v => {
+                            Object.keys(v).forEach(header => {
+                                if (header === 'cellName') {
+                                    const th1 = document.createElement('th');
+                                    th1.textContent = v[header];
+                                    tr1.appendChild(th1);
+                                }
+                            });
+                        });
+                        thead1.appendChild(tr1);
+                        table1.appendChild(thead1);
+                        div.appendChild(table1);
+                    }
+                    if (key === 'parichheds' && value.length > 0) {
+                        value.forEach(parichhed => {
+                            const div1 = document.createElement('div');
+                            Object.keys(parichhed).forEach(k => {
+                                let v = value[k];
+                                if (k === 'id') {
+                                    v = `Parichhed Number ${v}`;
+                                }
+                                if (k === 'mapdandas' && v.length > 0) {
+
+                                    v.forEach(mapd => {
+                                        Object.keys(mapd).forEach(k1 => {
+                                            if (k1 === 'id' || k1 === 'anusuchiNumber' || k1 === 'parichhedNumber') {
+                                                return;
+                                            }
+                                            const tr2 = document.createElement('tr');
+                                            const td2 = document.createElement('td');
+                                            td2.textContent = mapd[k1];
+                                            tr2.appendChild(td2);
+                                            table1.appendChild(tr2);
+
+                                        });
+
+                                    });
+                                }
+
+                                const p1 = document.createElement('p');
+                                p1.textContent = `${v}`;
+                                div1.appendChild(p1);
+                            });
+                            div.appendChild(div1);
+                        })
+                    }
+
+
+                    if (key === 'mapdandas' && value.length > 0) {
+                        value.forEach(mapd => {
+                            const tr2 = document.createElement('tr');
+                            anusuchi?.mapdandaTableHeaders.forEach(() => {
+                                const td2 = document.createElement('td');
+                                tr2.appendChild(td2);
+                            });
+                            
+                            console.log(tr2);
+                            Object.keys(mapd).forEach((k, i) => {
+                                if (k === 'serialNumber' || k === 'name') {
+                                    tr2.children[i].textContent = mapd[k];
+                                }
+                                table1.appendChild(tr2);
+                            });
+                        });
+                    }
+
+                    const p = document.createElement('p');
+                    p.textContent = `${value}`;
+                    div.appendChild(p);
+                });
+                dataContainer.appendChild(div);
+            });
+
+        }
+
+    </script>
+</body>
+
+</html>

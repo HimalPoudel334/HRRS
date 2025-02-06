@@ -1,3 +1,4 @@
+using HRRS.Persistence.Entities;
 using Persistence.Entities;
 
 public class HospitalStandard
@@ -10,13 +11,11 @@ public class HospitalStandard
     public string? FilePath { get; set; }
     public string? FiscalYear { get; set; }
     public bool? Status { get; set; }
-    public string? Has25 { get; set; }
-    public string? Has50 { get; set; }
-    public string? Has100 { get; set; } 
-    public string? Has200 { get; set; }
 
     public HealthFacility HealthFacility { get; set; }
     public Mapdanda Mapdanda { get; set; }
+
+    public virtual ICollection<MapdandaTableValue> MapdandaTableValues { get; set; } = [];
 }
 
 

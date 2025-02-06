@@ -17,11 +17,18 @@ namespace HRRS.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AnusuchiName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RelatedToDafaNo = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    RelatedToDafaNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AnusuchiId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Anusuchis", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Anusuchis_Anusuchis_AnusuchiId",
+                        column: x => x.AnusuchiId,
+                        principalTable: "Anusuchis",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -106,12 +113,13 @@ namespace HRRS.Migrations
                         column: x => x.AnusuchiId,
                         principalTable: "Anusuchis",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Parichheds_Parichheds_ParichhedId",
                         column: x => x.ParichhedId,
                         principalTable: "Parichheds",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -123,13 +131,9 @@ namespace HRRS.Migrations
                     SerialNumber = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsAvailableDivided = table.Column<bool>(type: "bit", nullable: false),
-                    Has25Enabled = table.Column<bool>(type: "bit", nullable: true),
-                    Has50Enabled = table.Column<bool>(type: "bit", nullable: true),
-                    Has100Enabled = table.Column<bool>(type: "bit", nullable: true),
-                    Has200Enabled = table.Column<bool>(type: "bit", nullable: true),
                     AnusuchiId = table.Column<int>(type: "int", nullable: false),
                     ParichhedId = table.Column<int>(type: "int", nullable: true),
-                    MapdandaId = table.Column<int>(type: "int", nullable: true)
+                    ParentMapdandaId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -139,17 +143,53 @@ namespace HRRS.Migrations
                         column: x => x.AnusuchiId,
                         principalTable: "Anusuchis",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Mapdandas_Mapdandas_MapdandaId",
-                        column: x => x.MapdandaId,
+                        name: "FK_Mapdandas_Mapdandas_ParentMapdandaId",
+                        column: x => x.ParentMapdandaId,
                         principalTable: "Mapdandas",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Mapdandas_Parichheds_ParichhedId",
                         column: x => x.ParichhedId,
                         principalTable: "Parichheds",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MapdandaTableHeaders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CellName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ParentCellId = table.Column<int>(type: "int", nullable: true),
+                    AnusuchiId = table.Column<int>(type: "int", nullable: false),
+                    ParichhedId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MapdandaTableHeaders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MapdandaTableHeaders_Anusuchis_AnusuchiId",
+                        column: x => x.AnusuchiId,
+                        principalTable: "Anusuchis",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MapdandaTableHeaders_MapdandaTableHeaders_ParentCellId",
+                        column: x => x.ParentCellId,
+                        principalTable: "MapdandaTableHeaders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MapdandaTableHeaders_Parichheds_ParichhedId",
+                        column: x => x.ParichhedId,
+                        principalTable: "Parichheds",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -164,11 +204,7 @@ namespace HRRS.Migrations
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FiscalYear = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<bool>(type: "bit", nullable: true),
-                    Has25 = table.Column<bool>(type: "bit", nullable: true),
-                    Has50 = table.Column<bool>(type: "bit", nullable: true),
-                    Has100 = table.Column<bool>(type: "bit", nullable: true),
-                    Has200 = table.Column<bool>(type: "bit", nullable: true)
+                    Status = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -186,6 +222,39 @@ namespace HRRS.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "MapdandaTableValues",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDisabled = table.Column<bool>(type: "bit", nullable: false),
+                    MapdandaTableHeaderId = table.Column<int>(type: "int", nullable: false),
+                    HospitalStandardId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MapdandaTableValues", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MapdandaTableValues_HospitalStandards_HospitalStandardId",
+                        column: x => x.HospitalStandardId,
+                        principalTable: "HospitalStandards",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MapdandaTableValues_MapdandaTableHeaders_MapdandaTableHeaderId",
+                        column: x => x.MapdandaTableHeaderId,
+                        principalTable: "MapdandaTableHeaders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Anusuchis_AnusuchiId",
+                table: "Anusuchis",
+                column: "AnusuchiId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HealthFacilities_PanNumber",
@@ -209,14 +278,39 @@ namespace HRRS.Migrations
                 column: "AnusuchiId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Mapdandas_MapdandaId",
+                name: "IX_Mapdandas_ParentMapdandaId",
                 table: "Mapdandas",
-                column: "MapdandaId");
+                column: "ParentMapdandaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Mapdandas_ParichhedId",
                 table: "Mapdandas",
                 column: "ParichhedId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MapdandaTableHeaders_AnusuchiId",
+                table: "MapdandaTableHeaders",
+                column: "AnusuchiId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MapdandaTableHeaders_ParentCellId",
+                table: "MapdandaTableHeaders",
+                column: "ParentCellId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MapdandaTableHeaders_ParichhedId",
+                table: "MapdandaTableHeaders",
+                column: "ParichhedId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MapdandaTableValues_HospitalStandardId",
+                table: "MapdandaTableValues",
+                column: "HospitalStandardId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MapdandaTableValues_MapdandaTableHeaderId",
+                table: "MapdandaTableValues",
+                column: "MapdandaTableHeaderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Parichheds_AnusuchiId",
@@ -233,10 +327,16 @@ namespace HRRS.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "HospitalStandards");
+                name: "MapdandaTableValues");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "HospitalStandards");
+
+            migrationBuilder.DropTable(
+                name: "MapdandaTableHeaders");
 
             migrationBuilder.DropTable(
                 name: "HealthFacilities");
