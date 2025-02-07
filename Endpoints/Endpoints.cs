@@ -133,6 +133,18 @@ public static class Endpoints
         //file upload services
         endpoints.MapPost("api/v2/FileUpload", async (FileUploadDto dto, IFileUploadService service) => TypedResults.Ok(await service.UploadFileAsync(dto)));
 
+        //mapdanda1 services
+        endpoints.MapGet("api/v2/Mapdanda/{id}", async (int id, IMapdandaService1 service) => TypedResults.Ok(await service.GetById(id)));
+        endpoints.MapGet("api/v2/Mapdanda/Anusuchi", async ([FromQuery] int? anusuchiId, IMapdandaService1 service) => TypedResults.Ok(await service.GetByAnusuchi(anusuchiId)));
+        endpoints.MapGet("api/v2/Mapdanda/Parichhed", async ([FromQuery] int parichhedId, [FromQuery] int? anusuchiId, IMapdandaService1 service) => TypedResults.Ok(await service.GetByParichhed(parichhedId, anusuchiId)));
+        endpoints.MapPost("api/v2/Mapdanda", async (MapdandaDto1 dto, IMapdandaService1 service) => TypedResults.Ok(await service.Add(dto)));
+        endpoints.MapPut("api/v2/Mapdanda", async (int mapdandaId, MapdandaDto1 dto, IMapdandaService1 service) => TypedResults.Ok(await service.UpdateMapdanda(mapdandaId, dto)));
+
+        // sub mapdanda services
+        endpoints.MapGet("api/v2/SubMapdanda/{id}", async (int id, IMapdandaService1 service) => TypedResults.Ok(await service.GetSubMapdandaById(id)));
+        endpoints.MapGet("api/v2/SubMapdanda/Mapdanda", async ([FromQuery] int mapdandaId, IMapdandaService1 service) => TypedResults.Ok(await service.GetSubMapdandaByMapdanda(mapdandaId)));
+
+
         return endpoints;
     }
 }

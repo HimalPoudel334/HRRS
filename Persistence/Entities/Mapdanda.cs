@@ -3,10 +3,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 public class Mapdanda
 {
+    public Mapdanda()
+    {
+        IsAvailableDivided = false;
+        Is25Active = true;
+        Is50Active = true;
+        Is100Active = true;
+        Is200Active = true;
+    }
+
     public int  Id { get; set; }
     public int SerialNumber { get; set; }
     public string Name { get; set; }
-    public bool IsAvailableDivided { get; set; } = true;
+    public bool IsAvailableDivided { get; set; }
     public bool Is25Active { get; set; }
     public bool Is50Active { get; set; }
     public bool Is100Active { get; set; }
