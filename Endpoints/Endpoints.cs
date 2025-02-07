@@ -1,7 +1,9 @@
 ﻿using HRRS.Dto;
+using HRRS.Dto.Anusuchi;
 using HRRS.Dto.Auth;
 using HRRS.Dto.FileUpload;
 using HRRS.Dto.HealthStandard;
+using HRRS.Dto.Parichhed;
 using HRRS.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -88,7 +90,7 @@ public static class Endpoints
 
         endpoints.MapPost("api/MapdandaUpload", async ([FromQuery] int hospitalId, [FromQuery] int serialNo, [FromQuery] int anusuchiNo, [FromQuery] string InspectionDate, IFormFile file, IFileUploadService service) =>
         {
-            var dto = new FIleDto()
+            var dto = new FileDto()
             {
                 HospitalId = hospitalId,
                 SerialNo = serialNo,
@@ -98,6 +100,38 @@ public static class Endpoints
             };
             return TypedResults.Ok(await service.UploadFileAsync(dto));
         }).DisableAntiforgery();
+
+
+        // anusuchi services
+        endpoints.MapPost("api/Anusuchi", async(AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Create(dto)));
+        endpoints.MapPut("api/Anusuchi", async(int anusuchiId, AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Update(anusuchiId, dto)));
+        endpoints.MapGet("api/Anusuchi", async (IAnusuchiService service) => TypedResults.Ok(await service.GetAll()));
+        endpoints.MapGet("api/Anusuchi/{id}", async (int id, IAnusuchiService service) => TypedResults.Ok(await service.GetById(id)));
+
+        // parichhed services
+        endpoints.MapPost("api/Parichhed", async (ParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.Create(dto)));
+        endpoints.MapPut("api/Parichhed", async (int parichhedId, ParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.Update(parichhedId, dto)));
+        endpoints.MapGet("api/Parichhed", async (IParichhedService service) => TypedResults.Ok(await service.GetAllParichhed()));
+        endpoints.MapGet("api/Parichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetParichhedById(id)));
+
+        //sub parichhed services
+        endpoints.MapPost("api/SubParichhed", async (SubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.CreateSubParichhed(dto)));
+        endpoints.MapPut("api/SubParichhed", async (int subParichhedId, SubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.UpdateSubParichhed(subParichhedId, dto)));
+        endpoints.MapGet("api/SubParichhed", async (int parichhedId, IParichhedService service) => TypedResults.Ok(await service.GetSubParichhedsByParichhed(parichhedId)));
+        endpoints.MapGet("api/SubParichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetSubParichhedById(id)));
+
+        //sub sub parichhed services
+        endpoints.MapPost("api/SubSubParichhed", async (SubSubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.CreateSubSubParichhed(dto)));
+        endpoints.MapPut("api/SubSubParichhed", async (int subSubParichhedId, SubSubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.UpdateSubSubParichhed(subSubParichhedId, dto)));
+        endpoints.MapGet("api/SubSubParichhed", async (int subParichhedId, IParichhedService service) => TypedResults.Ok(await service.GetSubSubParichhedsBySubParichhed(subParichhedId)));
+        endpoints.MapGet("api/SubSubParichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetSubSubParichhedById(id)));
+
+        //hospital standard1 services
+        endpoints.MapPost("api/v2/HospitalStandard", async (HospitalStandardDto1 dto, IHospitalStandardService1 service) => TypedResults.Ok(await service.Create(dto)));
+        endpoints.MapGet("api/v2/HospitalStandard", async ([FromQuery] int hospitalId, [FromQuery] int anusuchiId, IHospitalStandardService1 service) => TypedResults.Ok(await service.Get(hospitalId, anusuchiId)));
+
+        //file upload services
+        endpoints.MapPost("api/v2/FileUpload", async (FileUploadDto dto, IFileUploadService service) => TypedResults.Ok(await service.UploadFileAsync(dto)));
 
         return endpoints;
     }

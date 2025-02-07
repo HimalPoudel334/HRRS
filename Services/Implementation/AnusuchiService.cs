@@ -2,11 +2,12 @@
 using HRRS.Dto;
 using HRRS.Dto.Anusuchi;
 using HRRS.Persistence.Context;
+using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace HRRS.Services.Implementation;
 
-public class AnusuchiService(ApplicationDbContext context)
+public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
 {
     private readonly ApplicationDbContext _dbContext = context;
 

@@ -36,8 +36,11 @@ builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<IMapdandaService, MapdandaService>();
 builder.Services.AddScoped<IHospitalStandardService, HospitalStandardService>();
+builder.Services.AddScoped<IHospitalStandardService1, HospitalStandardService1>();
 builder.Services.AddScoped<IHealthFacilityService, HealthFacilityService>();
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
+builder.Services.AddScoped<IAnusuchiService, AnusuchiService>();
+builder.Services.AddScoped<IParichhedService, ParichhedService>();
 
 builder.Services.AddScoped<IMapdandaRepository, MapdandaRepository>();
 builder.Services.AddScoped<IHospitalStandardRespository, HospitalStandardRepository>();

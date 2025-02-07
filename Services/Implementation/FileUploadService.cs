@@ -1,4 +1,5 @@
 
+using System.Text;
 using HRRS.Dto;
 using HRRS.Dto.FileUpload;
 using HRRS.Services.Interface;
@@ -20,11 +21,11 @@ public class FileUploadService : IFileUploadService
         }
     }
 
-    public async Task<ResultWithDataDto<string>> UploadFileAsync(FIleDto dto)
+    public async Task<ResultWithDataDto<string>> UploadFileAsync(FileDto dto)
     {
         if (dto.File.Length == 0)
         {
-            throw new Exception("File is empty");
+            return ResultWithDataDto<string>.Failure("File is empty");
         }
 
         var uniqueFileName = $"H{dto.HospitalId}-A{dto.AnusuchiNo}-SN{dto.SerialNo}{Path.GetExtension(dto.File.FileName)}";
@@ -34,55 +35,46 @@ public class FileUploadService : IFileUploadService
         {
             await dto.File.CopyToAsync(stream);
         }
-        return new ResultWithDataDto<string>(true, uniqueFileName, null);
+
+        return ResultWithDataDto<string>.Success(uniqueFileName);
     }
 
-    public async Task<ResultWithDataDto<FileUploadDto>> RemoveFileAsync(List<String> filePaths)
+    public async Task<ResultWithDataDto<string>> UploadFileAsync(FileUploadDto dto)
     {
-        if (filePaths == null || filePaths.Count == 0)
+        if (dto.File.Length == 0)
         {
-            throw new Exception("File paths are required.");
+            return ResultWithDataDto<string>.Failure("File is empty");
+        }
+        var builder = new StringBuilder();
+        builder.Append($"H{dto.HospitalId}-A{dto.AnusuchiId}-SN{dto.SerialNo}");
+        if (dto.ParichhedId.HasValue)
+        {
+            builder.Append($"-P{dto.ParichhedId}");
+        }
+        if (dto.SubParichhedId.HasValue)
+        {
+            builder.Append($"-SP{dto.SubParichhedId}");
+        }
+        if (dto.SubSubParichhhedId.HasValue)
+        {
+            builder.Append($"-SSP{dto.SubSubParichhhedId}");
+        }
+        if (dto.MapdandaId.HasValue)
+        {
+            builder.Append($"-M{dto.MapdandaId}");
         }
 
-        List<string> deletedFiles = [];
-        List<string> notFoundFiles = [];
-        List<string> errors = [];
+        var uniqueFileName = $"{builder}{Path.GetExtension(dto.File.FileName)}";
 
-        foreach (string filePath in filePaths)
+        //var uniqueFileName = $"H{dto.HospitalId}-A{dto.AnusuchiId}-SN{dto.SerialNo}{Path.GetExtension(dto.File.FileName)}";
+        var filePath = Path.Combine(_fileUploadPath, uniqueFileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
         {
-            if (string.IsNullOrEmpty(filePath))
-            {
-                errors.Add($"File path is null or empty.");
-                continue;
-            }
-
-            try
-            {
-                if (File.Exists(filePath))
-                {
-                    await Task.Run(() => File.Delete(filePath));
-                    deletedFiles.Add(filePath);
-                }
-                else
-                {
-                    notFoundFiles.Add(filePath);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error deleting file {filePath}: {ex.Message}");
-                errors.Add($"Error deleting {filePath}: {ex.Message}");
-            }
+            await dto.File.CopyToAsync(stream);
         }
 
-        var fileUploadDto = new FileUploadDto()
-        {
-            DeletedFiles = deletedFiles,
-            NotFoundFiles = notFoundFiles,
-            Errors = errors
-        };
-
-        return new ResultWithDataDto<FileUploadDto>(true, fileUploadDto, null);
+        return ResultWithDataDto<string>.Success(uniqueFileName);
     }
 
     public ResultWithDataDto<FileStream> GetFileForPath(string filePath)

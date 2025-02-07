@@ -2,11 +2,12 @@
 using HRRS.Dto;
 using HRRS.Dto.Parichhed;
 using HRRS.Persistence.Context;
+using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace HRRS.Services.Implementation;
 
-public class ParichhedService
+public class ParichhedService : IParichhedService
 {
     private readonly ApplicationDbContext _context;
 
@@ -181,9 +182,9 @@ public class ParichhedService
 
 
 
-    public async Task<ResultDto> CreateSubSubParichhed(SubParichhedDto dto)
+    public async Task<ResultDto> CreateSubSubParichhed(SubSubParichhedDto dto)
     {
-        var subParichhed = await _context.SubParichheds.FindAsync(dto.ParichhedId);
+        var subParichhed = await _context.SubParichheds.FindAsync(dto.SubParichhedId);
         if (subParichhed == null)
         {
             return ResultDto.Failure("Parichhed Not Found");
