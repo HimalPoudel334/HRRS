@@ -4,6 +4,8 @@ using HRRS.Persistence.Repositories.Interfaces;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
+namespace HRRS.Services.Implementation;
+
 public class MapdandaService1 : IMapdandaService1
 {
     private readonly ApplicationDbContext _dbContext;
