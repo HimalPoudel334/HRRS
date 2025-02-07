@@ -53,7 +53,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
     {
         var res = await _dbContext.HospitalStandards
             .Include(x => x.Mapdanda)
-            .Where(x => x.HealthFacilityId == hospitalId && x.Mapdanda.AnusuchiNumber == anusuchiId)
+            .Where(x => x.HealthFacilityId == hospitalId && x.Mapdanda.AnusuchiId == anusuchiId)
             .GroupBy(x => x.HealthFacility.Id)
             .Select(x => new HospitalStandardDto()
             {
@@ -74,7 +74,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
         if (res is not null) return new ResultWithDataDto<HospitalStandardDto>(true, res, null);
 
-        var mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiNumber == anusuchiId).ToListAsync();
+        var mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == anusuchiId).ToListAsync();
         var dtos = new HospitalStandardDto()
         {
             HealthFacilityId = hospitalId,

@@ -21,6 +21,26 @@ namespace HRRS.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Anusuchi", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SerialNo")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Anusuchis");
+                });
+
             modelBuilder.Entity("HRRS.Persistence.Entities.User", b =>
                 {
                     b.Property<long>("UserId")
@@ -65,6 +85,18 @@ namespace HRRS.Migrations
                     b.Property<string>("FiscalYear")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Has100")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Has200")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Has25")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Has50")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("HealthFacilityId")
                         .HasColumnType("int");
 
@@ -97,19 +129,77 @@ namespace HRRS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AnusuchiNumber")
+                    b.Property<int>("AnusuchiId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Is100Active")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is200Active")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is25Active")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is50Active")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsAvailableDivided")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ParichhedId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SerialNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubParichhedId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubSubParichhedId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnusuchiId");
+
+                    b.HasIndex("ParichhedId");
+
+                    b.HasIndex("SubParichhedId");
+
+                    b.HasIndex("SubSubParichhedId");
+
+                    b.ToTable("Mapdandas");
+                });
+
+            modelBuilder.Entity("Parichhed", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AnusuchiId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SerialNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("SerialNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Mapdandas");
+                    b.HasIndex("AnusuchiId");
+
+                    b.ToTable("Parichheds");
                 });
 
             modelBuilder.Entity("Persistence.Entities.HealthFacility", b =>
@@ -247,6 +337,83 @@ namespace HRRS.Migrations
                     b.ToTable("HealthFacilities");
                 });
 
+            modelBuilder.Entity("SubMapdanda", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MapdandaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SerialNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MapdandaId");
+
+                    b.ToTable("SubMapdandas");
+                });
+
+            modelBuilder.Entity("SubParichhed", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ParichhedId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SerialNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParichhedId");
+
+                    b.ToTable("SubParichheds");
+                });
+
+            modelBuilder.Entity("SubSubParichhed", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SerialNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SubParichhedId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubParichhedId");
+
+                    b.ToTable("SubSubParichheds");
+                });
+
             modelBuilder.Entity("HRRS.Persistence.Entities.User", b =>
                 {
                     b.HasOne("Persistence.Entities.HealthFacility", "HealthFacility")
@@ -273,6 +440,99 @@ namespace HRRS.Migrations
                     b.Navigation("HealthFacility");
 
                     b.Navigation("Mapdanda");
+                });
+
+            modelBuilder.Entity("Mapdanda", b =>
+                {
+                    b.HasOne("Anusuchi", "Anusuchi")
+                        .WithMany()
+                        .HasForeignKey("AnusuchiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Parichhed", "Parichhed")
+                        .WithMany()
+                        .HasForeignKey("ParichhedId");
+
+                    b.HasOne("SubParichhed", "SubParichhed")
+                        .WithMany()
+                        .HasForeignKey("SubParichhedId");
+
+                    b.HasOne("SubSubParichhed", "SubSubParichhed")
+                        .WithMany()
+                        .HasForeignKey("SubSubParichhedId");
+
+                    b.Navigation("Anusuchi");
+
+                    b.Navigation("Parichhed");
+
+                    b.Navigation("SubParichhed");
+
+                    b.Navigation("SubSubParichhed");
+                });
+
+            modelBuilder.Entity("Parichhed", b =>
+                {
+                    b.HasOne("Anusuchi", "Anusuchi")
+                        .WithMany("Parichheds")
+                        .HasForeignKey("AnusuchiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Anusuchi");
+                });
+
+            modelBuilder.Entity("SubMapdanda", b =>
+                {
+                    b.HasOne("Mapdanda", "Mapdanda")
+                        .WithMany("SubMapdandas")
+                        .HasForeignKey("MapdandaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mapdanda");
+                });
+
+            modelBuilder.Entity("SubParichhed", b =>
+                {
+                    b.HasOne("Parichhed", "Parichhed")
+                        .WithMany("SubParichheds")
+                        .HasForeignKey("ParichhedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Parichhed");
+                });
+
+            modelBuilder.Entity("SubSubParichhed", b =>
+                {
+                    b.HasOne("SubParichhed", "SubParichhed")
+                        .WithMany("SubSubParichheds")
+                        .HasForeignKey("SubParichhedId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SubParichhed");
+                });
+
+            modelBuilder.Entity("Anusuchi", b =>
+                {
+                    b.Navigation("Parichheds");
+                });
+
+            modelBuilder.Entity("Mapdanda", b =>
+                {
+                    b.Navigation("SubMapdandas");
+                });
+
+            modelBuilder.Entity("Parichhed", b =>
+                {
+                    b.Navigation("SubParichheds");
+                });
+
+            modelBuilder.Entity("SubParichhed", b =>
+                {
+                    b.Navigation("SubSubParichheds");
                 });
 #pragma warning restore 612, 618
         }

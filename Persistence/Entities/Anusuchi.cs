@@ -1,15 +1,37 @@
-public class AnusuchiIV
+public class Anusuchi
 {
     public int Id { get; set; }
     public int SerialNo { get; set; }
-    public string MapdandaName { get; set; }
-    public string ParichhedName { get; set; }
-    public string? SubParichhedName { get; set; }
-    public string? SubParichhedName2 { get; set; }
-    public bool Is25Active { get; set; }
-    public bool Is50Active { get; set; }
-    public bool Is100Active { get; set; }
-    public bool Is200Active { get; set; }
-    public string? MapdandaGroupName { get; set; }
+    public string Name { get; set; }
+    public ICollection<Parichhed> Parichheds { get; set; } = [];
+}
+
+public class Parichhed
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string SerialNo { get; set; }
+    public int AnusuchiId { get; set; }
+    public Anusuchi Anusuchi { get; set; }
+    public ICollection<SubParichhed> SubParichheds { get; set; } = [];
+}
+
+public class SubParichhed
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string SerialNo { get; set; }
+    public Parichhed Parichhed { get; set; }
+    public int ParichhedId { get; set; }
+    public ICollection<SubSubParichhed> SubSubParichheds { get; set; } = [];
+}
+
+public class SubSubParichhed
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string SerialNo { get; set; }
+    public SubParichhed SubParichhed { get; set; }
+    public int SubParichhedId { get; set; }
 
 }

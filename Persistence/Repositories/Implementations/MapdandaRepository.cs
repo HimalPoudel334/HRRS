@@ -47,9 +47,9 @@ public class MapdandaRepository : IMapdandaRepository
         }
     }
 
-    public Task<List<Mapdanda>> GetByAnusuchiId(int anusuchi_id)
+    public Task<List<Mapdanda>> GetByAnusuchiId(int anusuchiId)
     {
-        return _context.Mapdandas.Where(x => x.AnusuchiNumber == anusuchi_id).ToListAsync();
+        return _context.Mapdandas.Where(x => x.AnusuchiId == anusuchiId).ToListAsync();
     }
 }
 

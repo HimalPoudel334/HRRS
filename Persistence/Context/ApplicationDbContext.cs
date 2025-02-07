@@ -15,7 +15,14 @@ public class ApplicationDbContext : DbContext
     public DbSet<Mapdanda> Mapdandas { get; set; }
     public DbSet<HospitalStandard> HospitalStandards { get; set; }
     public DbSet<HealthFacility> HealthFacilities { get; set; }
+    public DbSet<Anusuchi> Anusuchis { get; set; }
+    public DbSet<Parichhed> Parichheds { get; set; }
+    public DbSet<SubParichhed> SubParichheds { get; set; }
+    public DbSet<SubSubParichhed> SubSubParichheds { get; set; }
+    public DbSet<SubMapdanda> SubMapdandas { get; set; }
 
+
+    /*
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         optionsBuilder.UseSeeding((context, _) =>
         {
@@ -186,5 +193,7 @@ public class ApplicationDbContext : DbContext
                 await context.SaveChangesAsync(cancellationToken);
             }
         });
+    */
+
 }
 

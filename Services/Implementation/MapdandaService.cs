@@ -15,8 +15,8 @@ public class MapdandaService : IMapdandaService
 
     public async Task<ResultDto> Add(MapdandaDto dto)
     {
-        var serialNo = await _dbContext.Mapdandas.Where(x => x.AnusuchiNumber == dto.AnusuchiNumber).MaxAsync(x => x.SerialNumber);
-        var maxAnusuchiNo = await _dbContext.Mapdandas.MaxAsync(x => x.AnusuchiNumber);
+        var serialNo = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == dto.AnusuchiNumber).MaxAsync(x => x.SerialNumber);
+        var maxAnusuchiNo = await _dbContext.Mapdandas.MaxAsync(x => x.AnusuchiId);
         if (dto.AnusuchiNumber > (maxAnusuchiNo + 1))
         {
             return ResultDto.Failure($"Anusuchi number should not be greater than {maxAnusuchiNo + 1}");
@@ -26,7 +26,7 @@ public class MapdandaService : IMapdandaService
         {
             Name = dto.Name,
             SerialNumber = serialNo + 1,
-            AnusuchiNumber = dto.AnusuchiNumber
+            AnusuchiId = dto.AnusuchiNumber
         };
 
         await _dbContext.Mapdandas.AddAsync(mapdanda);
@@ -50,14 +50,14 @@ public class MapdandaService : IMapdandaService
         return ResultDto.Success();
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int? anusuchi_id)
+    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int? anusuchiId)
     {
 
         var mapdandas = _dbContext.Mapdandas.AsQueryable();
 
-        if (anusuchi_id != null)
+        if (anusuchiId != null)
         {
-            mapdandas = mapdandas.Where(x => x.AnusuchiNumber == anusuchi_id);
+            mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId);
         }
 
         var res = await mapdandas.Select(x => new MapdandaDto()
@@ -65,7 +65,7 @@ public class MapdandaService : IMapdandaService
             Id = x.Id,
             Name = x.Name,
             SerialNumber = x.SerialNumber,
-            AnusuchiNumber = x.AnusuchiNumber
+            AnusuchiNumber = x.AnusuchiId
         }).OrderBy(x=> x.SerialNumber)
         .OrderBy(x=> x.AnusuchiNumber)
         .ToListAsync();
