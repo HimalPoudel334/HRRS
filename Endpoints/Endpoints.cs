@@ -92,7 +92,7 @@ public static class Endpoints
 
         endpoints.MapGet("/api/getanusuchis/", async (IAnusuchiService service) => TypedResults.Ok(await service.GetAll()));
         endpoints.MapGet("/api/getanusuchi/{id}", async (int id, IAnusuchiService service) => TypedResults.Ok(await service.GetById(id)));
-
+        
         return endpoints;
     }
 }

@@ -88,6 +88,16 @@ public class ApplicationDbContext : DbContext
                 .WithOne(tv => tv.MapdandaTableHeader)
                 .HasForeignKey(tv => tv.MapdandaTableHeaderId)
                 .OnDelete(DeleteBehavior.Restrict); // Important!
+
+            b.HasOne(m => m.Anusuchi) // Relationship to Anusuchi
+                .WithMany(a => a.TableHeaders)
+                .HasForeignKey(m => m.AnusuchiId)
+                .OnDelete(DeleteBehavior.Restrict); // Important!
+
+            b.HasOne(m => m.Parichhed) // Relationship to Parichhed
+                .WithMany(p => p.TableHeaders)
+                .HasForeignKey(m => m.ParichhedId)
+                .OnDelete(DeleteBehavior.Restrict); // Important!
         });
 
         modelBuilder.Entity<MapdandaTableValue>(b => {
@@ -138,6 +148,86 @@ public class ApplicationDbContext : DbContext
                     };
                     anu.TableHeaders = tableHeaders;
                 }
+
+                //var anu4 = new Anusuchi
+                //{
+                //    RelatedToDafaNo = "दफा ३ सँग सम्बन्धित",
+                //    AnusuchiName = "औषधि संस्था (जनरल अस्पताल) को सेवा संचालन अनुमति, सेवा विस्तार, शाखा विस्तार, स्थानान्तरण, नवीकरण र स्तरोन्नति सम्बन्धी मापदण्ड",
+
+                //};
+
+                //var parichhed = new Parichhed() { ParichhedName = "स्वास्थ्य संस्था व्यवस्थापन सम्बन्धी मापदण्ड", Anusuchi = anu4 };
+                //var mapdandaTableHeaders = new List<MapdandaTableHeader>
+                //{
+                //    new() { CellName = "क्र.स.", Parichhed = parichhed, Anusuchi = anu4 },
+                //    new() { CellName = "मापदण्डहरू", Parichhed = parichhed },
+                //    new() { CellName = "कैफियत", Parichhed = parichhed, Anusuchi = anu4 }
+                //};
+                //var cell3rd = new MapdandaTableHeader
+                //{
+                //    CellName = "शय्या संख्या र छ/छैन",
+                //    Parichhed = parichhed,
+                //    Anusuchi = anu4,
+                //};
+                //cell3rd.SubCells = new List<MapdandaTableHeader> {
+                //    new MapdandaTableHeader { CellName = "२५", ParentCell = cell3rd, Parichhed = parichhed, Anusuchi = anu4 },
+                //    new MapdandaTableHeader { CellName = "५०", ParentCell = cell3rd, Parichhed = parichhed, Anusuchi = anu4 },
+                //    new MapdandaTableHeader { CellName = "१००", ParentCell = cell3rd, Parichhed = parichhed, Anusuchi = anu4 },
+                //    new MapdandaTableHeader { CellName = "२००", ParentCell = cell3rd, Parichhed = parichhed, Anusuchi = anu4 },
+                //};
+                //mapdandaTableHeaders.Add(cell3rd);
+                //parichhed.TableHeaders = mapdandaTableHeaders;
+                //parichhed.Mapdandas = new List<Mapdanda> {
+                //    new Mapdanda() { SerialNumber = 1, Name = "बिरहङ्ग विभागमा बिरामीको चापका आधारमा छिटो छरितो सेवा दिनको लागि अनलाइन वा टोकन वा अन्य उपयुक्त विधिको व्यवस्था गरेको", Parichhed = parichhed, Anusuchi = anu4 },
+                //    new Mapdanda() { SerialNumber = 2, Name = "स्वास्थ्य संस्थामा उपचारका लागि आउने बेवारिसे, अति गरिब, विपन्न, अपाङ्गता भएका विपन्न र असहाय बिरामीका लागि कुल शय्याको दश प्रतिशत शय्या छुट्याई उपलब्ध सेवा, औषधी तथा उपचार खर्च सोही अस्पतालले व्यहोर्ने सुनिश्चितता भएको (नवीकरण वा स्तरोन्नतिका लागि विवरणसहित)", Parichhed = parichhed, Anusuchi = anu4 },
+                //    new Mapdanda() { SerialNumber = 3, Name = "क्रम संख्या २ बमोजिमको सेवाको अभिलेख राखी सम्बन्धित निकायमा सोको प्रतिवेदन नियमित रूपमा पठाउने गरेको", Parichhed = parichhed, Anusuchi = anu4 },
+                //    new Mapdanda() { SerialNumber = 4, Name = "स्वास्थ्य संस्थामा तथ्याङ्क व्यवस्थापन इकाईको व्यवस्था भएको र सूचनाको विद्युतीय व्यवस्थापनलाई प्राथमिकता दिएको", Parichhed = parichhed, Anusuchi = anu4 },
+                //    new Mapdanda() { SerialNumber = 5, Name = "सेवा कक्षको अवस्थितिको रूपमा संकेत (Navigation) सवैले देख्ने ठाउँमा राखेको", Parichhed = parichhed, Anusuchi = anu4 },
+                //    new Mapdanda() { SerialNumber = 6, Name = "स्वास्थ्य संस्थाले आफ्ना कर्मचारीलाई पारदर्शी बैंकिङ प्रणालीमार्फत भुक्तानी गर्ने व्यवस्था गरी भुक्तानी भएको Pay roll महाशाखामा बुझाउने गरेको", Parichhed = parichhed, Anusuchi = anu4 },
+                //    new Mapdanda() { SerialNumber = 7, Name = "स्वास्थ्य संस्थाले सेवा शुल्क सम्बन्धी विवरण सवैले देख्ने ठाउँमा राखेको", Parichhed = parichhed, Anusuchi = anu4 },
+                //    new Mapdanda() { SerialNumber = 8, Name = "स्व-मूल्याङ्कनमा गलत विवरण उल्लेख गरेमा वा यस मापदण्डको पालना नगरेमा वा नगराएमा सो सम्बन्धमा प्रचलित कानून बमोजिम कारबाही हुनेछ", Parichhed = parichhed, Anusuchi = anu4 },
+                //};
+
+                //anu4.Parichheds = new List<Parichhed>() { parichhed };
+
+                //add anusuchi 4
+                //var anuIV = new Anusuchi
+                //{
+                //    RelatedToDafaNo = "दफा ३ सँग सम्बन्धित",
+                //    AnusuchiName = "औषधि संस्था (जनरल अस्पताल) को सेवा संचालन अनुमति, सेवा विस्तार, शाखा विस्तार, स्थानान्तरण, नवीकरण र स्तरोन्नति सम्बन्धी मापदण्ड",
+                //    Parichheds = [
+                //        new() {
+                //            ParichhedName = "औषधि संस्था (जनरल अस्पताल) को सेवा संचालन अनुमति, सेवा विस्तार, शाखा विस्तार, स्थानान्तरण, नवीकरण र स्तरोन्नति सम्बन्धी मापदण्ड",
+                //            TableHeaders = [
+                //                new() { CellName = "क्र.स." },
+                //                new() { CellName = "मापदण्डहरू" },
+                //                new() { CellName = "शय्या संख्या र छ/छैन", SubCells = [
+                //                    new() { CellName = "२५" },
+                //                    new() { CellName = "५०" },
+                //                    new() { CellName = "१००" },
+                //                    new() { CellName = "२००" },
+                //                ]},
+                //                new() { CellName = "कैफियत" }
+                //            ],
+                //            Mapdandas = [
+                //                new () { SerialNumber = 1, Name = "बिरहङ्ग विभागमा बिरामीको चापका आधारमा छिटो छरितो सेवा दिनको लागि अनलाइन वा टोकन वा अन्य उपयुक्त विधिको व्यवस्था गरेको" },
+                //                new () { SerialNumber = 2, Name = "स्वास्थ्य संस्थामा उपचारका लागि आउने बेवारिसे, अति गरिब, विपन्न, अपाङ्गता भएका विपन्न र असहाय बिरामीका लागि कुल शय्याको दश प्रतिशत शय्या छुट्याई उपलब्ध सेवा, औषधी तथा उपचार खर्च सोही अस्पतालले व्यहोर्ने सुनिश्चितता भएको (नवीकरण वा स्तरोन्नतिका लागि विवरणसहित)" },
+                //                new () { SerialNumber = 3, Name = "क्रम संख्या २ बमोजिमको सेवाको अभिलेख राखी सम्बन्धित निकायमा सोको प्रतिवेदन नियमित रूपमा पठाउने गरेको" },
+                //                new () { SerialNumber = 4, Name = "स्वास्थ्य संस्थामा तथ्याङ्क व्यवस्थापन इकाईको व्यवस्था भएको र सूचनाको विद्युतीय व्यवस्थापनलाई प्राथमिकता दिएको" },
+                //                new () { SerialNumber = 5, Name = "सेवा कक्षको अवस्थितिको रूपमा संकेत (Navigation) सवैले देख्ने ठाउँमा राखेको" },
+                //                new () { SerialNumber = 6, Name = "स्वास्थ्य संस्थाले आफ्ना कर्मचारीलाई पारदर्शी बैंकिङ प्रणालीमार्फत भुक्तानी गर्ने व्यवस्था गरी भुक्तानी भएको Pay roll महाशाखामा बुझाउने गरेको" },
+                //                new () { SerialNumber = 7, Name = "स्वास्थ्य संस्थाले सेवा शुल्क सम्बन्धी विवरण सवैले देख्ने ठाउँमा राखेको" },
+                //                new () { SerialNumber = 8, Name = "स्व-मूल्याङ्कनमा गलत विवरण उल्लेख गरेमा वा यस मापदण्डको पालना नगरेमा वा नगराएमा सो सम्बन्धमा प्रचलित कानून बमोजिम कारबाही हुनेछ" },
+
+                //            ]
+
+                //        }
+                //    ],
+
+
+                //};
+
+                //anusuchis.Add(anu4);
 
 
                 context.Set<Anusuchi>().AddRange(anusuchis);
@@ -252,12 +342,89 @@ public class ApplicationDbContext : DbContext
                     anu.TableHeaders = tableHeaders;
                 }
 
+                ////add anusuchi 4
+                //var anu4 = new Anusuchi
+                //{
+                //    RelatedToDafaNo = "दफा ३ सँग सम्बन्धित",
+                //    AnusuchiName = "औषधि संस्था (जनरल अस्पताल) को सेवा संचालन अनुमति, सेवा विस्तार, शाखा विस्तार, स्थानान्तरण, नवीकरण र स्तरोन्नति सम्बन्धी मापदण्ड",
+                //    Parichheds = [
+                //        new() {
+                //            ParichhedName = "औषधि संस्था (जनरल अस्पताल) को सेवा संचालन अनुमति, सेवा विस्तार, शाखा विस्तार, स्थानान्तरण, नवीकरण र स्तरोन्नति सम्बन्धी मापदण्ड",
+                //            TableHeaders = [
+                //                new() { CellName = "क्र.स." },
+                //                new() { CellName = "मापदण्डहरू" },
+                //                new() { CellName = "शय्या संख्या र छ/छैन", SubCells = [
+                //                    new() { CellName = "२५" },
+                //                    new() { CellName = "५०" },
+                //                    new() { CellName = "१००" },
+                //                    new() { CellName = "२००" },
+                //                ]},
+                //                new() { CellName = "कैफियत" }
+                //            ],
+                //            Mapdandas = [
+                //                new () { SerialNumber = 1, Name = "बिरहङ्ग विभागमा बिरामीको चापका आधारमा छिटो छरितो सेवा दिनको लागि अनलाइन वा टोकन वा अन्य उपयुक्त विधिको व्यवस्था गरेको" },
+                //                new () { SerialNumber = 2, Name = "स्वास्थ्य संस्थामा उपचारका लागि आउने बेवारिसे, अति गरिब, विपन्न, अपाङ्गता भएका विपन्न र असहाय बिरामीका लागि कुल शय्याको दश प्रतिशत शय्या छुट्याई उपलब्ध सेवा, औषधी तथा उपचार खर्च सोही अस्पतालले व्यहोर्ने सुनिश्चितता भएको (नवीकरण वा स्तरोन्नतिका लागि विवरणसहित)" },
+                //                new () { SerialNumber = 3, Name = "क्रम संख्या २ बमोजिमको सेवाको अभिलेख राखी सम्बन्धित निकायमा सोको प्रतिवेदन नियमित रूपमा पठाउने गरेको" },
+                //                new () { SerialNumber = 4, Name = "स्वास्थ्य संस्थामा तथ्याङ्क व्यवस्थापन इकाईको व्यवस्था भएको र सूचनाको विद्युतीय व्यवस्थापनलाई प्राथमिकता दिएको" },
+                //                new () { SerialNumber = 5, Name = "सेवा कक्षको अवस्थितिको रूपमा संकेत (Navigation) सवैले देख्ने ठाउँमा राखेको" },
+                //                new () { SerialNumber = 6, Name = "स्वास्थ्य संस्थाले आफ्ना कर्मचारीलाई पारदर्शी बैंकिङ प्रणालीमार्फत भुक्तानी गर्ने व्यवस्था गरी भुक्तानी भएको Pay roll महाशाखामा बुझाउने गरेको" },
+                //                new () { SerialNumber = 7, Name = "स्वास्थ्य संस्थाले सेवा शुल्क सम्बन्धी विवरण सवैले देख्ने ठाउँमा राखेको" },
+                //                new () { SerialNumber = 8, Name = "स्व-मूल्याङ्कनमा गलत विवरण उल्लेख गरेमा वा यस मापदण्डको पालना नगरेमा वा नगराएमा सो सम्बन्धमा प्रचलित कानून बमोजिम कारबाही हुनेछ" },
+
+                //            ]
+
+                //        }
+                //    ],
+                //};
+
+                /*var anu4 = new Anusuchi
+                {
+                    RelatedToDafaNo = "दफा ३ सँग सम्बन्धित",
+                    AnusuchiName = "औषधि संस्था (जनरल अस्पताल) को सेवा संचालन अनुमति, सेवा विस्तार, शाखा विस्तार, स्थानान्तरण, नवीकरण र स्तरोन्नति सम्बन्धी मापदण्ड",
+
+                };
+
+                var parichhed = new Parichhed() { ParichhedName = "स्वास्थ्य संस्था व्यवस्थापन सम्बन्धी मापदण्ड", Anusuchi = anu4 };
+                var mapdandaTableHeaders = new List<MapdandaTableHeader>
+                {
+                    new() { CellName = "क्र.स.", Parichhed = parichhed, Anusuchi = anu4 },
+                    new() { CellName = "मापदण्डहरू", Parichhed = parichhed },
+                    new() { CellName = "कैफियत", Parichhed = parichhed, Anusuchi = anu4 }
+                };
+                var cell3rd = new MapdandaTableHeader
+                {
+                    CellName = "शय्या संख्या र छ/छैन",
+                    Parichhed = parichhed,
+                    Anusuchi = anu4,
+                };
+                cell3rd.SubCells = new List<MapdandaTableHeader> {
+                    new MapdandaTableHeader { CellName = "२५", ParentCell = cell3rd, Parichhed = parichhed, Anusuchi = anu4 },
+                    new MapdandaTableHeader { CellName = "५०", ParentCell = cell3rd, Parichhed = parichhed, Anusuchi = anu4 },
+                    new MapdandaTableHeader { CellName = "१००", ParentCell = cell3rd, Parichhed = parichhed, Anusuchi = anu4 },
+                    new MapdandaTableHeader { CellName = "२००", ParentCell = cell3rd, Parichhed = parichhed, Anusuchi = anu4 },
+                };
+                mapdandaTableHeaders.Add(cell3rd);
+                parichhed.TableHeaders = mapdandaTableHeaders;
+                parichhed.Mapdandas = new List<Mapdanda> {
+                    new Mapdanda() { SerialNumber = 1, Name = "बिरहङ्ग विभागमा बिरामीको चापका आधारमा छिटो छरितो सेवा दिनको लागि अनलाइन वा टोकन वा अन्य उपयुक्त विधिको व्यवस्था गरेको", Parichhed = parichhed, Anusuchi = anu4 },
+                    new Mapdanda() { SerialNumber = 2, Name = "स्वास्थ्य संस्थामा उपचारका लागि आउने बेवारिसे, अति गरिब, विपन्न, अपाङ्गता भएका विपन्न र असहाय बिरामीका लागि कुल शय्याको दश प्रतिशत शय्या छुट्याई उपलब्ध सेवा, औषधी तथा उपचार खर्च सोही अस्पतालले व्यहोर्ने सुनिश्चितता भएको (नवीकरण वा स्तरोन्नतिका लागि विवरणसहित)", Parichhed = parichhed, Anusuchi = anu4 },
+                    new Mapdanda() { SerialNumber = 3, Name = "क्रम संख्या २ बमोजिमको सेवाको अभिलेख राखी सम्बन्धित निकायमा सोको प्रतिवेदन नियमित रूपमा पठाउने गरेको", Parichhed = parichhed, Anusuchi = anu4 },
+                    new Mapdanda() { SerialNumber = 4, Name = "स्वास्थ्य संस्थामा तथ्याङ्क व्यवस्थापन इकाईको व्यवस्था भएको र सूचनाको विद्युतीय व्यवस्थापनलाई प्राथमिकता दिएको", Parichhed = parichhed, Anusuchi = anu4 },
+                    new Mapdanda() { SerialNumber = 5, Name = "सेवा कक्षको अवस्थितिको रूपमा संकेत (Navigation) सवैले देख्ने ठाउँमा राखेको", Parichhed = parichhed, Anusuchi = anu4 },
+                    new Mapdanda() { SerialNumber = 6, Name = "स्वास्थ्य संस्थाले आफ्ना कर्मचारीलाई पारदर्शी बैंकिङ प्रणालीमार्फत भुक्तानी गर्ने व्यवस्था गरी भुक्तानी भएको Pay roll महाशाखामा बुझाउने गरेको", Parichhed = parichhed, Anusuchi = anu4 },
+                    new Mapdanda() { SerialNumber = 7, Name = "स्वास्थ्य संस्थाले सेवा शुल्क सम्बन्धी विवरण सवैले देख्ने ठाउँमा राखेको", Parichhed = parichhed, Anusuchi = anu4 },
+                    new Mapdanda() { SerialNumber = 8, Name = "स्व-मूल्याङ्कनमा गलत विवरण उल्लेख गरेमा वा यस मापदण्डको पालना नगरेमा वा नगराएमा सो सम्बन्धमा प्रचलित कानून बमोजिम कारबाही हुनेछ", Parichhed = parichhed, Anusuchi = anu4 },
+                };
+
+                anu4.Parichheds = new List<Parichhed>() { parichhed };*/
+                //anusuchis.Add(anu4);
+
                 await context.Set<Anusuchi>().AddRangeAsync(anusuchis, cancellationToken);
                 await context.SaveChangesAsync(cancellationToken);
             }
 
 
-            var mapdanda = context.Set<Mapdanda>().FirstOrDefault();
+            var mapdanda = await context.Set<Mapdanda>().FirstOrDefaultAsync(cancellationToken);
             if (mapdanda is null)
             {
                 List<Mapdanda> mapdandas = [

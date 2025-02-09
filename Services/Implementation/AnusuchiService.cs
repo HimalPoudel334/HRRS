@@ -1,4 +1,4 @@
-
+﻿
 using HRRS.Dto;
 using HRRS.Dto.Anusuchi;
 using HRRS.Dto.MapdandaTableHeader;
@@ -19,16 +19,16 @@ public class AnusuchiService : IAnusuchiService
     {
         _context = context;
     }
-
+    
     public async Task<ResultDto> Create(AnusuchiDto dto)
     {
         var anusuchi = new Anusuchi()
         {
             AnusuchiName = dto.AnusuchiName,
-            RelatedToDafaNo = dto.RelatedToDafaNo,    
+            RelatedToDafaNo = dto.RelatedToDafaNo,
         };
 
-        if(dto.Parichheds.Count >  0)
+        if (dto.Parichheds.Count > 0)
         {
             anusuchi.Parichheds = [];
             foreach (var parichhed in dto.Parichheds)
@@ -38,7 +38,7 @@ public class AnusuchiService : IAnusuchiService
 
         }
 
-        if(dto.Mapdandas.Count > 0)
+        if (dto.Mapdandas.Count > 0)
         {
             anusuchi.Mapdandas = [];
             foreach (var mapdanda in dto.Mapdandas)
@@ -68,7 +68,7 @@ public class AnusuchiService : IAnusuchiService
 
         anusuchi.AnusuchiName = dto.AnusuchiName;
         anusuchi.RelatedToDafaNo = dto.RelatedToDafaNo;
-        
+
         await _context.SaveChangesAsync();
 
         return ResultDto.Success();
@@ -76,10 +76,25 @@ public class AnusuchiService : IAnusuchiService
 
     public async Task<ResultWithDataDto<AnusuchiDto?>> GetById(int id)
     {
-        var anusuchi = await _context.Anusuchis.Include(x => x.Parichheds).Include(p => p.Mapdandas).Include(x => x.TableHeaders).FirstOrDefaultAsync(a => a.Id == id);
+        var anusuchi = await _context.Anusuchis.Include(x => x.Parichheds).FirstOrDefaultAsync(x => x.Id == id);
         if (anusuchi == null)
         {
             return ResultWithDataDto<AnusuchiDto?>.Failure("Anusuchi not found");
+        }
+        if (anusuchi.Parichheds.Count == 0)
+        {
+            anusuchi.TableHeaders = await _context.MapdandaTableHeaders.Where(x => x.AnusuchiId == id).ToListAsync();
+            anusuchi.Mapdandas = await _context.Mapdandas.Where(x => x.AnusuchiId == id).ToListAsync();
+        }
+        else
+        {
+            anusuchi.Parichheds = await _context.Parichheds.Include(x => x.SubParichheds).Where(x => x.AnusuchiId == id).ToListAsync();
+            foreach (var parichhed in anusuchi.Parichheds)
+            {
+                await AttachParichhedTableHeaders(parichhed);
+
+            }
+            anusuchi.TableHeaders = [];
         }
 
         var anusuchiDto = ReturnAnusuchiDto(anusuchi);
@@ -88,13 +103,46 @@ public class AnusuchiService : IAnusuchiService
 
     }
 
+    private async Task AttachParichhedTableHeaders(Parichhed parichhed)
+    {
+        if (parichhed.SubParichheds.Count == 0)
+        {
+            parichhed.TableHeaders = await _context.MapdandaTableHeaders.Include(x => x.SubCells).Where(x => x.ParichhedId == parichhed.Id && x.ParentCellId == null).ToListAsync();
+            parichhed.Mapdandas = await _context.Mapdandas.Include(x => x.SubMapdandas).Where(x => x.ParichhedId == parichhed.Id && x.ParentMapdandaId == null).ToListAsync();
+
+        }
+        else
+        {
+            foreach (var subParichhed in parichhed.SubParichheds)
+            {
+                await AttachParichhedTableHeaders(subParichhed);
+            }
+            parichhed.TableHeaders = [];
+        }
+
+    }
+
     public async Task<ResultWithDataDto<IEnumerable<AnusuchiDto>>> GetAll()
     {
-        var anusuchis = await _context.Anusuchis.Include(x => x.Parichheds).Include(p => p.Mapdandas).Include(x => x.TableHeaders).AsSplitQuery().ToListAsync();
+        var anusuchis = await _context.Anusuchis.Include(x => x.Parichheds).ToListAsync();
         var anusuchiDtos = new List<AnusuchiDto>();
 
         foreach (var anusuchi in anusuchis)
         {
+            if (anusuchi.Parichheds.Count == 0)
+            {
+                anusuchi.TableHeaders = await _context.MapdandaTableHeaders.Where(x => x.AnusuchiId == anusuchi.Id).ToListAsync();
+                anusuchi.Mapdandas = await _context.Mapdandas.Where(x => x.AnusuchiId == anusuchi.Id).ToListAsync();
+            }
+            else
+            {
+                foreach (var parichhed in anusuchi.Parichheds)
+                {
+                    await AttachParichhedTableHeaders(parichhed);
+
+                }
+                anusuchi.TableHeaders = [];
+            }
             anusuchiDtos.Add(ReturnAnusuchiDto(anusuchi));
         }
         return ResultWithDataDto<IEnumerable<AnusuchiDto>>.Success(anusuchiDtos);
@@ -162,15 +210,6 @@ public class AnusuchiService : IAnusuchiService
             RelatedToDafaNo = anusuchi.RelatedToDafaNo,
         };
 
-        if(anusuchi.TableHeaders.Count > 0)
-        {
-            foreach(var tableHeader in anusuchi.TableHeaders)
-            {
-                anusuchiDto.MapdandaTableHeaders.Add(AttachMapdandaTableHeaderDto(tableHeader));
-            }
-
-        }
-
         if (anusuchi.Parichheds.Count > 0)
         {
             anusuchiDto.Parichheds = [];
@@ -179,16 +218,19 @@ public class AnusuchiService : IAnusuchiService
                 anusuchiDto.Parichheds.Add(AttachParichhedDto(parichhed));
             }
         }
+
+
         else
         {
-            if (anusuchi.Mapdandas.Count > 0)
+            foreach (var tableHeader in anusuchi.TableHeaders)
             {
-                anusuchiDto.Mapdandas = [];
-                foreach (var mapdanda in anusuchi.Mapdandas)
-                {
-                    anusuchiDto.Mapdandas.Add(AttachMapdandaDto(mapdanda));
-                }
-                
+                anusuchiDto.TableHeaders.Add(AttachMapdandaTableHeaderDto(tableHeader));
+            }
+            
+            anusuchiDto.Mapdandas = [];
+            foreach (var mapdanda in anusuchi.Mapdandas)
+            {
+                anusuchiDto.Mapdandas.Add(AttachMapdandaDto(mapdanda));
             }
 
         }
@@ -215,8 +257,14 @@ public class AnusuchiService : IAnusuchiService
             }
         }
 
-        if (parichhed.Mapdandas.Count > 0)
+        else
         {
+            dto.TableHeaders = [];
+            foreach (var tableHeader in parichhed.TableHeaders)
+            {
+                dto.TableHeaders.Add(AttachMapdandaTableHeaderDto(tableHeader));
+            }
+
             dto.Mapdandas = [];
             foreach (var mapdanda in parichhed.Mapdandas)
             {
@@ -224,14 +272,6 @@ public class AnusuchiService : IAnusuchiService
             }
         }
 
-        if(parichhed.TableHeaders.Count > 0)
-        {
-            dto.TableHeaders = [];
-            foreach (var tableHeader in parichhed.TableHeaders)
-            {
-                dto.TableHeaders.Add(AttachMapdandaTableHeaderDto(tableHeader));
-            }
-        }
         return dto;
     }
 
