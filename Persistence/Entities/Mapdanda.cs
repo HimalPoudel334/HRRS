@@ -15,6 +15,7 @@ public class Mapdanda
     public int  Id { get; set; }
     public int SerialNumber { get; set; }
     public string Name { get; set; }
+    public string? Parimaad { get; set; }
     public bool IsAvailableDivided { get; set; }
     public bool Is25Active { get; set; }
     public bool Is50Active { get; set; }
@@ -40,6 +41,7 @@ public class SubMapdanda
     public int Id { get; set; }
     public int SerialNumber { get; set; }
     public string Name { get; set; }
+    public string? Parimaad { get; set; }
     public int MapdandaId { get; set; }
     public Mapdanda Mapdanda { get; set; }
 }

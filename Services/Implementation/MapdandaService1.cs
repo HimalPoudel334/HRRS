@@ -34,7 +34,8 @@ public class MapdandaService1 : IMapdandaService1
         {
             Name = dto.Name,
             SerialNumber = serialNo + 1,
-            Anusuchi = anusuchi
+            Anusuchi = anusuchi,
+            Parimaad = dto.Parimaad,
 
         };
 
@@ -83,6 +84,7 @@ public class MapdandaService1 : IMapdandaService1
         }
 
         mapdanda.Name = dto.Name;
+        mapdanda.Parimaad = dto.Parimaad;
 
         if (dto.ParichhedId.HasValue)
         {
@@ -144,6 +146,7 @@ public class MapdandaService1 : IMapdandaService1
             Is50Active = mapdanda.Is50Active,
             Is25Active = mapdanda.Is25Active,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
+            Parimaad = mapdanda.Parimaad
         }).OrderBy(x => x.SerialNumber)
         .OrderBy(x => x.AnusuchiId)
         .ToListAsync();
@@ -172,6 +175,7 @@ public class MapdandaService1 : IMapdandaService1
             Is50Active = mapdanda.Is50Active,
             Is25Active = mapdanda.Is25Active,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
+            Parimaad = mapdanda.Parimaad
         };
         return ResultWithDataDto<MapdandaDto1>.Success(dto);
     }
@@ -200,6 +204,7 @@ public class MapdandaService1 : IMapdandaService1
             Is50Active = mapdanda.Is50Active,
             Is25Active = mapdanda.Is25Active,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
+            Parimaad = mapdanda.Parimaad
         }).OrderBy(x => x.SerialNumber)
         .OrderBy(x => x.AnusuchiId)
         .ToListAsync();
@@ -218,7 +223,8 @@ public class MapdandaService1 : IMapdandaService1
         {
             Name = dto.Name,
             SerialNumber = dto.SerialNumber,
-            Mapdanda = mapdanda
+            Mapdanda = mapdanda,
+            Parimaad = dto.Parimaad
         };
         await _dbContext.SubMapdandas.AddAsync(subMapdanda);
         await _dbContext.SaveChangesAsync();
@@ -240,6 +246,7 @@ public class MapdandaService1 : IMapdandaService1
         subMapdanda.Name = dto.Name;
         subMapdanda.SerialNumber = dto.SerialNumber;
         subMapdanda.Mapdanda = mapdanda;
+        subMapdanda.Parimaad = dto.Parimaad;
         await _dbContext.SaveChangesAsync();
         return ResultDto.Success();
     }
@@ -251,7 +258,8 @@ public class MapdandaService1 : IMapdandaService1
             Id = x.Id,
             Name = x.Name,
             SerialNumber = x.SerialNumber,
-            MapdandaId = x.MapdandaId
+            MapdandaId = x.MapdandaId,
+            Parimaad = x.Parimaad
         }).ToListAsync();
         return ResultWithDataDto<List<SubMapdandaDto>>.Success(subMapdandas);
     }
@@ -268,7 +276,8 @@ public class MapdandaService1 : IMapdandaService1
             Id = subMapdanda.Id,
             Name = subMapdanda.Name,
             SerialNumber = subMapdanda.SerialNumber,
-            MapdandaId = subMapdanda.MapdandaId
+            MapdandaId = subMapdanda.MapdandaId,
+            Parimaad = subMapdanda.Parimaad
         };
         return ResultWithDataDto<SubMapdandaDto>.Success(dto);
     }
@@ -299,6 +308,7 @@ public class MapdandaService1 : IMapdandaService1
             Is50Active = mapdanda.Is50Active,
             Is25Active = mapdanda.Is25Active,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
+            Parimaad = mapdanda.Parimaad,
         }).OrderBy(x => x.SerialNumber)
         .OrderBy(x => x.AnusuchiId)
         .ToListAsync();
@@ -337,6 +347,7 @@ public class MapdandaService1 : IMapdandaService1
             Is50Active = mapdanda.Is50Active,
             Is25Active = mapdanda.Is25Active,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
+            Parimaad = mapdanda.Parimaad
         }).OrderBy(x => x.SerialNumber)
         .OrderBy(x => x.AnusuchiId)
         .ToListAsync();

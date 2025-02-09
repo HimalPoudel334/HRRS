@@ -1,4 +1,6 @@
 
+using HRRS.Dto.Parichhed;
+
 namespace HRRS.Dto.Anusuchi;
 
 public class AnusuchiDto
@@ -7,4 +9,5 @@ public class AnusuchiDto
     public int? SerialNo { get; set; }
     public string Name { get; set; }
     public string DafaNo { get; set; }
+    public ICollection<ParichhedDto> Parichheds { get; set; } = [];
 }
