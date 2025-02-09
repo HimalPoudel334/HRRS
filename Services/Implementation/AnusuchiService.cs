@@ -72,12 +72,31 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
             Name = anusuchi.Name,
             DafaNo = anusuchi.DafaNo,
             SerialNo = anusuchi.SerialNo,
-            Parichheds = anusuchi.Parichheds.Select(p => new ParichhedDto()
-            {
-                Id = p.Id,
-                Name = p.Name
-            }).ToList()
         };
+
+        if (anusuchi.Parichheds == null || anusuchi.Parichheds.Count == 0) {
+            dto.Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == null).Select(x => new MapdandaDto1()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                AnusuchiId = x.AnusuchiId,
+                ParichhedId = x.ParichhedId,
+                Is25Active = x.Is25Active,
+                Is50Active = x.Is50Active,
+                Is100Active = x.Is100Active,
+                Is200Active = x.Is200Active,
+                Parimaad = x.Parimaad,
+                IsAvailableDivided = x.IsAvailableDivided,
+                SerialNumber = x.SerialNumber,
+                SubParichhedId = x.SubParichhedId,
+                SubSubParichhedId = x.SubSubParichhedId
+            }).ToListAsync();
+
+            return ResultWithDataDto<AnusuchiDto>.Success(dto);
+
+
+        }
+
 
         return ResultWithDataDto<AnusuchiDto>.Success(dto);
        

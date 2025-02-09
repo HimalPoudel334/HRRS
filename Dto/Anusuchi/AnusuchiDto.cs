@@ -10,4 +10,5 @@ public class AnusuchiDto
     public string Name { get; set; }
     public string DafaNo { get; set; }
     public ICollection<ParichhedDto> Parichheds { get; set; } = [];
+    public ICollection<MapdandaDto1> Mapdandas { get; set; } = [];
 }

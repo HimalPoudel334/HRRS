@@ -1,7 +1,7 @@
 public class Anusuchi
 {
     public int Id { get; set; }
-    public int SerialNo { get; set; }
+    public string SerialNo { get; set; }
     public string Name { get; set; }
     public string DafaNo { get; set; }
     public ICollection<Parichhed> Parichheds { get; set; } = [];
