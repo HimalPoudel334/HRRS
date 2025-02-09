@@ -6,4 +6,5 @@ public interface IMapdandaService
     Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int? anusuchi_id);
     Task<ResultDto> Add(MapdandaDto dto);
     Task<ResultDto> UpdateMapdanda(int mapdandaId, MapdandaDto dto);
+    Task<ResultDto> ToggleStatus(int mapdandaId);
 }

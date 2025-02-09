@@ -20,7 +20,6 @@ public class HospitalMapdandasDto
     public string? Remarks { get; set; }
     public string? FilePath { get; set; }
     public string? FiscalYear { get; set; }
-    public bool? Status { get; set; }
 }
 
 public class HospitalStandardPartialDto {
@@ -55,5 +54,4 @@ public class HospitalMapdandasDto1
     public string? Remarks { get; set; }
     public string? FilePath { get; set; }
     public string? FiscalYear { get; set; }
-    public bool? Status { get; set; }
 }

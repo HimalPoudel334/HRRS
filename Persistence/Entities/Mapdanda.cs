@@ -3,14 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 public class Mapdanda
 {
-    public Mapdanda()
-    {
-        IsAvailableDivided = false;
-        Is25Active = true;
-        Is50Active = true;
-        Is100Active = true;
-        Is200Active = true;
-    }
 
     public int  Id { get; set; }
     public string SerialNumber { get; set; }
@@ -21,6 +13,7 @@ public class Mapdanda
     public bool Is50Active { get; set; }
     public bool Is100Active { get; set; }
     public bool Is200Active { get; set; }
+    public bool Status { get; set; } = true;
     public int AnusuchiId { get; set; }
     public Anusuchi Anusuchi { get; set; }
 
@@ -44,5 +37,7 @@ public class SubMapdanda
     public string? Parimaad { get; set; }
     public int MapdandaId { get; set; }
     public Mapdanda Mapdanda { get; set; }
+    public bool Status { get; set; }
+
 }
 

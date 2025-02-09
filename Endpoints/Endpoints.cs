@@ -29,18 +29,19 @@ public static class Endpoints
             return TypedResults.Ok(await service.RegisterHospitalAsync(dto));
         });
 
-        endpoints.MapGet("api/mapdanda/", async ([FromQuery] string? anusuchi_id, IMapdandaService mapdandaService) =>
+        endpoints.MapGet("api/mapdanda/", async ([FromQuery] string? anusuchiId, IMapdandaService mapdandaService) =>
         {
-            int? parsedId = string.IsNullOrWhiteSpace(anusuchi_id) ? null : int.Parse(anusuchi_id);
+            int? parsedId = string.IsNullOrWhiteSpace(anusuchiId) ? null : int.Parse(anusuchiId);
             return TypedResults.Ok(await mapdandaService.GetByAnusuchi(parsedId));
         });
 
         endpoints.MapPost("api/mapdanda/", [Authorize(Roles = "SuperAdmin")] async (MapdandaDto dto, IMapdandaService mapdandaService) =>
             TypedResults.Ok(await mapdandaService.Add(dto)));
 
-        endpoints.MapPut("api/mapdanda/", [Authorize(Roles = "SuperAdmin")] async (int mapdandaId, MapdandaDto dto, IMapdandaService mapdandaService) =>
+        endpoints.MapPut("api/mapdanda/{mapdandaId}/update", [Authorize(Roles = "SuperAdmin")] async (int mapdandaId, MapdandaDto dto, IMapdandaService mapdandaService) =>
             TypedResults.Ok(await mapdandaService.UpdateMapdanda(mapdandaId, dto)));
 
+        endpoints.MapPost("api/Mapdanda/{mapdandaId}/toggle-status", async (int mapdandaId, IMapdandaService service) => TypedResults.Ok(await service.ToggleStatus(mapdandaId)));
 
         endpoints.MapGet("api/HealthFacility", async (IHealthFacilityService service, HttpContext context) =>
         {
@@ -127,7 +128,7 @@ public static class Endpoints
         endpoints.MapPost("api/SubSubParichhed", async (SubSubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.CreateSubSubParichhed(dto)));
         endpoints.MapPut("api/SubSubParichhed", async (int subSubParichhedId, SubSubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.UpdateSubSubParichhed(subSubParichhedId, dto)));
         endpoints.MapGet("api/SubSubParichhed", async (IParichhedService service) => TypedResults.Ok(await service.GetAllSubSubParichheds()));
-        endpoints.MapGet("api/SubSubParichhed/SubParichhed", async (int subParichhedId, IParichhedService service) => TypedResults.Ok(await service.GetSubSubParichhedsBySubParichhed(subParichhedId)));
+        endpoints.MapGet("api/SubSubParichhed/SubParichhed/{subParichhedId}", async (int subParichhedId, IParichhedService service) => TypedResults.Ok(await service.GetSubSubParichhedsBySubParichhed(subParichhedId)));
         endpoints.MapGet("api/SubSubParichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetSubSubParichhedById(id)));
 
         //hospital standard1 services
@@ -141,8 +142,8 @@ public static class Endpoints
         endpoints.MapGet("api/v2/Mapdanda/{id}", async (int id, IMapdandaService1 service) => TypedResults.Ok(await service.GetById(id)));
         endpoints.MapGet("api/v2/Mapdanda/Anusuchi", async ([FromQuery] int? anusuchiId, IMapdandaService1 service) => TypedResults.Ok(await service.GetByAnusuchi(anusuchiId)));
         endpoints.MapGet("api/v2/Mapdanda/Parichhed", async ([FromQuery] int parichhedId, [FromQuery] int? anusuchiId, IMapdandaService1 service) => TypedResults.Ok(await service.GetByParichhed(parichhedId, anusuchiId)));
-        endpoints.MapPost("api/v2/Mapdanda", async (MapdandaDto1 dto, IMapdandaService1 service) => TypedResults.Ok(await service.Add(dto)));
-        endpoints.MapPut("api/v2/Mapdanda", async (int mapdandaId, MapdandaDto1 dto, IMapdandaService1 service) => TypedResults.Ok(await service.UpdateMapdanda(mapdandaId, dto)));
+        endpoints.MapPost("api/v2/Mapdanda", async (MapdandaDto dto, IMapdandaService1 service) => TypedResults.Ok(await service.Add(dto)));
+        endpoints.MapPut("api/v2/Mapdanda", async (int mapdandaId, MapdandaDto dto, IMapdandaService1 service) => TypedResults.Ok(await service.UpdateMapdanda(mapdandaId, dto)));
 
         // sub mapdanda services
         endpoints.MapGet("api/v2/SubMapdanda/{id}", async (int id, IMapdandaService1 service) => TypedResults.Ok(await service.GetSubMapdandaById(id)));
@@ -177,7 +178,8 @@ public static class Endpoints
                         Is100Active = x.Is100Active,
                         Is200Active = x.Is200Active,
                         Is50Active = x.Is50Active,
-                        Is25Active = x.Is25Active
+                        Is25Active = x.Is25Active,
+                        Status = x.Status,
                     }).ToList()
                 })
                 .ToListAsync();

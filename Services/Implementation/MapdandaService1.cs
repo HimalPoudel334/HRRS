@@ -15,7 +15,7 @@ public class MapdandaService1 : IMapdandaService1
         _dbContext = dbContext;
     }
 
-    public async Task<ResultDto> Add(MapdandaDto1 dto)
+    public async Task<ResultDto> Add(MapdandaDto dto)
     {
         var serialNo = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == dto.AnusuchiId).MaxAsync(x => x.SerialNumber);
         var maxAnusuchiNo = await _dbContext.Mapdandas.MaxAsync(x => x.AnusuchiId);
@@ -75,7 +75,7 @@ public class MapdandaService1 : IMapdandaService1
 
     }
 
-    public async Task<ResultDto> UpdateMapdanda(int mapdandaId, MapdandaDto1 dto)
+    public async Task<ResultDto> UpdateMapdanda(int mapdandaId, MapdandaDto dto)
     {
         var mapdanda = await _dbContext.Mapdandas.FindAsync(mapdandaId);
         if (mapdanda == null)
@@ -85,6 +85,8 @@ public class MapdandaService1 : IMapdandaService1
 
         mapdanda.Name = dto.Name;
         mapdanda.Parimaad = dto.Parimaad;
+        
+        if(mapdanda.SerialNumber != dto.SerialNumber )
 
         if (dto.ParichhedId.HasValue)
         {
@@ -122,7 +124,7 @@ public class MapdandaService1 : IMapdandaService1
         return ResultDto.Success();
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaDto1>>> GetByAnusuchi(int? anusuchiId)
+    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int? anusuchiId)
     {
 
         var mapdandas = _dbContext.Mapdandas.AsQueryable();
@@ -132,7 +134,7 @@ public class MapdandaService1 : IMapdandaService1
             mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId);
         }
 
-        var res = await mapdandas.Select(mapdanda => new MapdandaDto1()
+        var res = await mapdandas.Select(mapdanda => new MapdandaDto()
         {
             Id = mapdanda.Id,
             Name = mapdanda.Name,
@@ -151,17 +153,17 @@ public class MapdandaService1 : IMapdandaService1
         .OrderBy(x => x.AnusuchiId)
         .ToListAsync();
 
-        return ResultWithDataDto<List<MapdandaDto1>>.Success(res);
+        return ResultWithDataDto<List<MapdandaDto>>.Success(res);
     }
 
-    public async Task<ResultWithDataDto<MapdandaDto1>> GetById(int id)
+    public async Task<ResultWithDataDto<MapdandaDto>> GetById(int id)
     {
         var mapdanda = await _dbContext.Mapdandas.FindAsync(id);
         if (mapdanda == null)
         {
-            return ResultWithDataDto<MapdandaDto1>.Failure("Mapdanda Not Found");
+            return ResultWithDataDto<MapdandaDto>.Failure("Mapdanda Not Found");
         }
-        var dto = new MapdandaDto1()
+        var dto = new MapdandaDto()
         {
             Id = mapdanda.Id,
             Name = mapdanda.Name,
@@ -177,10 +179,10 @@ public class MapdandaService1 : IMapdandaService1
             IsAvailableDivided = mapdanda.IsAvailableDivided,
             Parimaad = mapdanda.Parimaad
         };
-        return ResultWithDataDto<MapdandaDto1>.Success(dto);
+        return ResultWithDataDto<MapdandaDto>.Success(dto);
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaDto1>>> GetByParichhed(int parichhedId, int? anusuchiId)
+    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByParichhed(int parichhedId, int? anusuchiId)
     {
 
         var mapdandas = _dbContext.Mapdandas.Where(x => x.ParichhedId == parichhedId).AsQueryable();
@@ -190,7 +192,7 @@ public class MapdandaService1 : IMapdandaService1
             mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId);
         }
 
-        var res = await mapdandas.Select(mapdanda => new MapdandaDto1()
+        var res = await mapdandas.Select(mapdanda => new MapdandaDto()
         {
             Id = mapdanda.Id,
             Name = mapdanda.Name,
@@ -209,7 +211,7 @@ public class MapdandaService1 : IMapdandaService1
         .OrderBy(x => x.AnusuchiId)
         .ToListAsync();
 
-        return ResultWithDataDto<List<MapdandaDto1>>.Success(res);
+        return ResultWithDataDto<List<MapdandaDto>>.Success(res);
     }
 
     public async Task<ResultDto> AddSubMapdanda(SubMapdandaDto dto)
@@ -277,12 +279,14 @@ public class MapdandaService1 : IMapdandaService1
             Name = subMapdanda.Name,
             SerialNumber = subMapdanda.SerialNumber,
             MapdandaId = subMapdanda.MapdandaId,
-            Parimaad = subMapdanda.Parimaad
+            Parimaad = subMapdanda.Parimaad,
+            Status = subMapdanda.Status,
+
         };
         return ResultWithDataDto<SubMapdandaDto>.Success(dto);
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaDto1>>> GetBySubParichhed(int subParichhedId, int? parichhedId, int? anusuchiId)
+    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetBySubParichhed(int subParichhedId, int? parichhedId, int? anusuchiId)
     {
         var mapdandas = _dbContext.Mapdandas.Where(x => x.SubParichhedId == subParichhedId).AsQueryable();
         if(parichhedId != null)
@@ -294,7 +298,7 @@ public class MapdandaService1 : IMapdandaService1
             mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId);
         }
 
-        var res = await mapdandas.Select(mapdanda => new MapdandaDto1()
+        var res = await mapdandas.Select(mapdanda => new MapdandaDto()
         {
             Id = mapdanda.Id,
             Name = mapdanda.Name,
@@ -307,17 +311,18 @@ public class MapdandaService1 : IMapdandaService1
             Is200Active = mapdanda.Is200Active,
             Is50Active = mapdanda.Is50Active,
             Is25Active = mapdanda.Is25Active,
+            Status = mapdanda.Status,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
             Parimaad = mapdanda.Parimaad,
         }).OrderBy(x => x.SerialNumber)
         .OrderBy(x => x.AnusuchiId)
         .ToListAsync();
 
-        return ResultWithDataDto<List<MapdandaDto1>>.Success(res);
+        return ResultWithDataDto<List<MapdandaDto>>.Success(res);
 
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaDto1>>> GetBySubSubParichhed(int subSubParichhedId, int? subParichhedId, int? parichhedId, int? anusuchiId)
+    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetBySubSubParichhed(int subSubParichhedId, int? subParichhedId, int? parichhedId, int? anusuchiId)
     {
         var mapdandas = _dbContext.Mapdandas.Where(x => x.SubSubParichhedId == subSubParichhedId).AsQueryable();
         if (subParichhedId != null)
@@ -333,7 +338,7 @@ public class MapdandaService1 : IMapdandaService1
             mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId);
         }
 
-        var res = await mapdandas.Select(mapdanda => new MapdandaDto1()
+        var res = await mapdandas.Select(mapdanda => new MapdandaDto()
         {
             Id = mapdanda.Id,
             Name = mapdanda.Name,
@@ -346,17 +351,32 @@ public class MapdandaService1 : IMapdandaService1
             Is200Active = mapdanda.Is200Active,
             Is50Active = mapdanda.Is50Active,
             Is25Active = mapdanda.Is25Active,
+            Status = mapdanda.Status,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
             Parimaad = mapdanda.Parimaad
         }).OrderBy(x => x.SerialNumber)
         .OrderBy(x => x.AnusuchiId)
         .ToListAsync();
 
-        return ResultWithDataDto<List<MapdandaDto1>>.Success(res);
+        return ResultWithDataDto<List<MapdandaDto>>.Success(res);
+    }
+
+    public async Task<ResultDto> ToggleStatus(int mapdandaId)
+    {
+        var mapdanda = await _dbContext.Mapdandas.FindAsync(mapdandaId);
+        if (mapdanda is null)
+        {
+            return ResultDto.Failure("Mapdanda doesnot exists");
+        }
+
+        mapdanda.Status = !mapdanda.Status;
+        await _dbContext.SaveChangesAsync();
+
+        return ResultDto.Success();
     }
 
     //public async Task<ResultWithDataDto<List<a>>> GetMapdandaGroupByParichhedId(int id)
     //{
-        
+
     //}
 }

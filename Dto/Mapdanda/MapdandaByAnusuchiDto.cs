@@ -21,5 +21,7 @@ public class GroupedMapdanda
     public bool Is200Active { get; set; }
     public bool Is50Active { get; set; }
     public bool Is25Active { get; set; }
+    public bool Status { get; set; }
+
 }
 

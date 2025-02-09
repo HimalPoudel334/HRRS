@@ -14,7 +14,14 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
 
     public async Task<ResultDto> Create(AnusuchiDto dto)
     {
-        //var maxSerialNo = int.Parse(await _dbContext.Anusuchis.MaxAsync(x => x.SerialNo));
+        if (string.IsNullOrEmpty(dto.Name) || string.IsNullOrEmpty(dto.SerialNo))
+        {
+            return ResultDto.Failure("Anusuchi must have name and serial number");
+        }
+        if(await _dbContext.Anusuchis.AnyAsync(x => x.SerialNo == dto.SerialNo))
+        {
+            return ResultDto.Failure("Serial Number already exists");
+        }
         Anusuchi anusuchi = new()
         {
             Name = dto.Name,
@@ -34,7 +41,12 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
         {
             return ResultDto.Failure("Anusuchi Not Found");
         }
-
+        
+        if (dto.SerialNo != anusuchi.SerialNo && await _dbContext.Anusuchis.AnyAsync(x => x.SerialNo == dto.SerialNo)) 
+        {
+                return ResultDto.Failure("Serial Number already taken");
+        }
+        anusuchi.SerialNo = dto.SerialNo;
         anusuchi.Name = dto.Name;
         anusuchi.DafaNo = dto.DafaNo;
 
@@ -77,7 +89,7 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
 
         if (anusuchi.Parichheds == null || anusuchi.Parichheds.Count == 0)
         {
-            dto.Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == null).Select(x => new MapdandaDto1()
+            dto.Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == null).Select(x => new MapdandaDto()
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -115,7 +127,7 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
                 if (parichhed.SubParichheds == null || parichhed.SubParichheds.Count == 0)
                 {
 
-                    parichhedDto.Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == parichhed.Id && x.SubParichhedId == null).Select(x => new MapdandaDto1()
+                    parichhedDto.Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == parichhed.Id && x.SubParichhedId == null).Select(x => new MapdandaDto()
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -154,7 +166,7 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
                         if (subParichhed.SubSubParichheds == null || subParichhed.SubSubParichheds.Count == 0)
                         {
 
-                            subParichhedDto.Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == parichhed.Id && x.SubParichhedId == subParichhed.Id).Select(x => new MapdandaDto1()
+                            subParichhedDto.Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == parichhed.Id && x.SubParichhedId == subParichhed.Id).Select(x => new MapdandaDto()
                             {
                                 Id = x.Id,
                                 Name = x.Name,
@@ -183,7 +195,7 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
                                     Name = ssParichhed.Name,
                                     SerialNo = ssParichhed.SerialNo,
                                     SubParichhedId = ssParichhed.SubParichhedId,
-                                    Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == parichhed.Id && x.SubParichhedId == subParichhed.Id && x.SubSubParichhedId == ssParichhed.Id).Select(x => new MapdandaDto1()
+                                    Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == parichhed.Id && x.SubParichhedId == subParichhed.Id && x.SubSubParichhedId == ssParichhed.Id).Select(x => new MapdandaDto()
                                     {
                                         Id = x.Id,
                                         Name = x.Name,

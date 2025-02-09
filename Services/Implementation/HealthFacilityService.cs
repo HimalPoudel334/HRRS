@@ -140,7 +140,7 @@ namespace HRRS.Services.Implementation
             {
                 var facility = await _context.HealthFacilities.Where(x=> x.Id == user.HealthFacilityId).SingleOrDefaultAsync();
                 if (facility == null) {
-                    return ResultWithDataDto<List<HealthFacilityDto>>.Failure("Cannot find Health Facility");
+                    return new ResultWithDataDto<List<HealthFacilityDto>>(true, null, "Cannot find Health Facility");
                 }
                 var dto = new HealthFacilityDto()
                 {
@@ -234,7 +234,7 @@ namespace HRRS.Services.Implementation
 
             if(facilityDto.Count == 0)
             {
-                return ResultWithDataDto<List<HealthFacilityDto>>.Failure("There are no health facilities available");
+                return new ResultWithDataDto<List<HealthFacilityDto>>(true, facilityDto, "There are no health facilities available");
             }
 
             return ResultWithDataDto<List<HealthFacilityDto>>.Success(facilityDto);

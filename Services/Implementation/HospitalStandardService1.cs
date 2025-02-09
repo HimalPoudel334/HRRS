@@ -40,7 +40,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                 Remarks = item.Remarks,
                 FilePath = item.FilePath,
                 FiscalYear = item.FiscalYear,
-                Status = item.Status,
                 Has25 = item.Has25,
                 Has50 = item.Has50,
                 Has100 = item.Has100,
@@ -70,7 +69,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                     FilePath = x.FilePath,
                     FiscalYear = x.FiscalYear,
                     IsAvailable = x.IsAvailable,
-                    Status = x.Status,
                     MapdandaName = x.Mapdanda.Name,
                     SerialNumber = x.Mapdanda.SerialNumber,
                     MapdandaId = x.Mapdanda.Id,
@@ -95,7 +93,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                 FilePath = "",
                 FiscalYear = null,
                 IsAvailable = false,
-                Status = true,
                 SerialNumber = x.SerialNumber,
                 MapdandaName = x.Name,
                 MapdandaId = x.Id,
@@ -126,7 +123,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                     FilePath = hospitalStandard.FilePath,
                     FiscalYear = hospitalStandard.FiscalYear,
                     IsAvailable = hospitalStandard.IsAvailable,
-                    Status = hospitalStandard.Status,
                     MapdandaName = hospitalStandard.Mapdanda.Name,
                     SerialNumber = hospitalStandard.Mapdanda.SerialNumber,
                     MapdandaId = hospitalStandard.MapdandaId,
@@ -158,7 +154,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                 standard.Remarks = mapdanda.Remarks;
                 standard.FilePath = mapdanda.FilePath;
                 standard.FiscalYear = mapdanda.FiscalYear;
-                standard.Status = mapdanda.Status;
                 standard.Has25 = mapdanda.Has25;
                 standard.Has50 = mapdanda.Has50;
                 standard.Has100 = mapdanda.Has100;

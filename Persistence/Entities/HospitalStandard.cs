@@ -13,7 +13,6 @@ public class HospitalStandard
     public string? Remarks { get; set; }
     public string? FilePath { get; set; }
     public string? FiscalYear { get; set; }
-    public bool? Status { get; set; }
 
     public HealthFacility HealthFacility { get; set; }
     public Mapdanda Mapdanda { get; set; }

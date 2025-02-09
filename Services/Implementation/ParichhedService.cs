@@ -15,10 +15,21 @@ public class ParichhedService : IParichhedService
 
     public async Task<ResultWithDataDto<ParichhedDto>> Create(ParichhedDto dto)
     {
+        if (string.IsNullOrEmpty(dto.Name) || string.IsNullOrEmpty(dto.SerialNo))
+        {
+            return ResultWithDataDto<ParichhedDto>.Failure("Parichhed must have name and serial number");
+        }
+
         var anusuchi = await _context.Anusuchis.FindAsync(dto.AnusuchiId);
         if (anusuchi == null)
         {
             return ResultWithDataDto<ParichhedDto>.Failure("Anusuchi Not Found");
+        }
+
+        if (await _context.Parichheds.AnyAsync(x => x.SerialNo == dto.SerialNo)) 
+        {
+            return ResultWithDataDto<ParichhedDto>.Failure("Serial number already taken");
+
         }
 
         var parichhed = new Parichhed()
@@ -49,6 +60,12 @@ public class ParichhedService : IParichhedService
         if (anusuchi == null)
         {
             return ResultDto.Failure("Anusuchi Not Found");
+        }
+
+        if(parichhed.SerialNo != dto.SerialNo && await _context.Parichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
+        {
+            return ResultDto.Failure("Serial number already taken");
+
         }
 
         parichhed.Name = dto.Name;
@@ -114,6 +131,11 @@ public class ParichhedService : IParichhedService
 
     public async Task<ResultWithDataDto<SubParichhedDto>> CreateSubParichhed(SubParichhedDto dto)
     {
+        if (string.IsNullOrEmpty(dto.Name) || string.IsNullOrEmpty(dto.SerialNo))
+        {
+            return ResultWithDataDto<SubParichhedDto>.Failure("Parichhed must have name and serial number");
+        }
+
         var parichhed = await _context.Parichheds.FindAsync(dto.ParichhedId);
         if (parichhed == null)
         {
@@ -207,12 +229,20 @@ public class ParichhedService : IParichhedService
 
     public async Task<ResultWithDataDto<SubSubParichhedDto>> CreateSubSubParichhed(SubSubParichhedDto dto)
     {
+        if (string.IsNullOrEmpty(dto.Name) || string.IsNullOrEmpty(dto.SerialNo))
+        {
+            return ResultWithDataDto<SubSubParichhedDto>.Failure("Parichhed must have name and serial number");
+        }
+
         var subParichhed = await _context.SubParichheds.FindAsync(dto.SubParichhedId);
         if (subParichhed == null)
         {
             return ResultWithDataDto<SubSubParichhedDto>.Failure("Parichhed Not Found");
         }
-
+        if(await _context.SubSubParichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
+        {
+            return ResultWithDataDto<SubSubParichhedDto>.Failure("Serial number already taken");
+        }
         var subSubParichhed = new SubSubParichhed()
         {
             SubParichhed = subParichhed,
@@ -240,6 +270,11 @@ public class ParichhedService : IParichhedService
         if (subParichhed == null)
         {
             return ResultDto.Failure("Parichhed Not Found");
+        }
+
+        if (subSubParichhed.SerialNo != dto.SerialNo && await _context.SubSubParichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
+        {
+            return ResultDto.Failure("Serial number already taken");
         }
 
         subSubParichhed.Name = dto.Name;

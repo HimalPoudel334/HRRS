@@ -8,7 +8,7 @@ public class ParichhedDto
     public string SerialNo { get; set; }
     public int AnusuchiId { get; set; }
     public ICollection<SubParichhedDto> SubParichheds { get; set; }
-    public ICollection<MapdandaDto1> Mapdandas { get; set; }
+    public ICollection<MapdandaDto> Mapdandas { get; set; }
 
 }
 
@@ -19,7 +19,7 @@ public class SubParichhedDto
     public string SerialNo { get; set; }
     public int ParichhedId { get; set; }
     public ICollection<SubSubParichhedDto> SubSubParichheds { get; set; }
-    public ICollection<MapdandaDto1> Mapdandas { get; set; }
+    public ICollection<MapdandaDto> Mapdandas { get; set; }
 }
 
 public class SubSubParichhedDto
@@ -28,5 +28,5 @@ public class SubSubParichhedDto
     public string Name { get; set; }
     public string SerialNo { get; set; }
     public int SubParichhedId { get; set; }
-    public ICollection<MapdandaDto1> Mapdandas { get; set; }
+    public ICollection<MapdandaDto> Mapdandas { get; set; }
 }

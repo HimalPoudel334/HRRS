@@ -28,7 +28,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
         foreach(var item in dto.HospitalMapdandas)
         {
-            var mapdanda = await _dbContext.Mapdandas.FindAsync(item.MapdandaId) ?? throw new Exception("Mapdanda not found");
+            var mapdanda = await _dbContext.Mapdandas.Where(x=>x.Status).FirstOrDefaultAsync(x => x.Id == item.MapdandaId) ?? throw new Exception("Mapdanda not found");
 
             stdrs.Add(new HospitalStandard()
             {
@@ -39,7 +39,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 Remarks = item.Remarks,
                 FilePath = item.FilePath,
                 FiscalYear = item.FiscalYear,
-                Status = item.Status,
             });
 
         }
@@ -64,7 +63,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                     FilePath = x.FilePath,
                     FiscalYear = x.FiscalYear,
                     IsAvailable = x.IsAvailable,
-                    Status = x.Status,
                     MapdandaName = x.Mapdanda.Name,
                     SerialNumber = x.Mapdanda.SerialNumber,
                     MapdandaId = x.Mapdanda.Id,
@@ -84,7 +82,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 FilePath = "",
                 FiscalYear = null,
                 IsAvailable = false,
-                Status = true,
                 SerialNumber = x.SerialNumber,
                 MapdandaName = x.Name,
                 MapdandaId = x.Id,
@@ -111,7 +108,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                     FilePath = hospitalStandard.FilePath,
                     FiscalYear = hospitalStandard.FiscalYear,
                     IsAvailable = hospitalStandard.IsAvailable,
-                    Status = hospitalStandard.Status,
                     MapdandaName = hospitalStandard.Mapdanda.Name,
                     SerialNumber = hospitalStandard.Mapdanda.SerialNumber,
                     MapdandaId = hospitalStandard.MapdandaId,
@@ -139,7 +135,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 standard.Remarks = mapdanda.Remarks;
                 standard.FilePath = mapdanda.FilePath;
                 standard.FiscalYear = mapdanda.FiscalYear;
-                standard.Status = mapdanda.Status;
             }
         }
 

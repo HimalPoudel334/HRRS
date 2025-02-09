@@ -1,18 +1,20 @@
+using System.ComponentModel.DataAnnotations;
 using HRRS.Dto.Anusuchi;
 using HRRS.Dto.Parichhed;
+
+//public class MapdandaDto
+//{
+//    public int Id { get; set; }
+//    public string? SerialNumber { get; set; }
+//    public string Name { get; set; }
+//    public int AnusuchiNumber { get; set; }
+//    public bool Status { get; set; }
+//}
 
 public class MapdandaDto
 {
     public int Id { get; set; }
-    public string? SerialNumber { get; set; }
-    public string Name { get; set; }
-    public int AnusuchiNumber { get; set; }
-}
-
-public class MapdandaDto1
-{
-    public int Id { get; set; }
-    public string? SerialNumber { get; set; }
+    public string SerialNumber { get; set; }
     public string Name { get; set; }
     public string? Parimaad { get; set; }
     public int AnusuchiId { get; set; }
@@ -21,6 +23,7 @@ public class MapdandaDto1
     public bool Is50Active { get; set; }
     public bool Is100Active { get; set; }
     public bool Is200Active { get; set; }
+    public bool Status { get; set; }
     public int? ParichhedId { get; set; }
     public int? SubParichhedId { get; set; }
     public int? SubSubParichhedId { get; set; }
@@ -34,6 +37,7 @@ public class SubMapdandaDto
     public string Name { get; set; }
     public string? Parimaad { get; set; }
     public int MapdandaId { get; set; }
+    public bool Status { get; set; }
 }
 
 public class MapdandaDtoResponse
