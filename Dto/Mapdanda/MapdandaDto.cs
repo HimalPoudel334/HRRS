@@ -4,7 +4,7 @@ using HRRS.Dto.Parichhed;
 public class MapdandaDto
 {
     public int Id { get; set; }
-    public int? SerialNumber { get; set; }
+    public string? SerialNumber { get; set; }
     public string Name { get; set; }
     public int AnusuchiNumber { get; set; }
 }
@@ -12,7 +12,7 @@ public class MapdandaDto
 public class MapdandaDto1
 {
     public int Id { get; set; }
-    public int? SerialNumber { get; set; }
+    public string? SerialNumber { get; set; }
     public string Name { get; set; }
     public string? Parimaad { get; set; }
     public int AnusuchiId { get; set; }
@@ -30,7 +30,7 @@ public class MapdandaDto1
 public class SubMapdandaDto
 {
     public int Id { get; set; }
-    public int SerialNumber { get; set; }
+    public string SerialNumber { get; set; }
     public string Name { get; set; }
     public string? Parimaad { get; set; }
     public int MapdandaId { get; set; }

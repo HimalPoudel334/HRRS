@@ -14,11 +14,12 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
 
     public async Task<ResultDto> Create(AnusuchiDto dto)
     {
+        //var maxSerialNo = int.Parse(await _dbContext.Anusuchis.MaxAsync(x => x.SerialNo));
         Anusuchi anusuchi = new()
         {
             Name = dto.Name,
             DafaNo = dto.DafaNo,
-            SerialNo = await _dbContext.Anusuchis.MaxAsync(x => x.SerialNo) + 1
+            SerialNo = dto.SerialNo //await _dbContext.Anusuchis.MaxAsync(x => x.SerialNo) + 1
         };
 
         await _dbContext.Anusuchis.AddAsync(anusuchi);
@@ -74,7 +75,8 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
             SerialNo = anusuchi.SerialNo,
         };
 
-        if (anusuchi.Parichheds == null || anusuchi.Parichheds.Count == 0) {
+        if (anusuchi.Parichheds == null || anusuchi.Parichheds.Count == 0)
+        {
             dto.Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == null).Select(x => new MapdandaDto1()
             {
                 Id = x.Id,
@@ -93,13 +95,122 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
             }).ToListAsync();
 
             return ResultWithDataDto<AnusuchiDto>.Success(dto);
+        }
+        else
+        {
+            anusuchi.Parichheds = await _dbContext.Parichheds.Include(x => x.SubParichheds).ToListAsync();
+            var parichhedDtos = new List<ParichhedDto>();
+            foreach (var parichhed in anusuchi.Parichheds)
+            {
+                var parichhedDto = new ParichhedDto()
+                {
+                    Id = parichhed.Id,
+                    SerialNo = parichhed.SerialNo,
+                    AnusuchiId = parichhed.AnusuchiId,
+                    Name = parichhed.Name,
 
+                };
+
+                //var subParichheds = await _dbContext.SubParichheds.Where(x => x.Parichhed == parichhed).ToListAsync();
+                if (parichhed.SubParichheds == null || parichhed.SubParichheds.Count == 0)
+                {
+
+                    parichhedDto.Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == parichhed.Id && x.SubParichhedId == null).Select(x => new MapdandaDto1()
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        AnusuchiId = x.AnusuchiId,
+                        ParichhedId = x.ParichhedId,
+                        Is25Active = x.Is25Active,
+                        Is50Active = x.Is50Active,
+                        Is100Active = x.Is100Active,
+                        Is200Active = x.Is200Active,
+                        Parimaad = x.Parimaad,
+                        IsAvailableDivided = x.IsAvailableDivided,
+                        SerialNumber = x.SerialNumber,
+                        SubParichhedId = x.SubParichhedId,
+                        SubSubParichhedId = x.SubSubParichhedId
+                    }).ToListAsync();
+                    parichhedDtos.Add(parichhedDto);
+                    dto.Parichheds = parichhedDtos;
+                }
+
+                else
+                {
+                    parichhed.SubParichheds = await _dbContext.SubParichheds.Include(x => x.SubSubParichheds).ToListAsync();
+                    var subParichhedDtos = new List<SubParichhedDto>();
+                    foreach (var subParichhed in parichhed.SubParichheds)
+                    {
+                        var subParichhedDto = new SubParichhedDto()
+                        {
+                            Id = subParichhed.Id,
+                            SerialNo = subParichhed.SerialNo,
+                            ParichhedId = subParichhed.ParichhedId,
+                            Name = subParichhed.Name,
+
+                        };
+
+                        //var subParichheds = await _dbContext.SubParichheds.Where(x => x.Parichhed == parichhed).ToListAsync();
+                        if (subParichhed.SubSubParichheds == null || subParichhed.SubSubParichheds.Count == 0)
+                        {
+
+                            subParichhedDto.Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == parichhed.Id && x.SubParichhedId == subParichhed.Id).Select(x => new MapdandaDto1()
+                            {
+                                Id = x.Id,
+                                Name = x.Name,
+                                AnusuchiId = x.AnusuchiId,
+                                ParichhedId = x.ParichhedId,
+                                Is25Active = x.Is25Active,
+                                Is50Active = x.Is50Active,
+                                Is100Active = x.Is100Active,
+                                Is200Active = x.Is200Active,
+                                Parimaad = x.Parimaad,
+                                IsAvailableDivided = x.IsAvailableDivided,
+                                SerialNumber = x.SerialNumber,
+                                SubParichhedId = x.SubParichhedId,
+                                SubSubParichhedId = x.SubSubParichhedId
+                            }).ToListAsync();
+                            parichhedDto.SubParichheds = subParichhedDtos;
+                        }
+                        else
+                        {
+                            var ssParichhedDtos = new List<SubSubParichhedDto>();
+                            foreach(var ssParichhed in subParichhed.SubSubParichheds)
+                            {
+                                var ssDto = new SubSubParichhedDto()
+                                {
+                                    Id = ssParichhed.Id,
+                                    Name = ssParichhed.Name,
+                                    SerialNo = ssParichhed.SerialNo,
+                                    SubParichhedId = ssParichhed.SubParichhedId,
+                                    Mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == id && x.ParichhedId == parichhed.Id && x.SubParichhedId == subParichhed.Id && x.SubSubParichhedId == ssParichhed.Id).Select(x => new MapdandaDto1()
+                                    {
+                                        Id = x.Id,
+                                        Name = x.Name,
+                                        AnusuchiId = x.AnusuchiId,
+                                        ParichhedId = x.ParichhedId,
+                                        Is25Active = x.Is25Active,
+                                        Is50Active = x.Is50Active,
+                                        Is100Active = x.Is100Active,
+                                        Is200Active = x.Is200Active,
+                                        Parimaad = x.Parimaad,
+                                        IsAvailableDivided = x.IsAvailableDivided,
+                                        SerialNumber = x.SerialNumber,
+                                        SubParichhedId = x.SubParichhedId,
+                                        SubSubParichhedId = x.SubSubParichhedId
+                                    }).ToListAsync()
+                                };
+                                ssParichhedDtos.Add(ssDto);
+                            }
+                            subParichhedDto.SubSubParichheds = ssParichhedDtos;
+                        }
+                    }
+                }
+            }
+
+            return ResultWithDataDto<AnusuchiDto>.Success(dto);
 
         }
-
-
-        return ResultWithDataDto<AnusuchiDto>.Success(dto);
-       
     }
 
     //public async Task<ResultWithDataDto<ResponseDto>> GetAnusuchiMapdanda(int anusuchiId)

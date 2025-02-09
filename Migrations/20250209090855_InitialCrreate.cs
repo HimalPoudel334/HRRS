@@ -5,7 +5,7 @@
 namespace HRRS.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCrreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,7 @@ namespace HRRS.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SerialNo = table.Column<int>(type: "int", nullable: false),
+                    SerialNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DafaNo = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
@@ -164,8 +164,9 @@ namespace HRRS.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SerialNumber = table.Column<int>(type: "int", nullable: false),
+                    SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Parimaad = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsAvailableDivided = table.Column<bool>(type: "bit", nullable: false),
                     Is25Active = table.Column<bool>(type: "bit", nullable: false),
                     Is50Active = table.Column<bool>(type: "bit", nullable: false),
@@ -243,8 +244,9 @@ namespace HRRS.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SerialNumber = table.Column<int>(type: "int", nullable: false),
+                    SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Parimaad = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MapdandaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

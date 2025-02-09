@@ -354,4 +354,9 @@ public class MapdandaService1 : IMapdandaService1
 
         return ResultWithDataDto<List<MapdandaDto1>>.Success(res);
     }
+
+    //public async Task<ResultWithDataDto<List<a>>> GetMapdandaGroupByParichhedId(int id)
+    //{
+        
+    //}
 }

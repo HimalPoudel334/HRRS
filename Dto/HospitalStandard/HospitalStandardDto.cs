@@ -14,7 +14,7 @@ public class HospitalMapdandasDto
 {
     public int StandardId { get; set; }
     public int MapdandaId { get; set; }
-    public int SerialNumber { get; set; }
+    public string SerialNumber { get; set; }
     public string? MapdandaName { get; set; }
     public bool? IsAvailable { get; set; }
     public string? Remarks { get; set; }
@@ -45,7 +45,7 @@ public class HospitalMapdandasDto1
 {
     public int StandardId { get; set; }
     public int MapdandaId { get; set; }
-    public int SerialNumber { get; set; }
+    public string SerialNumber { get; set; }
     public string? Has25 { get; set; }
     public string? Has50 { get; set; }
     public string? Has100 { get; set; }

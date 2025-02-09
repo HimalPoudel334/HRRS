@@ -37,8 +37,9 @@ namespace HRRS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SerialNo")
-                        .HasColumnType("int");
+                    b.Property<string>("SerialNo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -158,8 +159,12 @@ namespace HRRS.Migrations
                     b.Property<int?>("ParichhedId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SerialNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("Parimaad")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SerialNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SubParichhedId")
                         .HasColumnType("int");
@@ -356,8 +361,12 @@ namespace HRRS.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SerialNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("Parimaad")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SerialNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

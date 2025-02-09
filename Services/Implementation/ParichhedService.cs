@@ -59,17 +59,22 @@ public class ParichhedService : IParichhedService
 
     }
 
-    public async Task<ResultWithDataDto<List<ParichhedDto>>> GetAllParichhed()
+    public async Task<ResultWithDataDto<List<ParichhedDto>>> GetAllParichhed(int? anusuchiId)
     {
-        var parichheds = await _context.Parichheds.Select(x => new ParichhedDto()
+        var parichheds = _context.Parichheds.Select(x => new ParichhedDto()
         {
             Id = x.Id,
             AnusuchiId = x.AnusuchiId,
             Name = x.Name,
             SerialNo = x.SerialNo,
-        }).ToListAsync();
+        });
 
-        return ResultWithDataDto<List<ParichhedDto>>.Success(parichheds);
+        if (anusuchiId is not null)
+            parichheds = parichheds.Where(x => x.AnusuchiId == anusuchiId);
+
+        var res = await parichheds.ToListAsync();
+
+        return ResultWithDataDto<List<ParichhedDto>>.Success(res);
     }
 
     public async Task<ResultWithDataDto<ParichhedDto>> GetParichhedById(int id)
@@ -152,6 +157,20 @@ public class ParichhedService : IParichhedService
     public async Task<ResultWithDataDto<List<SubParichhedDto>>> GetSubParichhedsByParichhed(int parichhedId)
     {
         var subParichhedsDto = await _context.SubParichheds.Where(x => x.ParichhedId == parichhedId).Select(x => new SubParichhedDto()
+        {
+            Id = x.Id,
+            ParichhedId = x.ParichhedId,
+            Name = x.Name,
+            SerialNo = x.SerialNo,
+        }).ToListAsync();
+
+        return ResultWithDataDto<List<SubParichhedDto>>.Success(subParichhedsDto);
+
+    }
+
+    public async Task<ResultWithDataDto<List<SubParichhedDto>>> GetAllSubParichheds()
+    {
+        var subParichhedsDto = await _context.SubParichheds.Select(x => new SubParichhedDto()
         {
             Id = x.Id,
             ParichhedId = x.ParichhedId,
@@ -257,5 +276,16 @@ public class ParichhedService : IParichhedService
         return ResultWithDataDto<SubSubParichhedDto>.Success(subParichhedDto);
     }
 
+    public async Task<ResultWithDataDto<List<SubSubParichhedDto>>> GetAllSubSubParichheds()
+    {
+        var subSubParichhedsDto = await _context.SubSubParichheds.Select(x => new SubSubParichhedDto()
+        {
+            Id = x.Id,
+            SubParichhedId = x.SubParichhedId,
+            Name = x.Name,
+            SerialNo = x.SerialNo,
+        }).ToListAsync();
 
+        return ResultWithDataDto<List<SubSubParichhedDto>>.Success(subSubParichhedsDto);
+    }
 }
