@@ -106,7 +106,7 @@ public static class Endpoints
 
         // anusuchi services
         endpoints.MapPost("api/Anusuchi", async (AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Create(dto)));
-        endpoints.MapPut("api/Anusuchi", async (int anusuchiId, AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Update(anusuchiId, dto)));
+        endpoints.MapPost("api/Anusuchi/{anusuchiId}", async (int anusuchiId, AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Update(anusuchiId, dto)));
         endpoints.MapGet("api/Anusuchi", async (IAnusuchiService service) => TypedResults.Ok(await service.GetAll()));
         endpoints.MapGet("api/Anusuchi/{id}", async (int id, IAnusuchiService service) => TypedResults.Ok(await service.GetById(id)));
 
@@ -158,19 +158,18 @@ public static class Endpoints
                 .Where(x => x.AnusuchiId == id)
                 .GroupBy(m => new
                 {
-                    SubSubParichhedId = m.SubSubParichhed != null ? m.SubSubParichhed.Id : 0,
-                    SubParichhedId = m.SubParichhed != null ? m.SubParichhed.Id : 0,
-                    ParichhedId = m.Parichhed != null ? m.Parichhed.Id : 0,
+                    SubSubParichhed = m.SubSubParichhed != null ? m.SubSubParichhed.Name : "",
+                    SubParichhed = m.SubParichhed != null ? m.SubParichhed.Name : "",
+                    Parichhed = m.Parichhed != null ? m.Parichhed.Name : "",
                     m.IsAvailableDivided,
                 })
-                .Select(g => new
+                .Select(g => new MapdandaByAnusuchiDto
                 {
-                    g.Key.SubSubParichhedId,
-                    g.Key.SubParichhedId,
-                    g.Key.ParichhedId,
-                    g.Key.IsAvailableDivided,
-
-                    Mapdandas = g.Select(x => new
+                    SubSubParichhed = g.Key.SubSubParichhed,
+                    SubParichhed = g.Key.SubParichhed,
+                    Parichhed = g.Key.Parichhed,
+                    IsAvailableDivided = g.Key.IsAvailableDivided,
+                    Mapdandas = g.Select(x => new GroupedMapdanda
                     {
                         Id = x.Id,
                         Name = x.Name,
@@ -178,14 +177,12 @@ public static class Endpoints
                         Is100Active = x.Is100Active,
                         Is200Active = x.Is200Active,
                         Is50Active = x.Is50Active,
-                        Is25Active = x.Is25Active,
-                        Parimaad = x.Parimaad,
-                        SubMapdandas = x.SubMapdandas.ToList()
+                        Is25Active = x.Is25Active
                     }).ToList()
                 })
                 .ToListAsync();
 
-            return TypedResults.Ok(groupedMapdandas);
+            return TypedResults.Ok(new ResultWithDataDto<List<MapdandaByAnusuchiDto>>(true, groupedMapdandas, null));
 
         });
 
