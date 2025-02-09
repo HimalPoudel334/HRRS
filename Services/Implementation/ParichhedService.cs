@@ -13,12 +13,12 @@ public class ParichhedService : IParichhedService
 
     public ParichhedService(ApplicationDbContext context) => _context = context;
 
-    public async Task<ResultDto> Create(ParichhedDto dto)
+    public async Task<ResultWithDataDto<ParichhedDto>> Create(ParichhedDto dto)
     {
         var anusuchi = await _context.Anusuchis.FindAsync(dto.AnusuchiId);
         if (anusuchi == null)
         {
-            return ResultDto.Failure("Anusuchi Not Found");
+            return ResultWithDataDto<ParichhedDto>.Failure("Anusuchi Not Found");
         }
 
         var parichhed = new Parichhed()
@@ -32,7 +32,9 @@ public class ParichhedService : IParichhedService
         await _context.Parichheds.AddAsync(parichhed);
         await _context.SaveChangesAsync();
 
-        return ResultDto.Success();
+        dto.Id = parichhed.Id;
+
+        return ResultWithDataDto<ParichhedDto>.Success(dto);
     }
 
     public async Task<ResultDto> Update(int parichhedId, ParichhedDto dto)
@@ -110,12 +112,12 @@ public class ParichhedService : IParichhedService
 
     }
 
-    public async Task<ResultDto> CreateSubParichhed(SubParichhedDto dto)
+    public async Task<ResultWithDataDto<SubParichhedDto>> CreateSubParichhed(SubParichhedDto dto)
     {
         var parichhed = await _context.Parichheds.FindAsync(dto.ParichhedId);
         if (parichhed == null)
         {
-            return ResultDto.Failure("Parichhed Not Found");
+            return ResultWithDataDto<SubParichhedDto>.Failure("Parichhed Not Found");
         }
 
         var subParichhed = new SubParichhed()
@@ -129,7 +131,9 @@ public class ParichhedService : IParichhedService
         await _context.SubParichheds.AddAsync(subParichhed);
         await _context.SaveChangesAsync();
 
-        return ResultDto.Success();
+        dto.Id = subParichhed.Id;
+
+        return ResultWithDataDto<SubParichhedDto>.Success(dto);
     }
 
     public async Task<ResultDto> UpdateSubParichhed(int subParichhedId, SubParichhedDto  dto)
@@ -201,12 +205,12 @@ public class ParichhedService : IParichhedService
 
 
 
-    public async Task<ResultDto> CreateSubSubParichhed(SubSubParichhedDto dto)
+    public async Task<ResultWithDataDto<SubSubParichhedDto>> CreateSubSubParichhed(SubSubParichhedDto dto)
     {
         var subParichhed = await _context.SubParichheds.FindAsync(dto.SubParichhedId);
         if (subParichhed == null)
         {
-            return ResultDto.Failure("Parichhed Not Found");
+            return ResultWithDataDto<SubSubParichhedDto>.Failure("Parichhed Not Found");
         }
 
         var subSubParichhed = new SubSubParichhed()
@@ -220,7 +224,8 @@ public class ParichhedService : IParichhedService
         await _context.SubSubParichheds.AddAsync(subSubParichhed);
         await _context.SaveChangesAsync();
 
-        return ResultDto.Success();
+        dto.Id = subSubParichhed.Id;
+        return ResultWithDataDto<SubSubParichhedDto>.Success(dto);
     }
 
     public async Task<ResultDto> UpdateSubSubParichhed(int subSubParichhedId, SubSubParichhedDto dto)

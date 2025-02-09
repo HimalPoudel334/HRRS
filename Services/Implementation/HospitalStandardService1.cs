@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using HRRS.Dto;
 using HRRS.Dto.HealthStandard;
 using HRRS.Persistence.Context;
@@ -18,7 +19,7 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
         List<HospitalStandard> stdrs = [];
         if (healthFacility == null)
         {
-            throw new Exception("Health Facility not found");
+            ResultDto.Failure("Health Facility not found");
         }
 
         if(dto.HospitalMapdandas.Any(x => x.StandardId > 0))
