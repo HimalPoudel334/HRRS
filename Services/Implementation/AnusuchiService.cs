@@ -225,33 +225,4 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
         }
     }
 
-    //public async Task<ResultWithDataDto<ResponseDto>> GetAnusuchiMapdanda(int anusuchiId)
-    //{
-    //    var anusuchi = await _dbContext.Anusuchis.FindAsync();
-    //    if (anusuchi == null)
-    //    {
-    //        return ResultWithDataDto<ResponseDto>.Failure("Anusuchi Not Found");
-    //    }
-    //    var mapdandas = anusuchi.Mapdandas.Select(x => new MapdandaDto()
-    //    {
-    //        Id = x.Id,
-    //        Name = x.Name,
-    //        SerialNumber = x.SerialNumber,
-    //        AnusuchiNumber = x.AnusuchiId
-    //    }).ToList();
-    //    var response = new ResponseDto()
-    //    {
-    //        Anusuchi = new AnusuchiDto()
-    //        {
-    //            Id = anusuchi.Id,
-    //            Name = anusuchi.Name,
-    //            DafaNo = anusuchi.DafaNo,
-    //            SerialNo = anusuchi.SerialNo
-    //        },
-    //        Mapdandas = mapdandas
-    //    };
-    //    return ResultWithDataDto<ResponseDto>.Success(response);
-
-    //}
-
 }

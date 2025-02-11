@@ -56,8 +56,6 @@ public class MapdandaService : IMapdandaService
             }
         }
 
-
-
         var mapdanda = new Mapdanda()
         {
             Name = dto.Name,
@@ -133,6 +131,11 @@ public class MapdandaService : IMapdandaService
 
         mapdanda.Name = dto.Name;
         mapdanda.SerialNumber = dto.SerialNumber;
+        mapdanda.Is100Active = dto.Is100Active;
+        mapdanda.Is25Active = dto.Is25Active;
+        mapdanda.Is200Active = dto.Is200Active;
+        mapdanda.Is50Active = dto.Is50Active;
+
         //mapdanda.AnusuchiId = dto.AnusuchiId;
         await _dbContext.SaveChangesAsync();
         return ResultDto.Success();

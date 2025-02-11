@@ -38,7 +38,7 @@ public static class Endpoints
         endpoints.MapPost("api/mapdanda/", [Authorize(Roles = "SuperAdmin")] async (MapdandaDto dto, IMapdandaService mapdandaService) =>
             TypedResults.Ok(await mapdandaService.Add(dto)));
 
-        endpoints.MapPut("api/mapdanda/{mapdandaId}/update", [Authorize(Roles = "SuperAdmin")] async (int mapdandaId, MapdandaDto dto, IMapdandaService mapdandaService) =>
+        endpoints.MapPost("api/mapdanda/{mapdandaId}/update", [Authorize(Roles = "SuperAdmin")] async (int mapdandaId, MapdandaDto dto, IMapdandaService mapdandaService) =>
             TypedResults.Ok(await mapdandaService.UpdateMapdanda(mapdandaId, dto)));
 
         endpoints.MapPost("api/Mapdanda/{mapdandaId}/toggle-status", async (int mapdandaId, IMapdandaService service) => TypedResults.Ok(await service.ToggleStatus(mapdandaId)));
@@ -113,20 +113,20 @@ public static class Endpoints
 
         // parichhed services
         endpoints.MapPost("api/Parichhed", async (ParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.Create(dto)));
-        endpoints.MapPut("api/Parichhed", async (int parichhedId, ParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.Update(parichhedId, dto)));
+        endpoints.MapPost("api/Parichhed/{parichhedId}/update", async (int parichhedId, ParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.Update(parichhedId, dto)));
         endpoints.MapGet("api/Parichhed", async ([FromQuery] int? anusuchiId, IParichhedService service) => TypedResults.Ok(await service.GetAllParichhed(anusuchiId)));
         endpoints.MapGet("api/Parichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetParichhedById(id)));
 
         //sub parichhed services
         endpoints.MapPost("api/SubParichhed", async (SubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.CreateSubParichhed(dto)));
-        endpoints.MapPut("api/SubParichhed", async (int subParichhedId, SubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.UpdateSubParichhed(subParichhedId, dto)));
+        endpoints.MapPost("api/SubParichhed/{subParichhedId}/update", async (int subParichhedId, SubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.UpdateSubParichhed(subParichhedId, dto)));
         endpoints.MapGet("api/SubParichhed", async ([FromQuery] int parichhedId, IParichhedService service) => TypedResults.Ok(await service.GetSubParichhedsByParichhed(parichhedId)));
         endpoints.MapGet("api/SubParichhed/all", async ( IParichhedService service) => TypedResults.Ok(await service.GetAllSubParichheds()));
         endpoints.MapGet("api/SubParichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetSubParichhedById(id)));
 
         //sub sub parichhed services
         endpoints.MapPost("api/SubSubParichhed", async (SubSubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.CreateSubSubParichhed(dto)));
-        endpoints.MapPut("api/SubSubParichhed", async (int subSubParichhedId, SubSubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.UpdateSubSubParichhed(subSubParichhedId, dto)));
+        endpoints.MapPost("api/SubSubParichhed/{subSubParichhedId}/update", async (int subSubParichhedId, SubSubParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.UpdateSubSubParichhed(subSubParichhedId, dto)));
         endpoints.MapGet("api/SubSubParichhed", async (IParichhedService service) => TypedResults.Ok(await service.GetAllSubSubParichheds()));
         endpoints.MapGet("api/SubSubParichhed/SubParichhed/{subParichhedId}", async (int subParichhedId, IParichhedService service) => TypedResults.Ok(await service.GetSubSubParichhedsBySubParichhed(subParichhedId)));
         endpoints.MapGet("api/SubSubParichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetSubSubParichhedById(id)));
@@ -143,7 +143,7 @@ public static class Endpoints
         endpoints.MapGet("api/v2/Mapdanda/Anusuchi", async ([FromQuery] int? anusuchiId, IMapdandaService1 service) => TypedResults.Ok(await service.GetByAnusuchi(anusuchiId)));
         endpoints.MapGet("api/v2/Mapdanda/Parichhed", async ([FromQuery] int parichhedId, [FromQuery] int? anusuchiId, IMapdandaService1 service) => TypedResults.Ok(await service.GetByParichhed(parichhedId, anusuchiId)));
         endpoints.MapPost("api/v2/Mapdanda", async (MapdandaDto dto, IMapdandaService1 service) => TypedResults.Ok(await service.Add(dto)));
-        endpoints.MapPut("api/v2/Mapdanda", async (int mapdandaId, MapdandaDto dto, IMapdandaService1 service) => TypedResults.Ok(await service.UpdateMapdanda(mapdandaId, dto)));
+        endpoints.MapPost("api/v2/Mapdanda/{mapdandaId}/update", async (int mapdandaId, MapdandaDto dto, IMapdandaService1 service) => TypedResults.Ok(await service.UpdateMapdanda(mapdandaId, dto)));
 
         // sub mapdanda services
         endpoints.MapGet("api/v2/SubMapdanda/{id}", async (int id, IMapdandaService1 service) => TypedResults.Ok(await service.GetSubMapdandaById(id)));
@@ -157,37 +157,53 @@ public static class Endpoints
                 .Include(m => m.Parichhed)
                 .Include(m => m.SubMapdandas)
                 .Where(x => x.AnusuchiId == id)
-                .GroupBy(m => new
+                .ToListAsync();
+
+            var res = groupedMapdandas.GroupBy(m => new
                 {
-                    SubSubParichhed = m.SubSubParichhed != null ? m.SubSubParichhed.Name : "",
-                    SubParichhed = m.SubParichhed != null ? m.SubParichhed.Name : "",
                     Parichhed = m.Parichhed != null ? m.Parichhed.Name : "",
                     m.IsAvailableDivided,
                 })
                 .Select(g => new MapdandaByAnusuchiDto
                 {
-                    SubSubParichhed = g.Key.SubSubParichhed,
-                    SubParichhed = g.Key.SubParichhed,
-                    Parichhed = g.Key.Parichhed,
                     IsAvailableDivided = g.Key.IsAvailableDivided,
-                    Mapdandas = g.Select(x => new GroupedMapdanda
+                    Parichhed = g.GroupBy(x => x.Parichhed).Select(x => new GroupdParichhed
                     {
-                        Id = x.Id,
-                        Name = x.Name,
-                        SerialNumber = x.SerialNumber,
-                        Is100Active = x.Is100Active,
-                        Is200Active = x.Is200Active,
-                        Is50Active = x.Is50Active,
-                        Is25Active = x.Is25Active,
-                        Status = x.Status,
-                    }).ToList()
-                })
-                .ToListAsync();
+                        Name = x.Key != null ? x.Key.Name : "",
+                        GroupedPariched = x.GroupBy(y => y.SubParichhed).Select(a => new GroupdSubParichhed
+                        {
+                            Name = a.Key != null ? a.Key.Name : "",
+                            GroupdSubSubParichhed = a.GroupBy(b => b.SubSubParichhed).Select(c => new GroupdSubSubParichhed
+                            {
+                                Name = c.Key != null ? c.Key.Name : "",
+                                GroupedMapdanda = c.Select(d => new GroupedMapdanda
+                                {
+                                    Name = d.Name,
+                                    Id = d.Id,
+                                    SerialNumber = d.SerialNumber,
+                                    Is100Active = d.Is100Active,
+                                    Is200Active = d.Is200Active,
+                                    Is50Active = d.Is50Active,
+                                    Is25Active = d.Is25Active,
 
-            return TypedResults.Ok(new ResultWithDataDto<List<MapdandaByAnusuchiDto>>(true, groupedMapdandas, null));
+                                }).ToList(),
+                            }).ToList(),
+                        }).ToList(),
+                        
+                    }).ToList(),
+                })
+                .ToList();
+
+            return TypedResults.Ok(new ResultWithDataDto<List<MapdandaByAnusuchiDto>>(true, res, null));
 
         });
 
+
+        // mapdandas inside of anusuchi / parichheds / subparichheds / subsubparichheds
+        endpoints.MapGet("api/mapdandas/anusuchi/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetMapdandasOfAnusuchi(id)));
+        endpoints.MapGet("api/mapdandas/parichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetMapdandasOfParichhed(id)));
+        endpoints.MapGet("api/mapdandas/subparichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetMapdandasOfSubParichhed(id)));
+        endpoints.MapGet("api/mapdandas/subsubparichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetMapdandasOfSubSubParichhed(id)));
 
         return endpoints;
     }

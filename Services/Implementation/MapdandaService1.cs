@@ -85,8 +85,13 @@ public class MapdandaService1 : IMapdandaService1
 
         mapdanda.Name = dto.Name;
         mapdanda.Parimaad = dto.Parimaad;
-        
-        if(mapdanda.SerialNumber != dto.SerialNumber )
+        mapdanda.Is25Active = dto.Is25Active;
+        mapdanda.Is100Active = dto.Is100Active;
+        mapdanda.Is50Active = dto.Is50Active;
+        mapdanda.Is200Active = dto.Is200Active;
+
+
+        if (mapdanda.SerialNumber != dto.SerialNumber )
 
         if (dto.ParichhedId.HasValue)
         {

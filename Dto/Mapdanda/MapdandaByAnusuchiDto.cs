@@ -3,12 +3,28 @@ using HRRS.Dto.Parichhed;
 
 public class MapdandaByAnusuchiDto
 {
-    public string SubSubParichhed { get; set; }
-    public string SubParichhed { get; set; }
-    public string Parichhed { get; set; }
     public bool IsAvailableDivided { get; set; }
+    public List<GroupdParichhed> Parichhed { get; set; }
+}
 
-    public List<GroupedMapdanda> Mapdandas { get; set; }
+public class GroupdParichhed
+{
+    public string? Name { get; set; }
+    public List<GroupdSubParichhed> GroupedPariched { get; set; }
+
+}
+
+public class GroupdSubParichhed
+{
+    public string? Name { get; set; }
+    public List<GroupdSubSubParichhed> GroupdSubSubParichhed { get; set; }
+
+}
+
+public class GroupdSubSubParichhed
+{
+    public string? Name { get; set; }
+    public List<GroupedMapdanda> GroupedMapdanda { get; set; }
 }
 
 
@@ -21,6 +37,7 @@ public class GroupedMapdanda
     public bool Is200Active { get; set; }
     public bool Is50Active { get; set; }
     public bool Is25Active { get; set; }
+    public bool IsAvailableDivided { get; set; }
     public bool Status { get; set; }
 
 }

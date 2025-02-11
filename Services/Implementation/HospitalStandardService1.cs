@@ -143,8 +143,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
         
         hospitalStandards = hospitalStandards.Where(x => dto.HospitalMapdandas.Any(y => y.MapdandaId == x.MapdandaId)).ToList();
 
-
-
         foreach (var standard in hospitalStandards)
         {
             var mapdanda = dto.HospitalMapdandas.FirstOrDefault(x => x.MapdandaId == standard.MapdandaId);
