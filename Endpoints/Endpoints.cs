@@ -3,6 +3,7 @@ using HRRS.Dto.Anusuchi;
 using HRRS.Dto.Auth;
 using HRRS.Dto.FileUpload;
 using HRRS.Dto.HealthStandard;
+using HRRS.Dto.Mapdanda;
 using HRRS.Dto.Parichhed;
 using HRRS.Persistence.Context;
 using HRRS.Services.Interface;
@@ -145,10 +146,6 @@ public static class Endpoints
         endpoints.MapPost("api/v2/Mapdanda", async (MapdandaDto dto, IMapdandaService1 service) => TypedResults.Ok(await service.Add(dto)));
         endpoints.MapPost("api/v2/Mapdanda/{mapdandaId}/update", async (int mapdandaId, MapdandaDto dto, IMapdandaService1 service) => TypedResults.Ok(await service.UpdateMapdanda(mapdandaId, dto)));
 
-        // sub mapdanda services
-        endpoints.MapGet("api/v2/SubMapdanda/{id}", async (int id, IMapdandaService1 service) => TypedResults.Ok(await service.GetSubMapdandaById(id)));
-        endpoints.MapGet("api/v2/SubMapdanda/Mapdanda", async ([FromQuery] int mapdandaId, IMapdandaService1 service) => TypedResults.Ok(await service.GetSubMapdandaByMapdanda(mapdandaId)));
-
         endpoints.MapGet("api/v2/testgetanusuchi/{id}", async (int id, ApplicationDbContext context) =>
         {
             var groupedMapdandas = await context.Mapdandas
@@ -160,10 +157,10 @@ public static class Endpoints
                 .ToListAsync();
 
             var res = groupedMapdandas.GroupBy(m => new
-                {
-                    Parichhed = m.Parichhed != null ? m.Parichhed.Name : "",
-                    m.IsAvailableDivided,
-                })
+            {
+                Parichhed = m.Parichhed != null ? m.Parichhed.Name : "",
+                m.IsAvailableDivided,
+            })
                 .Select(g => new MapdandaByAnusuchiDto
                 {
                     IsAvailableDivided = g.Key.IsAvailableDivided,
@@ -189,12 +186,67 @@ public static class Endpoints
                                 }).ToList(),
                             }).ToList(),
                         }).ToList(),
+
+                    }).ToList(),
+                })
+                .ToList();
+
+            return TypedResults.Ok(new ResultWithDataDto<List<Dto.Mapdanda.MapdandaByAnusuchiDto>>(true, res, null));
+
+        });
+
+
+
+        endpoints.MapGet("api/v3/testgetanusuchi/{id}", async (int id, ApplicationDbContext context) =>
+        {
+            var groupedMapdandas = await context.Mapdandas
+                .Include(m => m.SubSubParichhed)
+                .Include(m => m.SubParichhed)
+                .Include(m => m.Parichhed)
+                .Where(x => x.AnusuchiId == id)
+                .ToListAsync();
+
+            var res = groupedMapdandas.GroupBy(m => new
+                {
+                    Parichhed = m.Parichhed != null ? m.Parichhed.Name : "",
+                    m.IsAvailableDivided,
+                })
+                .Select(g => new Dto.Mapdanda1.MapdandaByAnusuchiDto
+                {
+                    IsAvailableDivided = g.Key.IsAvailableDivided,
+                    Parichhed = g.GroupBy(x => x.Parichhed).Select(x => new Dto.Mapdanda1.GroupdParichhed
+                    {
+                        Name = x.Key != null ? x.Key.Name : "",
+                        GroupedPariched = x.GroupBy(y => y.SubParichhed).Select(a => new Dto.Mapdanda1.GroupdSubParichhed
+                        {
+                            Name = a.Key != null ? a.Key.Name : "",
+                            GroupdSubSubParichhed = a.GroupBy(b => b.SubSubParichhed).Select(c => new Dto.Mapdanda1.GroupdSubSubParichhed
+                            {
+                                Name = c.Key != null ? c.Key.Name : "",
+                                GroupedMapdandaGroup = c.GroupBy(e => e.Group).Select(f => new Dto.Mapdanda1.GroupedMapdandaByGroupName
+                                {
+                                    GroupName = f.Key,
+                                    GroupedMapdanda = f.Select(h => new Dto.Mapdanda1.GroupedMapdanda
+                                    {
+                                        Id = h.Id,
+                                        Name = h.Name,
+                                        SerialNumber = h.SerialNumber,
+                                        Is100Active = h.Is100Active,
+                                        Is200Active = h.Is200Active,
+                                        Is50Active = h.Is50Active,
+                                        Is25Active = h.Is25Active,
+                                        IsAvailableDivided = g.Key.IsAvailableDivided,
+                                        Status = h.Status,
+                                    }).ToList()
+                                }).ToList(),
+                            }).ToList(),
+                        }).ToList(),
                         
                     }).ToList(),
                 })
                 .ToList();
 
-            return TypedResults.Ok(new ResultWithDataDto<List<MapdandaByAnusuchiDto>>(true, res, null));
+            return TypedResults.Ok(new ResultWithDataDto<List<Dto.Mapdanda1.MapdandaByAnusuchiDto>>(true, res, null));
 
         });
 

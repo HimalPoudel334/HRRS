@@ -12,10 +12,4 @@ public interface IMapdandaService1
     Task<ResultWithDataDto<List<MapdandaDto>>> GetBySubParichhed(int subParichhedId, int? parichhedId, int? anusuchiId);
     Task<ResultWithDataDto<List<MapdandaDto>>> GetBySubSubParichhed(int subSubParichhedId, int? subParichhedId, int? parichhedId, int? anusuchiId);
 
-    Task<ResultDto> AddSubMapdanda(SubMapdandaDto dto);
-    Task<ResultDto> UpdateSubMapdanda(int subMapdandaId, SubMapdandaDto dto);
-    Task<ResultWithDataDto<SubMapdandaDto>> GetSubMapdandaById(int id);
-    Task<ResultWithDataDto<List<SubMapdandaDto>>> GetSubMapdandaByMapdanda(int mapdandaId);
-
-
 }

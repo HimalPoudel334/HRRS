@@ -8,6 +8,7 @@ public class Mapdanda
     public string SerialNumber { get; set; }
     public string Name { get; set; }
     public string? Parimaad { get; set; }
+    public string? Group { get; set; }
     public bool IsAvailableDivided { get; set; }
     public bool Is25Active { get; set; }
     public bool Is50Active { get; set; }
