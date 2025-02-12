@@ -1,4 +1,5 @@
 using HRRS.Dto;
+using HRRS.Dto.Mapdanda1;
 
 namespace HRRS.Services.Interface;
 public interface IMapdandaService1
@@ -8,7 +9,7 @@ public interface IMapdandaService1
     Task<ResultDto> UpdateMapdanda(int mapdandaId, MapdandaDto dto);
     Task<ResultDto> ToggleStatus(int mapdandaId);
     Task<ResultWithDataDto<MapdandaDto>> GetById(int id);
-    Task<ResultWithDataDto<List<MapdandaDto>>> GetByParichhed(int parichhedId, int? anusuchiId);
+    Task<ResultWithDataDto<List<GroupedMapdandaByGroupName>>> GetByParichhed(int parichhedId, int? anusuchiId);
     Task<ResultWithDataDto<List<MapdandaDto>>> GetBySubParichhed(int subParichhedId, int? parichhedId, int? anusuchiId);
     Task<ResultWithDataDto<List<MapdandaDto>>> GetBySubSubParichhed(int subSubParichhedId, int? subParichhedId, int? parichhedId, int? anusuchiId);
 

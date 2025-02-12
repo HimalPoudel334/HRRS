@@ -24,8 +24,10 @@ public class MapdandaDto
     public bool Is100Active { get; set; }
     public bool Is200Active { get; set; }
     public bool Status { get; set; }
+    public string? Group { get; set; }
     public int? ParichhedId { get; set; }
     public int? SubParichhedId { get; set; }
+    public SubSubParichhedDto SubSubParichhed { get; set; }
     public int? SubSubParichhedId { get; set; }
 
 }
@@ -38,21 +40,6 @@ public class SubMapdandaDto
     public string? Parimaad { get; set; }
     public int MapdandaId { get; set; }
     public bool Status { get; set; }
-}
+    public string? Group { get; set; }
 
-public class MapdandaDtoResponse
-{
-    public AnusuchiDto anusuchi { get; set; }
-    public ParichhedDto? parixed { get; set; }
-    public SubParichhedDto? subParixed { get; set; }
-    public SubSubParichhedDto? subbparixed { get; set; }
-    public MapdandaDto MapdandaName { get; set; }
-
-    public ICollection<SubMapdandaDto> SubMapdandas { get; set; } = [];
-}
-
-
-public class ResponseDto
-{
-    public List<MapdandaDtoResponse> data { get; set; }
 }

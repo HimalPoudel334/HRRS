@@ -18,10 +18,10 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
         {
             return ResultDto.Failure("Anusuchi must have name and serial number");
         }
-        if(await _dbContext.Anusuchis.AnyAsync(x => x.SerialNo == dto.SerialNo))
-        {
-            return ResultDto.Failure("Serial Number already exists");
-        }
+        //if(await _dbContext.Anusuchis.AnyAsync(x => x.SerialNo == dto.SerialNo))
+        //{
+        //    return ResultDto.Failure("Serial Number already exists");
+        //}
         Anusuchi anusuchi = new()
         {
             Name = dto.Name,
@@ -42,10 +42,10 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
             return ResultDto.Failure("Anusuchi Not Found");
         }
         
-        if (dto.SerialNo != anusuchi.SerialNo && await _dbContext.Anusuchis.AnyAsync(x => x.SerialNo == dto.SerialNo)) 
-        {
-                return ResultDto.Failure("Serial Number already taken");
-        }
+        //if (dto.SerialNo != anusuchi.SerialNo && await _dbContext.Anusuchis.AnyAsync(x => x.SerialNo == dto.SerialNo)) 
+        //{
+        //        return ResultDto.Failure("Serial Number already taken");
+        //}
         anusuchi.SerialNo = dto.SerialNo;
         anusuchi.Name = dto.Name;
         anusuchi.DafaNo = dto.DafaNo;
@@ -103,7 +103,8 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
                 IsAvailableDivided = x.IsAvailableDivided,
                 SerialNumber = x.SerialNumber,
                 SubParichhedId = x.SubParichhedId,
-                SubSubParichhedId = x.SubSubParichhedId
+                SubSubParichhedId = x.SubSubParichhedId,
+                Group = x.Group,
             }).ToListAsync();
 
             return ResultWithDataDto<AnusuchiDto>.Success(dto);
@@ -141,7 +142,8 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
                         IsAvailableDivided = x.IsAvailableDivided,
                         SerialNumber = x.SerialNumber,
                         SubParichhedId = x.SubParichhedId,
-                        SubSubParichhedId = x.SubSubParichhedId
+                        SubSubParichhedId = x.SubSubParichhedId,
+                        Group = x.Group,
                     }).ToListAsync();
                     parichhedDtos.Add(parichhedDto);
                     dto.Parichheds = parichhedDtos;
@@ -180,7 +182,8 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
                                 IsAvailableDivided = x.IsAvailableDivided,
                                 SerialNumber = x.SerialNumber,
                                 SubParichhedId = x.SubParichhedId,
-                                SubSubParichhedId = x.SubSubParichhedId
+                                SubSubParichhedId = x.SubSubParichhedId,
+                                Group = x.Group,
                             }).ToListAsync();
                             parichhedDto.SubParichheds = subParichhedDtos;
                         }
@@ -209,7 +212,8 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
                                         IsAvailableDivided = x.IsAvailableDivided,
                                         SerialNumber = x.SerialNumber,
                                         SubParichhedId = x.SubParichhedId,
-                                        SubSubParichhedId = x.SubSubParichhedId
+                                        SubSubParichhedId = x.SubSubParichhedId,
+                                        Group = x.Group,
                                     }).ToListAsync()
                                 };
                                 ssParichhedDtos.Add(ssDto);

@@ -1,5 +1,7 @@
 
+using System.Linq;
 using HRRS.Dto;
+using HRRS.Dto.Mapdanda1;
 using HRRS.Dto.Parichhed;
 using HRRS.Persistence.Context;
 using HRRS.Services.Interface;
@@ -26,11 +28,11 @@ public class ParichhedService : IParichhedService
             return ResultWithDataDto<ParichhedDto>.Failure("Anusuchi Not Found");
         }
 
-        if (await _context.Parichheds.AnyAsync(x => x.SerialNo == dto.SerialNo)) 
-        {
-            return ResultWithDataDto<ParichhedDto>.Failure("Serial number already taken");
+        //if (await _context.Parichheds.AnyAsync(x => x.SerialNo == dto.SerialNo)) 
+        //{
+        //    return ResultWithDataDto<ParichhedDto>.Failure("Serial number already taken");
 
-        }
+        //}
 
         var parichhed = new Parichhed()
         {
@@ -210,7 +212,7 @@ public class ParichhedService : IParichhedService
 
     public async Task<ResultWithDataDto<SubParichhedDto>> GetSubParichhedById(int id)
     {
-        var subParichhed = await _context.SubParichheds.FindAsync(id);
+        var subParichhed = await _context.SubParichheds.Include(x => x.Mapdandas).Include(x => x.SubSubParichheds).FirstOrDefaultAsync(x => x.Id == id);
         if (subParichhed == null)
         {
             return ResultWithDataDto<SubParichhedDto>.Failure("Sub Parichhed not found");
@@ -237,10 +239,10 @@ public class ParichhedService : IParichhedService
         {
             return ResultWithDataDto<SubSubParichhedDto>.Failure("Parichhed Not Found");
         }
-        if(await _context.SubSubParichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
-        {
-            return ResultWithDataDto<SubSubParichhedDto>.Failure("Serial number already taken");
-        }
+        //if(await _context.SubSubParichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
+        //{
+        //    return ResultWithDataDto<SubSubParichhedDto>.Failure("Serial number already taken");
+        //}
         var subSubParichhed = new SubSubParichhed()
         {
             SubParichhed = subParichhed,
@@ -270,10 +272,10 @@ public class ParichhedService : IParichhedService
             return ResultDto.Failure("Parichhed Not Found");
         }
 
-        if (subSubParichhed.SerialNo != dto.SerialNo && await _context.SubSubParichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
-        {
-            return ResultDto.Failure("Serial number already taken");
-        }
+        //if (subSubParichhed.SerialNo != dto.SerialNo && await _context.SubSubParichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
+        //{
+        //    return ResultDto.Failure("Serial number already taken");
+        //}
 
         subSubParichhed.Name = dto.Name;
         subSubParichhed.SerialNo = dto.SerialNo;
@@ -327,69 +329,180 @@ public class ParichhedService : IParichhedService
         return ResultWithDataDto<List<SubSubParichhedDto>>.Success(subSubParichhedsDto);
     }
 
-    public async Task<ResultWithDataDto<List<Mapdanda>>> GetMapdandasOfAnusuchi(int id)
+    public async Task<ResultWithDataDto<List<MapdandaByAnusuchiDto>>> GetMapdandasOfAnusuchi(int id)
     {
-        var res = await _context.Mapdandas.Where(x => x.AnusuchiId == id)
-            .Where(x => x.Parichhed == null).ToListAsync();
+        var mapdandas = await _context.Mapdandas.Where(x => x.AnusuchiId == id)
+        .Where(x => x.Parichhed == null).ToListAsync();
 
-        return new ResultWithDataDto<List<Mapdanda>>(true, res, null);
+        var res = mapdandas.GroupBy(m => new
+        {
+            Parichhed = m.Parichhed != null ? m.Parichhed.Name : "",
+            m.IsAvailableDivided,
+        })
+        .Select(g => new Dto.Mapdanda1.MapdandaByAnusuchiDto
+        {
+            IsAvailableDivided = g.Key.IsAvailableDivided,
+            Parichhed = g.GroupBy(x => x.Parichhed).Select(x => new Dto.Mapdanda1.GroupdParichhed
+            {
+                Name = x.Key != null ? x.Key.Name : "",
+                GroupedPariched = x.GroupBy(y => y.SubParichhed).Select(a => new Dto.Mapdanda1.GroupdSubParichhed
+                {
+                    Name = a.Key != null ? a.Key.Name : "",
+                    GroupdSubSubParichhed = a.GroupBy(b => b.SubSubParichhed).Select(c => new Dto.Mapdanda1.GroupdSubSubParichhed
+                    {
+                        Name = c.Key != null ? c.Key.Name : "",
+                        GroupedMapdandaGroup = c.GroupBy(e => e.Group).Select(f => new Dto.Mapdanda1.GroupedMapdandaByGroupName
+                        {
+                            GroupName = f.Key,
+                            GroupedMapdanda = f.Select(h => new Dto.Mapdanda1.GroupedMapdanda
+                            {
+                                Id = h.Id,
+                                Name = h.Name,
+                                SerialNumber = h.SerialNumber,
+                                Is100Active = h.Is100Active,
+                                Is200Active = h.Is200Active,
+                                Is50Active = h.Is50Active,
+                                Is25Active = h.Is25Active,
+                                IsAvailableDivided = g.Key.IsAvailableDivided,
+                                Status = h.Status,
+                                Parimaad = h.Parimaad,
+                                Group = h.Group,
+                            }).ToList()
+                        }).ToList(),
+                    }).ToList(),
+                }).ToList(),
+
+            }).ToList(),
+        })
+        .ToList();
+
+        return new ResultWithDataDto<List<Dto.Mapdanda1.MapdandaByAnusuchiDto>>(true, res, null);
     }
 
-    public async Task<ResultWithDataDto<List<Mapdanda>>> GetMapdandasOfParichhed(int parichhedId)
+    public async Task<ResultWithDataDto<List<GroupdParichhed>>> GetMapdandasOfParichhed(int parichhedId)
     {
-        //var parichhed = await _context.Parichheds.FindAsync(parichhedId);
-        //var groupedMapdandas = await _context.Mapdandas
-        //        .Include(m => m.SubSubParichhed)
-        //        .Include(m => m.SubParichhed)
-        //        .Include(m => m.Parichhed)
-        //        .Include(m => m.SubMapdandas)
-        //        .Where(x => x.Parichhed == parichhed)
-        //        .GroupBy(m => new
-        //        {
-        //            SubSubParichhed = m.SubSubParichhed != null ? m.SubSubParichhed.Name : "",
-        //            SubParichhed = m.SubParichhed != null ? m.SubParichhed.Name : "",
-        //            Parichhed = m.Parichhed != null ? m.Parichhed.Name : "",
-        //            m.IsAvailableDivided,
-        //        })
-        //        .Select(g => new MapdandaByAnusuchiDto
-        //        {
-        //            SubSubParichhed = g.Key.SubSubParichhed,
-        //            SubParichhed = g.Key.SubParichhed,
-        //            Parichhed = g.Key.Parichhed,
-        //            IsAvailableDivided = g.Key.IsAvailableDivided,
-        //            Mapdandas = g.Select(x => new GroupedMapdanda
-        //            {
-        //                Id = x.Id,
-        //                Name = x.Name,
-        //                SerialNumber = x.SerialNumber,
-        //                Is100Active = x.Is100Active,
-        //                Is200Active = x.Is200Active,
-        //                Is50Active = x.Is50Active,
-        //                Is25Active = x.Is25Active,
-        //                IsAvailableDivided = g.Key.IsAvailableDivided,
-        //                Status = x.Status,
-        //            }).ToList()
-        //        })
-        //        .ToListAsync();
-
         var map = await _context.Mapdandas
             .Where(x => x.ParichhedId == parichhedId)
             .Where(x => x.SubParichhedId == null)
             .ToListAsync();
 
+        var res = map.GroupBy(m => new
+        {
+            SubParichhed = m.SubParichhed != null ? m.SubParichhed.Name : "",
+            m.IsAvailableDivided,
+        })
+        .Select(g => new GroupdParichhed
+        {
+            Name = g.Key != null ? g.Key.SubParichhed : "",
+            GroupedPariched = g.GroupBy(x => x.SubParichhed).Select(z => new GroupdSubParichhed
+            {
+                Name = z.Key != null ? z.Key.Name : "",
+                GroupdSubSubParichhed = z.GroupBy(a => a.SubSubParichhed).Select(b => new GroupdSubSubParichhed
+                {
+                    Name = b.Key.Name != null ? b.Key.Name : "",
+                    GroupedMapdandaGroup = b.GroupBy(c => c.Group).Select(d => new GroupedMapdandaByGroupName
+                    {
+                        GroupName = d.Key,
+                        GroupedMapdanda = d.Select(e => new GroupedMapdanda
+                        {
+                            Id = e.Id,
+                            Name = e.Name,
+                            SerialNumber = e.SerialNumber,
+                            Is100Active = e.Is100Active,
+                            Is200Active = e.Is200Active,
+                            Is50Active = e.Is50Active,
+                            Is25Active = e.Is25Active,
+                            Status = e.Status,
+                            Parimaad = e.Parimaad,
+                            Group = e.Group,
 
-        return new ResultWithDataDto<List<Mapdanda>>(true, map, null);
-        }
+                        }).ToList()
+                    }).ToList()
+                }).ToList(),
+            }).ToList()
+        }).ToList();
 
-    public async Task<ResultWithDataDto<List<Mapdanda>>> GetMapdandasOfSubParichhed(int subParichhedId)
+        return new ResultWithDataDto<List<Dto.Mapdanda1.GroupdParichhed>>(true, res, null);
+
+    }
+
+    public async Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetMapdandasOfSubParichhed(int subParichhedId)
     {
         var map = await _context.Mapdandas
+            .Include(x => x.SubSubParichhed)
             .Where(x => x.SubParichhedId == subParichhedId)
-            .Where(x => x.SubSubParichhedId == null)
             .ToListAsync();
 
-        return new ResultWithDataDto<List<Mapdanda>>(true, map, null);
+
+        var res = map
+            .GroupBy(m => m.SubSubParichhed)
+            .Select(m => new GroupedSubSubParichhedAndMapdanda
+            {
+                HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
+                SubSubParixed = m.Key?.Name,
+                List = m
+                .GroupBy(m => m.Group)
+                .Select(m => new GroupedMapdandaByGroupName
+                {
+                    GroupName = m.Key,
+                    GroupedMapdanda = m.Select( m => new GroupedMapdanda
+                    {
+                        Id = m.Id,
+                        Name = m.Name,
+                        SerialNumber = m.SerialNumber,
+                        Is100Active = m.Is100Active,
+                        Is200Active = m.Is200Active,
+                        Is50Active = m.Is50Active,
+                        Is25Active = m.Is25Active,
+                        Status = m.Status,
+                        Parimaad = m.Parimaad,
+                        Group = m.Group,
+                        IsAvailableDivided = m.IsAvailableDivided,
+                    }).ToList()
+
+                }).ToList()
+            })
+            .ToList();
+
+        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(res);
+
+        
+
+
+
+        //var res = map.GroupBy(m => new
+        //{
+        //    SubSubParichhed = m.SubSubParichhed != null ? m.SubSubParichhed.Name : "",
+        //    m.IsAvailableDivided,
+        //}).Select(x => new GroupdSubParichhed
+        //{
+        //    Name = x.Key.SubSubParichhed != null ? x.Key.SubSubParichhed : "",
+        //    GroupdSubSubParichhed = x.GroupBy(y => y.SubSubParichhed).Select(z => new GroupdSubSubParichhed
+        //    {
+        //        Name = z.Key != null ? z.Key.Name : "",
+        //        GroupedMapdandaGroup = z.GroupBy(a => a.Group).Select(b => new GroupedMapdandaByGroupName
+        //        {
+        //            GroupName = b.Key,
+        //            GroupedMapdanda = b.Select(c => new GroupedMapdanda
+        //            {
+        //                Id = c.Id,
+        //                Name = c.Name,
+        //                SerialNumber = c.SerialNumber,
+        //                Is100Active = c.Is100Active,
+        //                Is200Active = c.Is200Active,
+        //                Is50Active = c.Is50Active,
+        //                Is25Active = c.Is25Active,
+        //                Status = c.Status,
+        //                Parimaad = c.Parimaad
+        //            }).ToList()
+        //        }).ToList(),
+        //    }).ToList(),
+        //}).ToList();
+
+        //return new ResultWithDataDto<List<GroupdSubParichhed>>(true, res, null);
     }
+
+
 
     public async Task<ResultWithDataDto<List<Mapdanda>>> GetMapdandasOfSubSubParichhed(int subSubParichhedId)
     {

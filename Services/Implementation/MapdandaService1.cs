@@ -1,4 +1,5 @@
 using HRRS.Dto;
+using HRRS.Dto.Mapdanda1;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Repositories.Interfaces;
 using HRRS.Services.Interface;
@@ -36,7 +37,7 @@ public class MapdandaService1 : IMapdandaService1
             SerialNumber = serialNo + 1,
             Anusuchi = anusuchi,
             Parimaad = dto.Parimaad,
-
+            Group = dto.Group,
         };
 
         if (dto.ParichhedId.HasValue)
@@ -89,6 +90,7 @@ public class MapdandaService1 : IMapdandaService1
         mapdanda.Is100Active = dto.Is100Active;
         mapdanda.Is50Active = dto.Is50Active;
         mapdanda.Is200Active = dto.Is200Active;
+        mapdanda.Group = dto.Group;
 
 
         if (mapdanda.SerialNumber != dto.SerialNumber )
@@ -136,7 +138,7 @@ public class MapdandaService1 : IMapdandaService1
 
         if (anusuchiId != null)
         {
-            mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId);
+            mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId && x.Parichhed == null && x.SubParichhed == null && x.SubSubParichhed == null);
         }
 
         var res = await mapdandas.Select(mapdanda => new MapdandaDto()
@@ -152,8 +154,10 @@ public class MapdandaService1 : IMapdandaService1
             Is200Active = mapdanda.Is200Active,
             Is50Active = mapdanda.Is50Active,
             Is25Active = mapdanda.Is25Active,
+            Status = mapdanda.Status,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
-            Parimaad = mapdanda.Parimaad
+            Parimaad = mapdanda.Parimaad,
+            Group = mapdanda.Group,
         }).OrderBy(x => x.SerialNumber)
         .OrderBy(x => x.AnusuchiId)
         .ToListAsync();
@@ -181,47 +185,52 @@ public class MapdandaService1 : IMapdandaService1
             Is200Active = mapdanda.Is200Active,
             Is50Active = mapdanda.Is50Active,
             Is25Active = mapdanda.Is25Active,
+            Status = mapdanda.Status,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
-            Parimaad = mapdanda.Parimaad
+            Parimaad = mapdanda.Parimaad,
+            Group = mapdanda.Group,
         };
         return ResultWithDataDto<MapdandaDto>.Success(dto);
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByParichhed(int parichhedId, int? anusuchiId)
+    public async Task<ResultWithDataDto<List<GroupedMapdandaByGroupName>>> GetByParichhed(int parichhedId, int? anusuchiId)
     {
 
-        var mapdandas = _dbContext.Mapdandas.Where(x => x.ParichhedId == parichhedId).AsQueryable();
+        var mapdandas = _dbContext.Mapdandas.Where(x => x.ParichhedId == parichhedId && x.SubParichhed == null && x.SubSubParichhed == null).AsQueryable();
 
         if (anusuchiId != null)
         {
             mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId);
         }
 
-        var res = await mapdandas.Select(mapdanda => new MapdandaDto()
-        {
-            Id = mapdanda.Id,
-            Name = mapdanda.Name,
-            SerialNumber = mapdanda.SerialNumber,
-            AnusuchiId = mapdanda.AnusuchiId,
-            ParichhedId = mapdanda.ParichhedId,
-            SubParichhedId = mapdanda.SubParichhedId,
-            SubSubParichhedId = mapdanda.SubSubParichhedId,
-            Is100Active = mapdanda.Is100Active,
-            Is200Active = mapdanda.Is200Active,
-            Is50Active = mapdanda.Is50Active,
-            Is25Active = mapdanda.Is25Active,
-            IsAvailableDivided = mapdanda.IsAvailableDivided,
-            Parimaad = mapdanda.Parimaad
-        }).OrderBy(x => x.SerialNumber)
-        .OrderBy(x => x.AnusuchiId)
-        .ToListAsync();
+        var res = await mapdandas.GroupBy(m => new {m.IsAvailableDivided, m.Group})
+            .Select(m => new GroupedMapdandaByGroupName
+            {
+                HasBedCount = m.Key.IsAvailableDivided,
+                GroupName = m.Key.Group,
+                GroupedMapdanda = m.Select(m => new GroupedMapdanda
+                {
+                    Id = m.Id,  
+                    Name = m.Name,
+                    SerialNumber = m.SerialNumber,
+                    Is100Active = m.Is100Active,
+                    Is200Active = m.Is200Active,
+                    Is50Active = m.Is50Active,
+                    Is25Active = m.Is25Active,
+                    Status = m.Status,
+                    Parimaad = m.Parimaad,
+                    Group = m.Group,
+                    IsAvailableDivided = m.IsAvailableDivided,
+                }).ToList()
 
-        return ResultWithDataDto<List<MapdandaDto>>.Success(res);
+            }).ToListAsync();
+
+        return ResultWithDataDto<List<GroupedMapdandaByGroupName>>.Success(res);
     }
 
     public async Task<ResultWithDataDto<List<MapdandaDto>>> GetBySubParichhed(int subParichhedId, int? parichhedId, int? anusuchiId)
     {
-        var mapdandas = _dbContext.Mapdandas.Where(x => x.SubParichhedId == subParichhedId).AsQueryable();
+        var mapdandas = _dbContext.Mapdandas.Where(x => x.SubParichhedId == subParichhedId && x.SubSubParichhed == null).AsQueryable();
         if(parichhedId != null)
         {
             mapdandas = mapdandas.Where(x => x.ParichhedId == parichhedId);
@@ -247,6 +256,7 @@ public class MapdandaService1 : IMapdandaService1
             Status = mapdanda.Status,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
             Parimaad = mapdanda.Parimaad,
+            Group = mapdanda.Group,
         }).OrderBy(x => x.SerialNumber)
         .OrderBy(x => x.AnusuchiId)
         .ToListAsync();
@@ -286,7 +296,8 @@ public class MapdandaService1 : IMapdandaService1
             Is25Active = mapdanda.Is25Active,
             Status = mapdanda.Status,
             IsAvailableDivided = mapdanda.IsAvailableDivided,
-            Parimaad = mapdanda.Parimaad
+            Parimaad = mapdanda.Parimaad,
+            Group = mapdanda.Group,
         }).OrderBy(x => x.SerialNumber)
         .OrderBy(x => x.AnusuchiId)
         .ToListAsync();

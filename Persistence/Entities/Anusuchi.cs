@@ -25,6 +25,7 @@ public class SubParichhed
     public Parichhed Parichhed { get; set; }
     public int ParichhedId { get; set; }
     public ICollection<SubSubParichhed> SubSubParichheds { get; set; } = [];
+    public ICollection<Mapdanda> Mapdandas { get; set; } = [];
 }
 
 public class SubSubParichhed
@@ -34,5 +35,7 @@ public class SubSubParichhed
     public string SerialNo { get; set; }
     public SubParichhed SubParichhed { get; set; }
     public int SubParichhedId { get; set; }
+    public ICollection<Mapdanda> Mapdandas { get; set; } = [];
+
 
 }

@@ -1,4 +1,5 @@
 using HRRS.Dto;
+using HRRS.Dto.Mapdanda1;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Repositories.Interfaces;
 using HRRS.Services.Interface;
@@ -39,10 +40,10 @@ public class MapdandaService : IMapdandaService
         if(dto.SubParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.SubParichhedId == dto.SubParichhedId);
         if(dto.SubSubParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.SubSubParichhedId == dto.SubSubParichhedId);
 
-        if(await exsitingMapdanda.AnyAsync(x => x.SerialNumber == dto.SerialNumber))
-        {
-            return ResultDto.Failure("Serial Number Already Exist");
-        }
+        //if(await exsitingMapdanda.AnyAsync(x => x.SerialNumber == dto.SerialNumber))
+        //{
+        //    return ResultDto.Failure("Serial Number Already Exist");
+        //}
 
         if (await exsitingMapdanda.AnyAsync(x => x.IsAvailableDivided != dto.IsAvailableDivided))
         {
@@ -62,7 +63,8 @@ public class MapdandaService : IMapdandaService
             SerialNumber = dto.SerialNumber,
             Anusuchi = anusuchi,
             Parimaad = dto.Parimaad,
-            IsAvailableDivided = dto.IsAvailableDivided
+            IsAvailableDivided = dto.IsAvailableDivided,
+            Group = dto.Group,
         };
 
         if (dto.ParichhedId.HasValue)
@@ -135,39 +137,46 @@ public class MapdandaService : IMapdandaService
         mapdanda.Is25Active = dto.Is25Active;
         mapdanda.Is200Active = dto.Is200Active;
         mapdanda.Is50Active = dto.Is50Active;
+        mapdanda.Group = dto.Group;
 
         //mapdanda.AnusuchiId = dto.AnusuchiId;
         await _dbContext.SaveChangesAsync();
         return ResultDto.Success();
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int? anusuchiId)
+    public async Task<ResultWithDataDto<List<GroupedMapdandaByGroupName>>> GetByAnusuchi(int? anusuchiId)
     {
 
         var mapdandas = _dbContext.Mapdandas.AsQueryable();
 
         if (anusuchiId != null)
         {
-            mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId);
+            mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId && x.Parichhed == null && x.SubParichhed == null && x.SubSubParichhed == null);
         }
 
-        var res = await mapdandas.Select(x => new MapdandaDto()
-        {
-            Id = x.Id,
-            Name = x.Name,
-            SerialNumber = x.SerialNumber,
-            AnusuchiId = x.AnusuchiId,
-            Status = x.Status,
-            Is25Active = x.Is25Active,
-            Is50Active = x.Is50Active,
-            Is100Active = x.Is100Active,
-            Is200Active = x.Is200Active,
-            IsAvailableDivided = x.IsAvailableDivided
-        }).OrderBy(x=> x.SerialNumber)
-        .OrderBy(x=> x.AnusuchiId)
-        .ToListAsync();
+        var res = await mapdandas.GroupBy(m => new {m.IsAvailableDivided, m.Group})
+            .Select(m => new GroupedMapdandaByGroupName
+            {
+                HasBedCount = m.Key.IsAvailableDivided,
+                GroupName = m.Key.Group,
+                GroupedMapdanda = m.Select(m => new GroupedMapdanda
+                {
+                    Id = m.Id,
+                    Name = m.Name,
+                    SerialNumber = m.SerialNumber,
+                    Is100Active = m.Is100Active,
+                    Is200Active = m.Is200Active,
+                    Is50Active = m.Is50Active,
+                    Is25Active = m.Is25Active,
+                    Status = m.Status,
+                    Parimaad = m.Parimaad,
+                    Group = m.Group,
+                    IsAvailableDivided = m.IsAvailableDivided,
+                }).ToList()
 
-        return ResultWithDataDto<List<MapdandaDto>>.Success(res);
+            }).ToListAsync();
+
+        return ResultWithDataDto<List<GroupedMapdandaByGroupName>>.Success(res);
     }
 
     public async Task<ResultDto> ToggleStatus(int mapdandaId)
@@ -183,4 +192,22 @@ public class MapdandaService : IMapdandaService
 
         return ResultDto.Success();
     }
+
+    public async Task<ResultWithDataDto<List<string>>> GetMapdandaGroups(string? searchKey)
+    {
+        var distinctGroupsQuery = _dbContext.Mapdandas
+            .Where(m => m.Group != null)
+            .Select(x => x.Group)
+            .Distinct();
+
+        if (!string.IsNullOrEmpty(searchKey))
+        {
+            distinctGroupsQuery = distinctGroupsQuery.Where(x => x.Contains(searchKey));
+        }
+
+        var distinctGroups = await distinctGroupsQuery.ToListAsync();
+
+        return ResultWithDataDto<List<string>>.Success(distinctGroups);
+    }
+
 }
