@@ -1,4 +1,5 @@
-﻿using HRRS.Dto;
+﻿using System.Security.Claims;
+using HRRS.Dto;
 using HRRS.Dto.Anusuchi;
 using HRRS.Dto.Auth;
 using HRRS.Dto.FileUpload;
@@ -30,11 +31,12 @@ public static class Endpoints
             return TypedResults.Ok(await service.RegisterHospitalAsync(dto));
         });
 
-        endpoints.MapGet("api/mapdanda/", async ([FromQuery] string? anusuchiId, IMapdandaService mapdandaService) =>
+        endpoints.MapGet("api/mapdanda/", async ([FromQuery] string? anusuchiId, IMapdandaService mapdandaService, ClaimsPrincipal user) =>
         {
             int? parsedId = string.IsNullOrWhiteSpace(anusuchiId) ? null : int.Parse(anusuchiId);
-            return TypedResults.Ok(await mapdandaService.GetByAnusuchi(parsedId));
-        });
+            var userType = user.FindFirstValue(ClaimTypes.Role);
+            return TypedResults.Ok(await mapdandaService.GetByAnusuchi(parsedId, userType));
+        }).RequireAuthorization();
 
         endpoints.MapPost("api/mapdanda/", [Authorize(Roles = "SuperAdmin")] async (MapdandaDto dto, IMapdandaService mapdandaService) =>
             TypedResults.Ok(await mapdandaService.Add(dto)));
@@ -92,18 +94,17 @@ public static class Endpoints
 
         });
 
-        endpoints.MapPost("api/MapdandaUpload", async ([FromQuery] int hospitalId, [FromQuery] int serialNo, [FromQuery] int anusuchiNo, [FromQuery] string InspectionDate, IFormFile file, IFileUploadService service) =>
+        endpoints.MapPost("api/MapdandaUpload", async ([FromQuery] int mapdandaId, IFormFile file, IFileUploadService service, ClaimsPrincipal user) =>
         {
+            var userId = int.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
             var dto = new FileDto()
             {
-                HospitalId = hospitalId,
-                SerialNo = serialNo,
-                AnusuchiNo = anusuchiNo,
-                InspectionDate = InspectionDate,
+                UserId = userId,
+                MapdandaId = mapdandaId,
                 File = file
             };
             return TypedResults.Ok(await service.UploadFileAsync(dto));
-        }).DisableAntiforgery();
+        }).RequireAuthorization().DisableAntiforgery();
 
 
         // anusuchi services
@@ -133,7 +134,7 @@ public static class Endpoints
         endpoints.MapGet("api/SubSubParichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetSubSubParichhedById(id)));
 
         //hospital standard1 services
-        endpoints.MapPost("api/v2/HospitalStandard", async (HospitalStandardDto1 dto, IHospitalStandardService1 service) => TypedResults.Ok(await service.Create(dto)));
+        endpoints.MapPost("api/v2/HospitalStandard", async (List<HospitalMapdandasDto1> dto, IHospitalStandardService1 service, ClaimsPrincipal user) => TypedResults.Ok(await service.Create(dto, int.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization();
         endpoints.MapGet("api/v2/HospitalStandard", async ([FromQuery] int hospitalId, [FromQuery] int anusuchiId, IHospitalStandardService1 service) => TypedResults.Ok(await service.Get(hospitalId, anusuchiId)));
 
         //file upload services

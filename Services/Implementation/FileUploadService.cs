@@ -2,15 +2,19 @@
 using System.Text;
 using HRRS.Dto;
 using HRRS.Dto.FileUpload;
+using HRRS.Persistence.Context;
 using HRRS.Services.Interface;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HRRS.Services.Implementation;
 
 public class FileUploadService : IFileUploadService
 {
     private readonly string _fileUploadPath;
+    private readonly ApplicationDbContext _context;
 
-    public FileUploadService(IConfiguration configuration, IWebHostEnvironment env)
+    public FileUploadService(IConfiguration configuration, IWebHostEnvironment env, ApplicationDbContext context)
     {
         var appRoot = env.ContentRootPath;
         _fileUploadPath = Path.Combine(appRoot, configuration["FileUploadPath"] ?? Path.Combine("Media", "Mapdanda"));
@@ -19,6 +23,8 @@ public class FileUploadService : IFileUploadService
         {
             Directory.CreateDirectory(_fileUploadPath);
         }
+
+        _context = context;
     }
 
     public async Task<ResultWithDataDto<string>> UploadFileAsync(FileDto dto)
@@ -28,7 +34,13 @@ public class FileUploadService : IFileUploadService
             return ResultWithDataDto<string>.Failure("File is empty");
         }
 
-        var uniqueFileName = $"H{dto.HospitalId}-A{dto.AnusuchiNo}-SN{dto.SerialNo}{Path.GetExtension(dto.File.FileName)}";
+        var user = await _context.Users.Include(x => x.HealthFacility).FirstOrDefaultAsync(x => x.UserId==dto.UserId);
+        if(user is null || user.HealthFacility == null)
+        {
+            return ResultWithDataDto<string>.Failure("Hospital not found");
+        }
+
+        var uniqueFileName = $"H{user.HealthFacilityId}-M{dto.MapdandaId}{Path.GetExtension(dto.File.FileName)}";
         var filePath = Path.Combine(_fileUploadPath, uniqueFileName);
 
         using (var stream = new FileStream(filePath, FileMode.Create))

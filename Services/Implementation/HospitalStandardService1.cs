@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Claims;
 using HRRS.Dto;
 using HRRS.Dto.HealthStandard;
 using HRRS.Persistence.Context;
@@ -12,9 +14,15 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
     
-    public async Task<ResultDto> Create(HospitalStandardDto1 dto)
+    public async Task<ResultDto> Create(List<HospitalMapdandasDto1> dto, int id)
     {
-        var healthFacility = await _dbContext.HealthFacilities.FindAsync(dto.HealthFacilityId);
+        var user = await _dbContext.Users.FindAsync((long) id); 
+        if(user == null)
+        {
+            return ResultDto.Failure("User not found");
+        }
+
+        var healthFacility = await _dbContext.HealthFacilities.FindAsync(user.HealthFacilityId);
 
         List<HospitalStandard> stdrs = [];
         if (healthFacility == null)
@@ -22,12 +30,12 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
             ResultDto.Failure("Health Facility not found");
         }
 
-        if(dto.HospitalMapdandas.Any(x => x.StandardId > 0))
+        if(dto.Any(x => x.StandardId > 0))
         {
-           return await Update(dto);
+           return await Update(dto, healthFacility.Id);
         }
 
-        foreach(var item in dto.HospitalMapdandas)
+        foreach(var item in dto)
         {
             var mapdanda = await _dbContext.Mapdandas.FindAsync(item.MapdandaId) ?? throw new Exception("Mapdanda not found");
 
@@ -43,7 +51,7 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                 Has50 = item.Has50,
                 Has100 = item.Has100,
                 Has200 = item.Has200,
-
+                Status = false,
             });
 
         }
@@ -53,17 +61,14 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
 
         return ResultDto.Success();
     }
-    public async Task<ResultWithDataDto<HospitalStandardDto1>> Get(int hospitalId, int anusuchiId)
+
+    public async Task<ResultWithDataDto<List<HospitalMapdandasDto1>>> Get(int hospitalId, int anusuchiId)
     {
         var res = await _dbContext.HospitalStandards
             .Include(x => x.Mapdanda)
             .Where(x => x.HealthFacilityId == hospitalId && x.Mapdanda.AnusuchiId == anusuchiId)
-            .GroupBy(x => x.HealthFacility.Id)
-            .Select(x => new HospitalStandardDto1()
+            .Select(x => new HospitalMapdandasDto1()
             {
-                HealthFacilityId = x.Key,
-                HospitalMapdandas = x.Select(x => new HospitalMapdandasDto1()
-                {
                     StandardId = x.Id,
                     FilePath = x.FilePath,
                     FiscalYear = x.FiscalYear,
@@ -75,76 +80,43 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                     Has25 = x.Has25,
                     Has50 = x.Has50,
                     Has100 = x.Has100,
-                    Has200 = x.Has200
+                    Has200 = x.Has200,
+                    Status = x.Status
 
-                }).ToList(),
-            }).FirstOrDefaultAsync();
+            }).ToListAsync();
 
-        if (res is not null) return ResultWithDataDto<HospitalStandardDto1>.Success(res);
+        if (res is not null) return ResultWithDataDto<List<HospitalMapdandasDto1>>.Success(res);
 
-        var mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == anusuchiId).ToListAsync();
-        var dtos = new HospitalStandardDto1()
+        var mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == anusuchiId).Select(x => new HospitalMapdandasDto1()
         {
-            HealthFacilityId = hospitalId,
-            HospitalMapdandas = mapdandas.Select(x => new HospitalMapdandasDto1()
-            {
-                StandardId = 0,
-                FilePath = "",
-                FiscalYear = null,
-                IsAvailable = false,
-                SerialNumber = x.SerialNumber,
-                MapdandaName = x.Name,
-                MapdandaId = x.Id,
-                Remarks = "",
-                Has25 = "",
-                Has50 = "",
-                Has100 = "",
-                Has200 = ""
-            }).ToList(),
-        };
+            StandardId = 0,
+            FilePath = "",
+            FiscalYear = null,
+            IsAvailable = false,
+            SerialNumber = x.SerialNumber,
+            MapdandaName = x.Name,
+            MapdandaId = x.Id,
+            Remarks = "",
+            Has25 = false,
+            Has50 = false,
+            Has100 = false,
+            Has200 = false,
+            Status = false,
+        }).ToListAsync();
 
-        return ResultWithDataDto<HospitalStandardDto1>.Success(dtos);
+        return ResultWithDataDto<List<HospitalMapdandasDto1>>.Success(mapdandas);
     }
-    public async Task<ResultWithDataDto<HospitalStandardDto1>> GetById(int id)
-    {
-        var hospitalStandard = await _dbContext.HospitalStandards.FindAsync(id);
-        if(hospitalStandard == null)
-        {
-            return ResultWithDataDto<HospitalStandardDto1>.Failure("Hospital Standard not found");
-        }
-        var hospitalStandardDto = new HospitalStandardDto1()
-        {
-            HealthFacilityId = hospitalStandard.HealthFacilityId,
-            HospitalMapdandas =
-            [
-                new HospitalMapdandasDto1()
-                {
-                    FilePath = hospitalStandard.FilePath,
-                    FiscalYear = hospitalStandard.FiscalYear,
-                    IsAvailable = hospitalStandard.IsAvailable,
-                    MapdandaName = hospitalStandard.Mapdanda.Name,
-                    SerialNumber = hospitalStandard.Mapdanda.SerialNumber,
-                    MapdandaId = hospitalStandard.MapdandaId,
-                    Remarks = hospitalStandard.Remarks,
-                    Has25 = hospitalStandard.Has25,
-                    Has50 = hospitalStandard.Has50,
-                    Has100 = hospitalStandard.Has100,
-                    Has200 = hospitalStandard.Has200
-                }
-            ]
-        };
-        return ResultWithDataDto<HospitalStandardDto1>.Success(hospitalStandardDto);
-    }
-    private async Task<ResultDto> Update(HospitalStandardDto1 dto)
+
+    private async Task<ResultDto> Update(List<HospitalMapdandasDto1> dto, int facilityId)
     {
         var hospitalStandards = await _dbContext.HospitalStandards
-            .Where(x => x.HealthFacilityId == dto.HealthFacilityId).ToListAsync();
+            .Where(x => x.HealthFacilityId == facilityId).ToListAsync();
         
-        hospitalStandards = hospitalStandards.Where(x => dto.HospitalMapdandas.Any(y => y.MapdandaId == x.MapdandaId)).ToList();
+        hospitalStandards = hospitalStandards.Where(x => dto.Any(y => y.MapdandaId == x.MapdandaId)).ToList(); 
 
         foreach (var standard in hospitalStandards)
         {
-            var mapdanda = dto.HospitalMapdandas.FirstOrDefault(x => x.MapdandaId == standard.MapdandaId);
+            var mapdanda = dto.FirstOrDefault(x => x.MapdandaId == standard.MapdandaId);
             if (mapdanda is not null)
             {
                 standard.IsAvailable = mapdanda.IsAvailable;
@@ -155,7 +127,8 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                 standard.Has50 = mapdanda.Has50;
                 standard.Has100 = mapdanda.Has100;
                 standard.Has200 = mapdanda.Has200;
-
+                standard.Status = mapdanda.Status;
+                standard.UpdatedAt = DateTime.Now;
             }
         }
 

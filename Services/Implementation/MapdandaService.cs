@@ -144,14 +144,16 @@ public class MapdandaService : IMapdandaService
         return ResultDto.Success();
     }
 
-    public async Task<ResultWithDataDto<List<GroupedMapdandaByGroupName>>> GetByAnusuchi(int? anusuchiId)
+    public async Task<ResultWithDataDto<List<GroupedMapdandaByGroupName>>> GetByAnusuchi(int? anusuchiId, string userType)
     {
-
         var mapdandas = _dbContext.Mapdandas.AsQueryable();
 
         if (anusuchiId != null)
         {
             mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId && x.Parichhed == null && x.SubParichhed == null && x.SubSubParichhed == null);
+        }
+        if (userType == "Hospital") {
+            mapdandas = mapdandas.Where(x => x.Status == true);
         }
 
         var res = await mapdandas.GroupBy(m => new {m.IsAvailableDivided, m.Group})

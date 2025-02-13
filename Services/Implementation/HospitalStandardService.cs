@@ -18,7 +18,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         List<HospitalStandard> stdrs = [];
         if (healthFacility == null)
         {
-            throw new Exception("Health Facility not found");
+            return ResultDto.Failure("Health Facility not found");
         }
 
         if(dto.HospitalMapdandas.Any(x => x.StandardId > 0))
