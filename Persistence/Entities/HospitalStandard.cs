@@ -18,6 +18,8 @@ public class HospitalStandard
     public bool Status { get; set; } = false;
     public HealthFacility HealthFacility { get; set; }
     public Mapdanda Mapdanda { get; set; }
+    public HospitalStandardEntry StandardEntry { get; set; }
+    public int StandardEntryId { get; set; }
 }
 
 

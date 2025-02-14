@@ -21,6 +21,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<SubParichhed> SubParichheds { get; set; }
     public DbSet<SubSubParichhed> SubSubParichheds { get; set; }
     public DbSet<SubMapdanda> SubMapdandas { get; set; }
+    public DbSet<HospitalStandardEntry> HospitalStandardEntrys { get; set; }
 
 
     

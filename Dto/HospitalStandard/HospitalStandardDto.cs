@@ -30,6 +30,7 @@ public class HospitalStandardPartialDto {
     public string Remarks { get; set; }
     public string FiscalYear { get; set; }
     public bool? Status { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
 
 public class HospitalMapdandasDto1

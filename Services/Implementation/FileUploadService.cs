@@ -34,13 +34,13 @@ public class FileUploadService : IFileUploadService
             return ResultWithDataDto<string>.Failure("File is empty");
         }
 
-        var user = await _context.Users.Include(x => x.HealthFacility).FirstOrDefaultAsync(x => x.UserId==dto.UserId);
-        if(user is null || user.HealthFacility == null)
-        {
-            return ResultWithDataDto<string>.Failure("Hospital not found");
-        }
+        //var user = await _context.Users.Include(x => x.HealthFacility).FirstOrDefaultAsync(x => x.UserId==dto.UserId);
+        //if(user is null || user.HealthFacility == null)
+        //{
+        //    return ResultWithDataDto<string>.Failure("Hospital not found");
+        //}
 
-        var uniqueFileName = $"H{user.HealthFacilityId}-M{dto.MapdandaId}{Path.GetExtension(dto.File.FileName)}";
+        var uniqueFileName = $"H{Guid.NewGuid()}-M{dto.MapdandaId}{Path.GetExtension(dto.File.FileName)}";
         var filePath = Path.Combine(_fileUploadPath, uniqueFileName);
 
         using (var stream = new FileStream(filePath, FileMode.Create))

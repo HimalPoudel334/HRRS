@@ -5,8 +5,7 @@ public class HospitalStandardEntry
     public string? Remarks { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; set; }
-
-    public EntryStatus Status { get; set; }
+    public EntryStatus Status { get; set; } = EntryStatus.Draft;
 
     public ICollection<HospitalStandard> HospitalStandards { get; set; } = [];
 }
