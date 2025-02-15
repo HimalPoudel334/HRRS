@@ -136,6 +136,14 @@ public static class Endpoints
         //hospital standard1 services
         endpoints.MapPost("api/v2/HospitalStandard", async (List<HospitalMapdandasDto1> dto, IHospitalStandardService1 service, ClaimsPrincipal user) => TypedResults.Ok(await service.Create(dto, int.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization();
         endpoints.MapGet("api/v2/HospitalStandard", async ([FromQuery] int hospitalId, [FromQuery] int anusuchiId, IHospitalStandardService1 service) => TypedResults.Ok(await service.Get(hospitalId, anusuchiId)));
+        endpoints.MapGet("api/v2/standardentry/{hospitalId}", async (int hospitalId, IHospitalStandardService1 service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetHospitalStandardsEntry(hospitalId, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization();
+        endpoints.MapGet("api/v2/standard/entry/{standardId}", async (int standardId, IHospitalStandardService1 service) => TypedResults.Ok(await service.GetHospitalStandardForEntry(standardId)));
+
+        endpoints.MapPost("api/v2/standard/status/approve/{entryId}", [Authorize(Roles = "SuperAdmin")] async (int entryId, StandardRemarkDto dto, IHospitalStandardService1 service) => TypedResults.Ok(await service.ApproveStandardsWithRemark(entryId, dto))).RequireAuthorization();
+        endpoints.MapPost("api/v2/standard/status/reject/{entryId}", [Authorize(Roles = "SuperAdmin")] async (int entryId, StandardRemarkDto dto, IHospitalStandardService1 service) => TypedResults.Ok(await service.RejectStandardsWithRemark(entryId, dto))).RequireAuthorization();
+        endpoints.MapPost("api/v2/standard/status/pending/{entryId}", async (int entryId, IHospitalStandardService1 service, ClaimsPrincipal user) => TypedResults.Ok(await service.PendingHospitalStandardsEntry(entryId, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization();
+
+        endpoints.MapGet("api/v2/hospitalentry/{entryId}", async (int entryId, IHospitalStandardService1 service) => TypedResults.Ok(await service.GetHospitalEntryById(entryId)));
 
         //file upload services
         endpoints.MapPost("api/v2/FileUpload", async (FileUploadDto dto, IFileUploadService service) => TypedResults.Ok(await service.UploadFileAsync(dto)));

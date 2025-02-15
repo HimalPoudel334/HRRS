@@ -79,6 +79,7 @@ namespace HRRS.Services.Implementation
             }
             var healthFacilityDto = new HealthFacilityDto
             {
+                Id = id,
                 FacilityName = healthFacility.FacilityName,
                 FacilityType = healthFacility.FacilityType,
                 PanNumber = healthFacility.PanNumber,

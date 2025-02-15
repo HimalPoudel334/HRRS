@@ -1,4 +1,6 @@
 
+using Persistence.Entities;
+
 public class HospitalStandardEntry
 {
     public int Id { get; set; }
