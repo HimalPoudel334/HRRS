@@ -44,7 +44,7 @@ namespace HRRS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Anusuchis", (string)null);
+                    b.ToTable("Anusuchis");
                 });
 
             modelBuilder.Entity("HRRS.Persistence.Entities.User", b =>
@@ -74,7 +74,7 @@ namespace HRRS.Migrations
 
                     b.HasIndex("HealthFacilityId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("HospitalStandard", b =>
@@ -135,7 +135,7 @@ namespace HRRS.Migrations
 
                     b.HasIndex("StandardEntryId");
 
-                    b.ToTable("HospitalStandards", (string)null);
+                    b.ToTable("HospitalStandards");
                 });
 
             modelBuilder.Entity("HospitalStandardEntry", b =>
@@ -160,7 +160,7 @@ namespace HRRS.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("HospitalStandardEntrys", (string)null);
+                    b.ToTable("HospitalStandardEntrys");
                 });
 
             modelBuilder.Entity("Mapdanda", b =>
@@ -225,7 +225,7 @@ namespace HRRS.Migrations
 
                     b.HasIndex("SubSubParichhedId");
 
-                    b.ToTable("Mapdandas", (string)null);
+                    b.ToTable("Mapdandas");
                 });
 
             modelBuilder.Entity("Parichhed", b =>
@@ -251,7 +251,7 @@ namespace HRRS.Migrations
 
                     b.HasIndex("AnusuchiId");
 
-                    b.ToTable("Parichheds", (string)null);
+                    b.ToTable("Parichheds");
                 });
 
             modelBuilder.Entity("Persistence.Entities.HealthFacility", b =>
@@ -386,7 +386,7 @@ namespace HRRS.Migrations
                     b.HasIndex("PanNumber")
                         .IsUnique();
 
-                    b.ToTable("HealthFacilities", (string)null);
+                    b.ToTable("HealthFacilities");
                 });
 
             modelBuilder.Entity("SubMapdanda", b =>
@@ -418,7 +418,7 @@ namespace HRRS.Migrations
 
                     b.HasIndex("MapdandaId");
 
-                    b.ToTable("SubMapdandas", (string)null);
+                    b.ToTable("SubMapdandas");
                 });
 
             modelBuilder.Entity("SubParichhed", b =>
@@ -444,7 +444,7 @@ namespace HRRS.Migrations
 
                     b.HasIndex("ParichhedId");
 
-                    b.ToTable("SubParichheds", (string)null);
+                    b.ToTable("SubParichheds");
                 });
 
             modelBuilder.Entity("SubSubParichhed", b =>
@@ -470,7 +470,7 @@ namespace HRRS.Migrations
 
                     b.HasIndex("SubParichhedId");
 
-                    b.ToTable("SubSubParichheds", (string)null);
+                    b.ToTable("SubSubParichheds");
                 });
 
             modelBuilder.Entity("HRRS.Persistence.Entities.User", b =>

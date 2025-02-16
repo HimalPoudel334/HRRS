@@ -73,23 +73,23 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
 
     public async Task<ResultWithDataDto<List<HospitalEntryDto>>> GetHospitalStandardsEntry(int hospitalId, long userId)
     {
-        //var user = await _dbContext.Users.FindAsync(userId);
-        //if(user is null)
-        //{
-        //    return ResultWithDataDto<List<HospitalEntryDto>>.Failure("Health Facility not found");
-        //}
+        var user = await _dbContext.Users.FindAsync(userId);
+        if (user is null)
+        {
+            return ResultWithDataDto<List<HospitalEntryDto>>.Failure("Health Facility not found");
+        }
 
-        //var query = _dbContext.HospitalStandards.AsQueryable();
-        //if(user.UserType == "SuperAdmin")
-        //{
-        //    query = query.Where(x => x.StandardEntry.Status != EntryStatus.Draft).Where(x => x.HealthFacilityId == hospitalId);
-        //} 
+        var query = _dbContext.HospitalStandards.AsQueryable();
+        if (user.UserType == "SuperAdmin")
+        {
+            query = query.Where(x => x.StandardEntry.Status != EntryStatus.Draft);
+        }
         //else
         //{
         //    query = query.Where(x => x.HealthFacilityId == user.HealthFacilityId);
         //}
 
-        var entries = await _dbContext.HospitalStandards
+        var entries = await query
             .Where(x => x.HealthFacilityId == hospitalId)
             .GroupBy(x => x.StandardEntry)
             .Select(x => new HospitalEntryDto

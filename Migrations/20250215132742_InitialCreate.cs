@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace HRRS.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCrreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -72,6 +73,22 @@ namespace HRRS.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_HealthFacilities", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "HospitalStandardEntrys",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HospitalStandardEntrys", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,11 +184,13 @@ namespace HRRS.Migrations
                     SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Parimaad = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Group = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsAvailableDivided = table.Column<bool>(type: "bit", nullable: false),
                     Is25Active = table.Column<bool>(type: "bit", nullable: false),
                     Is50Active = table.Column<bool>(type: "bit", nullable: false),
                     Is100Active = table.Column<bool>(type: "bit", nullable: false),
                     Is200Active = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
                     AnusuchiId = table.Column<int>(type: "int", nullable: false),
                     ParichhedId = table.Column<int>(type: "int", nullable: true),
                     SubParichhedId = table.Column<int>(type: "int", nullable: true),
@@ -212,14 +231,17 @@ namespace HRRS.Migrations
                     HealthFacilityId = table.Column<int>(type: "int", nullable: false),
                     MapdandaId = table.Column<int>(type: "int", nullable: false),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: true),
-                    Has25 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Has50 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Has100 = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Has200 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Has25 = table.Column<bool>(type: "bit", nullable: true),
+                    Has50 = table.Column<bool>(type: "bit", nullable: true),
+                    Has100 = table.Column<bool>(type: "bit", nullable: true),
+                    Has200 = table.Column<bool>(type: "bit", nullable: true),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FiscalYear = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<bool>(type: "bit", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    StandardEntryId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -228,6 +250,12 @@ namespace HRRS.Migrations
                         name: "FK_HospitalStandards_HealthFacilities_HealthFacilityId",
                         column: x => x.HealthFacilityId,
                         principalTable: "HealthFacilities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_HospitalStandards_HospitalStandardEntrys_StandardEntryId",
+                        column: x => x.StandardEntryId,
+                        principalTable: "HospitalStandardEntrys",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -247,7 +275,8 @@ namespace HRRS.Migrations
                     SerialNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Parimaad = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MapdandaId = table.Column<int>(type: "int", nullable: false)
+                    MapdandaId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -275,6 +304,11 @@ namespace HRRS.Migrations
                 name: "IX_HospitalStandards_MapdandaId",
                 table: "HospitalStandards",
                 column: "MapdandaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HospitalStandards_StandardEntryId",
+                table: "HospitalStandards",
+                column: "StandardEntryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Mapdandas_AnusuchiId",
@@ -333,6 +367,9 @@ namespace HRRS.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "HospitalStandardEntrys");
 
             migrationBuilder.DropTable(
                 name: "Mapdandas");
