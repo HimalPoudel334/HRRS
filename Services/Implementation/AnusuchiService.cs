@@ -1,4 +1,4 @@
-
+﻿
 using HRRS.Dto;
 using HRRS.Dto.Anusuchi;
 using HRRS.Dto.Parichhed;
@@ -16,7 +16,7 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
     {
         if (string.IsNullOrEmpty(dto.Name) || string.IsNullOrEmpty(dto.SerialNo))
         {
-            return ResultDto.Failure("Anusuchi must have name and serial number");
+            return ResultDto.Failure("अनुसूचीमा नाम र क्रम सङ्ख्या हुनु पर्छ।");
         }
         //if(await _dbContext.Anusuchis.AnyAsync(x => x.SerialNo == dto.SerialNo))
         //{
@@ -39,7 +39,7 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
         var anusuchi = await _dbContext.Anusuchis.FindAsync(anusuchiId);
         if (anusuchi == null)
         {
-            return ResultDto.Failure("Anusuchi Not Found");
+            return ResultDto.Failure("अनुसूची फेला परेन।");
         }
         
         //if (dto.SerialNo != anusuchi.SerialNo && await _dbContext.Anusuchis.AnyAsync(x => x.SerialNo == dto.SerialNo)) 
@@ -76,7 +76,7 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
         var anusuchi = await _dbContext.Anusuchis.Include(x => x.Parichheds).FirstOrDefaultAsync(x => x.Id == id);
         if (anusuchi == null)
         {
-            return ResultWithDataDto<AnusuchiDto>.Failure("Anusuchi Not Found");
+            return ResultWithDataDto<AnusuchiDto>.Failure("अनुसूची फेला परेन।");
         }
 
         var dto = new AnusuchiDto()
@@ -99,6 +99,10 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
                 Is50Active = x.Is50Active,
                 Is100Active = x.Is100Active,
                 Is200Active = x.Is200Active,
+                Value25 = x.Value25,
+                Value50 = x.Value50,
+                Value100 = x.Value100,
+                Value200 = x.Value200,
                 Parimaad = x.Parimaad,
                 IsAvailableDivided = x.IsAvailableDivided,
                 SerialNumber = x.SerialNumber,
@@ -138,6 +142,10 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
                         Is50Active = x.Is50Active,
                         Is100Active = x.Is100Active,
                         Is200Active = x.Is200Active,
+                        Value25 = x.Value25,
+                        Value50 = x.Value50,
+                        Value100 = x.Value100,
+                        Value200 = x.Value200,
                         Parimaad = x.Parimaad,
                         IsAvailableDivided = x.IsAvailableDivided,
                         SerialNumber = x.SerialNumber,
@@ -178,6 +186,10 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
                                 Is50Active = x.Is50Active,
                                 Is100Active = x.Is100Active,
                                 Is200Active = x.Is200Active,
+                                Value25 = x.Value25,
+                                Value50 = x.Value50,
+                                Value100 = x.Value100,
+                                Value200 = x.Value200,
                                 Parimaad = x.Parimaad,
                                 IsAvailableDivided = x.IsAvailableDivided,
                                 SerialNumber = x.SerialNumber,
@@ -208,6 +220,10 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
                                         Is50Active = x.Is50Active,
                                         Is100Active = x.Is100Active,
                                         Is200Active = x.Is200Active,
+                                        Value25 = x.Value25,
+                                        Value50 = x.Value50,
+                                        Value100 = x.Value100,
+                                        Value200 = x.Value200,
                                         Parimaad = x.Parimaad,
                                         IsAvailableDivided = x.IsAvailableDivided,
                                         SerialNumber = x.SerialNumber,

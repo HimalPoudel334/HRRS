@@ -1,4 +1,6 @@
 
+using System.ComponentModel.DataAnnotations.Schema;
+using HRRS.Persistence.Entities;
 using Persistence.Entities;
 
 public class HospitalStandardEntry
@@ -8,7 +10,8 @@ public class HospitalStandardEntry
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; set; }
     public EntryStatus Status { get; set; } = EntryStatus.Draft;
-
+    public SubmissionType SubmissionType { get; set; } = SubmissionType.Registration;
+    public MasterStandardEntry MasterStandardEntry { get; set; }
     public ICollection<HospitalStandard> HospitalStandards { get; set; } = [];
 }
 
@@ -18,4 +21,10 @@ public enum EntryStatus
     Approved,
     Rejected,
     Draft
+}
+
+public enum SubmissionType
+{
+    Registration,
+    Renewal
 }

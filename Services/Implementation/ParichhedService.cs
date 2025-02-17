@@ -1,4 +1,4 @@
-
+﻿
 using System.Linq;
 using HRRS.Dto;
 using HRRS.Dto.Mapdanda1;
@@ -19,13 +19,13 @@ public class ParichhedService : IParichhedService
     {
         if (string.IsNullOrEmpty(dto.Name) || string.IsNullOrEmpty(dto.SerialNo))
         {
-            return ResultWithDataDto<ParichhedDto>.Failure("Parichhed must have name and serial number");
+            return ResultWithDataDto<ParichhedDto>.Failure("परिच्छेदको नाम र क्रम सङ्ख्या हुनु पर्छ।");
         }
 
         var anusuchi = await _context.Anusuchis.FindAsync(dto.AnusuchiId);
         if (anusuchi == null)
         {
-            return ResultWithDataDto<ParichhedDto>.Failure("Anusuchi Not Found");
+            return ResultWithDataDto<ParichhedDto>.Failure("अनुसूची फेला परेन।");
         }
 
         //if (await _context.Parichheds.AnyAsync(x => x.SerialNo == dto.SerialNo)) 
@@ -55,13 +55,13 @@ public class ParichhedService : IParichhedService
         var parichhed = await _context.Parichheds.FindAsync(parichhedId);
         if (parichhed == null)
         {
-            return ResultDto.Failure("Parichhed not found");
+            return ResultDto.Failure("परिच्छेद फेला परेन।");
         }
 
         var anusuchi = await _context.Anusuchis.FindAsync(dto.AnusuchiId);
         if (anusuchi == null)
         {
-            return ResultDto.Failure("Anusuchi Not Found");
+            return ResultDto.Failure("अनुसूची फेला परेन।");
         }
 
         if(parichhed.SerialNo != dto.SerialNo && await _context.Parichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
@@ -103,7 +103,7 @@ public class ParichhedService : IParichhedService
         var parichhed = await _context.Parichheds.FindAsync(id);
         if (parichhed == null)
         {
-            return ResultWithDataDto<ParichhedDto>.Failure("Parichhed not found");
+            return ResultWithDataDto<ParichhedDto>.Failure("परिच्छेद फेला परेन।");
         }
 
         var parichhedDto = new ParichhedDto()
@@ -135,13 +135,13 @@ public class ParichhedService : IParichhedService
     {
         if (string.IsNullOrEmpty(dto.Name) || string.IsNullOrEmpty(dto.SerialNo))
         {
-            return ResultWithDataDto<SubParichhedDto>.Failure("Parichhed must have name and serial number");
+            return ResultWithDataDto<SubParichhedDto>.Failure("उपपरिच्छेदको नाम र क्रम सङ्ख्या हुनु पर्छ।");
         }
 
         var parichhed = await _context.Parichheds.FindAsync(dto.ParichhedId);
         if (parichhed == null)
         {
-            return ResultWithDataDto<SubParichhedDto>.Failure("Parichhed Not Found");
+            return ResultWithDataDto<SubParichhedDto>.Failure("परिच्छेद फेला परेन।");
         }
 
         var subParichhed = new SubParichhed()
@@ -165,13 +165,13 @@ public class ParichhedService : IParichhedService
         var subParichhed = await _context.SubParichheds.FindAsync(subParichhedId);
         if (subParichhed == null)
         {
-            return ResultDto.Failure("Parichhed Not Found");
+            return ResultDto.Failure("Parichhed फेला परेन।");
         }
 
         var parichhed = await _context.Parichheds.FindAsync(dto.ParichhedId);
         if (parichhed == null)
         {
-            return ResultDto.Failure("Parichhed Not Found");
+            return ResultDto.Failure("Parichhed फेला परेन।");
         }
 
         subParichhed.Name = dto.Name;
@@ -215,7 +215,7 @@ public class ParichhedService : IParichhedService
         var subParichhed = await _context.SubParichheds.Include(x => x.Mapdandas).Include(x => x.SubSubParichheds).FirstOrDefaultAsync(x => x.Id == id);
         if (subParichhed == null)
         {
-            return ResultWithDataDto<SubParichhedDto>.Failure("Sub Parichhed not found");
+            return ResultWithDataDto<SubParichhedDto>.Failure("Sub Parichhed फेला परेन।");
         }
         var subParichhedDto = new SubParichhedDto()
         {
@@ -237,7 +237,7 @@ public class ParichhedService : IParichhedService
         var subParichhed = await _context.SubParichheds.FindAsync(dto.SubParichhedId);
         if (subParichhed == null)
         {
-            return ResultWithDataDto<SubSubParichhedDto>.Failure("Parichhed Not Found");
+            return ResultWithDataDto<SubSubParichhedDto>.Failure("Parichhed फेला परेन।");
         }
         //if(await _context.SubSubParichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
         //{
@@ -263,13 +263,13 @@ public class ParichhedService : IParichhedService
         var subSubParichhed = await _context.SubSubParichheds.FindAsync(subSubParichhedId);
         if (subSubParichhed == null)
         {
-            return ResultDto.Failure("Parichhed Not Found");
+            return ResultDto.Failure("Parichhed फेला परेन।");
         }
 
         var subParichhed = await _context.SubParichheds.FindAsync(dto.SubParichhedId);
         if (subParichhed == null)
         {
-            return ResultDto.Failure("Parichhed Not Found");
+            return ResultDto.Failure("Parichhed फेला परेन।");
         }
 
         //if (subSubParichhed.SerialNo != dto.SerialNo && await _context.SubSubParichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
@@ -304,7 +304,7 @@ public class ParichhedService : IParichhedService
         var subSubParichhed = await _context.SubSubParichheds.FindAsync(id);
         if (subSubParichhed == null)
         {
-            return ResultWithDataDto<SubSubParichhedDto>.Failure("Sub Parichhed not found");
+            return ResultWithDataDto<SubSubParichhedDto>.Failure("Sub Parichhed फेला परेन।");
         }
         var subParichhedDto = new SubSubParichhedDto()
         {
@@ -412,6 +412,10 @@ public class ParichhedService : IParichhedService
                             Is200Active = e.Is200Active,
                             Is50Active = e.Is50Active,
                             Is25Active = e.Is25Active,
+                            Value25 = e.Value25,
+                            Value50 = e.Value50,
+                            Value100 = e.Value100,
+                            Value200 = e.Value200,
                             Status = e.Status,
                             Parimaad = e.Parimaad,
                             Group = e.Group,
@@ -454,6 +458,10 @@ public class ParichhedService : IParichhedService
                         Is200Active = m.Is200Active,
                         Is50Active = m.Is50Active,
                         Is25Active = m.Is25Active,
+                        Value25 = m.Value25,
+                        Value50 = m.Value50,
+                        Value100 = m.Value100,
+                        Value200 = m.Value200,
                         Status = m.Status,
                         Parimaad = m.Parimaad,
                         Group = m.Group,

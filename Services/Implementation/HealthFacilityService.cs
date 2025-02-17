@@ -1,4 +1,4 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
@@ -75,7 +75,7 @@ namespace HRRS.Services.Implementation
             var healthFacility = await _context.HealthFacilities.FindAsync(id);
             if(healthFacility == null)
             {
-                return ResultWithDataDto<HealthFacilityDto>.Failure("Not found");
+                return ResultWithDataDto<HealthFacilityDto>.Failure("स्वास्थ्य संस्था फेला परेन।");
             }
             var healthFacilityDto = new HealthFacilityDto
             {
@@ -141,7 +141,7 @@ namespace HRRS.Services.Implementation
             {
                 var facility = await _context.HealthFacilities.Where(x=> x.Id == user.HealthFacilityId).SingleOrDefaultAsync();
                 if (facility == null) {
-                    return new ResultWithDataDto<List<HealthFacilityDto>>(true, null, "Cannot find Health Facility");
+                    return new ResultWithDataDto<List<HealthFacilityDto>>(true, null, "स्वास्थ्य संस्था फेला परेन।");
                 }
                 var dto = new HealthFacilityDto()
                 {
@@ -235,7 +235,7 @@ namespace HRRS.Services.Implementation
 
             if(facilityDto.Count == 0)
             {
-                return new ResultWithDataDto<List<HealthFacilityDto>>(true, facilityDto, "There are no health facilities available");
+                return new ResultWithDataDto<List<HealthFacilityDto>>(true, facilityDto, "कुनै पनि स्वास्थ्य संस्था फेला परेन।");
             }
 
             return ResultWithDataDto<List<HealthFacilityDto>>.Success(facilityDto);

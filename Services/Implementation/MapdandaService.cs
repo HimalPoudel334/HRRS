@@ -1,4 +1,4 @@
-using HRRS.Dto;
+﻿using HRRS.Dto;
 using HRRS.Dto.Mapdanda1;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Repositories.Interfaces;
@@ -25,13 +25,13 @@ public class MapdandaService : IMapdandaService
         //}
         if(string.IsNullOrEmpty(dto.Name) || string.IsNullOrEmpty(dto.SerialNumber))
         {
-            return ResultDto.Failure("Mapdanda must have name and serial number");    
+            return ResultDto.Failure("मापदण्डामा नाम र क्रम सङ्ख्या हुनु पर्छ।");    
         }
 
         var anusuchi = await _dbContext.Anusuchis.FindAsync(dto.AnusuchiId);
         if (anusuchi == null)
         {
-            return ResultDto.Failure("Anusuchi Not Found");
+            return ResultDto.Failure("अनुसूची फेला परेन।");
         }
 
         var exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.AnusuchiId == dto.AnusuchiId);
@@ -51,9 +51,21 @@ public class MapdandaService : IMapdandaService
             if(exm.IsAvailableDivided != dto.IsAvailableDivided)
             {
                 if(exm.IsAvailableDivided)
-                    return ResultDto.Failure("Mapdanda should have bed counts");
+                    return ResultDto.Failure("मापदण्डामा शय्या सङ्ख्याको गणना हुनु पर्छ।");
 
-                return ResultDto.Failure("Mapdanda should not have bed counts");
+                return ResultDto.Failure("मापदण्डामा शय्या सङ्ख्याको गणना हुनु हुँदैन।");
+            }
+        }
+
+        if (await exsitingMapdanda.AnyAsync(x => x.Parimaad != dto.Parimaad))
+        {
+            var exm = await exsitingMapdanda.FirstAsync();
+            if (exm.Parimaad != dto.Parimaad)
+            {
+                if (exm.IsAvailableDivided)
+                    return ResultDto.Failure("मापदण्डामा परिमाण हुनु पर्छ।");
+
+                return ResultDto.Failure("मापदण्डामा परिमाण हुनु हुँदैन।");
             }
         }
 
@@ -72,7 +84,7 @@ public class MapdandaService : IMapdandaService
             var parichhed = await _dbContext.Parichheds.FindAsync(dto.ParichhedId);
             if (parichhed == null)
             {
-                return ResultDto.Failure("Parichhed Not Found");
+                return ResultDto.Failure("परिच्छेद फेला परेन।");
             }
             mapdanda.Parichhed = parichhed;
 
@@ -81,7 +93,7 @@ public class MapdandaService : IMapdandaService
                 var subParichhed = await _dbContext.SubParichheds.FindAsync(dto.SubParichhedId);
                 if (subParichhed == null)
                 {
-                    return ResultDto.Failure("Sub Parichhed Not Found");
+                    return ResultDto.Failure("उपपरिच्छेद फेला परेन।");
                 }
                 
                 mapdanda.SubParichhed = subParichhed;
@@ -91,7 +103,7 @@ public class MapdandaService : IMapdandaService
                     var subSubParichhed = await _dbContext.SubSubParichheds.FindAsync(dto.SubSubParichhedId);
                     if (subSubParichhed == null)
                     {
-                        return ResultDto.Failure("Sub Sub Parichhed Not Found");
+                        return ResultDto.Failure("उपपरिच्छेदको भाग परिच्छेद फेला परेन।");
                     }
                     mapdanda.SubSubParichhed = subSubParichhed;
                 }
@@ -104,6 +116,10 @@ public class MapdandaService : IMapdandaService
             mapdanda.Is50Active = dto.Is50Active;
             mapdanda.Is100Active = dto.Is100Active;
             mapdanda.Is200Active = dto.Is200Active;
+            mapdanda.Value25 = dto.Is25Active ? dto.Value25 : null;
+            mapdanda.Value50 = dto.Is50Active ? dto.Value50 : null;
+            mapdanda.Value100 = dto.Is100Active ? dto.Value100 : null;
+            mapdanda.Value200 = dto.Is200Active ? dto.Value200 : null;
         }
 
         await _dbContext.Mapdandas.AddAsync(mapdanda);
@@ -117,7 +133,7 @@ public class MapdandaService : IMapdandaService
         var mapdanda = await _dbContext.Mapdandas.FindAsync(mapdandaId);
         if (mapdanda == null)
         {
-            return ResultDto.Failure("Mapdanda not found");
+            return ResultDto.Failure("मापदण्ड फेला परेन।");
         }
 
         var exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.AnusuchiId == dto.AnusuchiId);
@@ -128,7 +144,7 @@ public class MapdandaService : IMapdandaService
 
         if (dto.SerialNumber != mapdanda.SerialNumber && await exsitingMapdanda.AnyAsync(x => x.SerialNumber == dto.SerialNumber))
         {
-            return ResultDto.Failure("Serial Number Already Exist");
+            return ResultDto.Failure("सिरियल नम्बर पहिलेदेखि प्रयोगमा छ।");
         }
 
         mapdanda.Name = dto.Name;
@@ -138,6 +154,10 @@ public class MapdandaService : IMapdandaService
         mapdanda.Is200Active = dto.Is200Active;
         mapdanda.Is50Active = dto.Is50Active;
         mapdanda.Group = dto.Group;
+        mapdanda.Value25 = dto.Is25Active ? dto.Value25 : null;
+        mapdanda.Value50 = dto.Is50Active ? dto.Value50 : null;
+        mapdanda.Value100 = dto.Is100Active ? dto.Value100 : null;
+        mapdanda.Value200 = dto.Is200Active ? dto.Value200 : null;
 
         //mapdanda.AnusuchiId = dto.AnusuchiId;
         await _dbContext.SaveChangesAsync();
@@ -170,6 +190,10 @@ public class MapdandaService : IMapdandaService
                     Is200Active = m.Is200Active,
                     Is50Active = m.Is50Active,
                     Is25Active = m.Is25Active,
+                    Value25 = m.Value25,
+                    Value50 = m.Value50,
+                    Value100 = m.Value100,
+                    Value200 = m.Value200,
                     Status = m.Status,
                     Parimaad = m.Parimaad,
                     Group = m.Group,
@@ -186,7 +210,7 @@ public class MapdandaService : IMapdandaService
         var mapdanda = await _dbContext.Mapdandas.FindAsync(mapdandaId);
         if (mapdanda is null)
         {
-            return ResultDto.Failure("Mapdanda doesnot exists");
+            return ResultDto.Failure("मापदण्ड फेला परेन।");
         }
 
         mapdanda.Status = !mapdanda.Status;

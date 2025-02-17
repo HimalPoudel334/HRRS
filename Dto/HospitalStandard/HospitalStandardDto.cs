@@ -50,6 +50,12 @@ public class HospitalMapdandasDto1
     public bool Status { get; set; }
 }
 
+public class HospitalStandardDto1
+{
+    public Guid SubmissionCode { get; set; }
+    public ICollection<HospitalMapdandasDto1> Mapdandas { get; set; } = [];
+}
+
 public class HospitalEntryDto
 {
     public int Id { get; set; }
@@ -58,6 +64,7 @@ public class HospitalEntryDto
     public string? SubParichhed { get; set; }
     public string Anusuchi { get; set; }
     public string? Remarks { get; set; }
+    public SubmissionType SubmissionType { get; set; }
 
 }
 

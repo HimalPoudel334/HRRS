@@ -42,6 +42,7 @@ builder.Services.AddScoped<IHealthFacilityService, HealthFacilityService>();
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 builder.Services.AddScoped<IAnusuchiService, AnusuchiService>();
 builder.Services.AddScoped<IParichhedService, ParichhedService>();
+builder.Services.AddScoped<IMasterStandardEntryService, MasterStandardEntryService>();
 
 builder.Services.AddScoped<IMapdandaRepository, MapdandaRepository>();
 builder.Services.AddScoped<IHospitalStandardRespository, HospitalStandardRepository>();

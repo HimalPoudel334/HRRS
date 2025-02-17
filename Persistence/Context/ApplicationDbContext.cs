@@ -22,10 +22,11 @@ public class ApplicationDbContext : DbContext
     public DbSet<SubSubParichhed> SubSubParichheds { get; set; }
     public DbSet<SubMapdanda> SubMapdandas { get; set; }
     public DbSet<HospitalStandardEntry> HospitalStandardEntrys { get; set; }
+    public DbSet<MasterStandardEntry> MasterStandardEntries { get; set; }
 
 
     
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+    /*protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         optionsBuilder.UseSeeding((context, _) =>
         {
             var user = context.Set<User>().FirstOrDefault();
@@ -222,7 +223,7 @@ public class ApplicationDbContext : DbContext
                 await context.Set<Mapdanda>().AddRangeAsync(mapdandas, cancellationToken);
                 await context.SaveChangesAsync(cancellationToken);
             }
-        });
+        });*/
     
 
 }
