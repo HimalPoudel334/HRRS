@@ -1,7 +1,6 @@
 
 using HRRS.Dto;
-using HRRS.Dto.Anusuchi;
-using HRRS.Dto.Mapdanda1;
+using HRRS.Dto.AdminMapdanda;
 using HRRS.Dto.Parichhed;
 
 namespace HRRS.Services.Interface;
@@ -25,8 +24,6 @@ public interface IParichhedService
     Task<ResultWithDataDto<List<SubSubParichhedDto>>> GetAllSubSubParichheds();
 
     /* mapdandas insides of anusuchis, parichheds, subparichheds, subsubparichheds */
-    Task<ResultWithDataDto<List<MapdandaByAnusuchiDto>>> GetMapdandasOfAnusuchi(int id);
-    Task<ResultWithDataDto<List<GroupdParichhed>>> GetMapdandasOfParichhed(int parichhedId);
     Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetMapdandasOfSubParichhed(int subParichhedId);
     Task<ResultWithDataDto<List<Mapdanda>>> GetMapdandasOfSubSubParichhed(int subSubParichhedId);
 

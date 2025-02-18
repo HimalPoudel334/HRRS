@@ -1,6 +1,7 @@
 
 using HRRS.Dto;
 using HRRS.Dto.HealthStandard;
+using HRRS.Dto.Mapdanda;
 using HRRS.Dto.MasterStandardEntry;
 
 namespace HRRS.Services.Interface;
@@ -9,7 +10,7 @@ public interface IHospitalStandardService
 {
     Task<ResultDto> Create(HospitalStandardDto dto, int id);
     Task<ResultDto> Update(HospitalStandardDto dto, int id);
-    Task<ResultWithDataDto<List<HospitalStandardModel>>> GetHospitalStandardForEntry(int entryId);
+    Task<ResultWithDataDto<List<HospitalStandardModel>>> GetHospitalStandardForEntry(int entryId, int healthFacilityId);
     Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetHospitalStandardForEntry(Guid submissionCode, HospitalStandardQueryParams dto, int healthFacilityId);
     Task<ResultWithDataDto<HospitalEntryDto>> GetHospitalEntryById(int entryId);
     Task<ResultWithDataDto<List<MasterStandardEntryDto>>> AdminGetMasterStandardsEntry(int hospitalId);

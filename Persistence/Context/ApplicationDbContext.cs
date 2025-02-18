@@ -26,7 +26,7 @@ public class ApplicationDbContext : DbContext
 
 
     
-    /*protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         optionsBuilder.UseSeeding((context, _) =>
         {
             var user = context.Set<User>().FirstOrDefault();
@@ -223,7 +223,7 @@ public class ApplicationDbContext : DbContext
                 await context.Set<Mapdanda>().AddRangeAsync(mapdandas, cancellationToken);
                 await context.SaveChangesAsync(cancellationToken);
             }
-        });*/
+        });
     
 
 }

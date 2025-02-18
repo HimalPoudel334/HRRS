@@ -1,5 +1,5 @@
 ﻿using HRRS.Dto;
-using HRRS.Dto.Mapdanda1;
+using HRRS.Dto.AdminMapdanda;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Repositories.Interfaces;
 using HRRS.Services.Interface;
@@ -172,7 +172,7 @@ public class MapdandaService1 : IMapdandaService1
                .Select(m => new GroupedMapdandaByGroupName
                {
                    GroupName = m.Key,
-                   GroupedMapdanda = m.Select(m => new GroupedMapdanda
+                   GroupedMapdanda = m.Select(m => new GroupedAdminMapdanda
                    {
                        Id = m.Id,
                        Name = m.Name,
@@ -252,7 +252,7 @@ public class MapdandaService1 : IMapdandaService1
                .Select(m => new GroupedMapdandaByGroupName
                {
                    GroupName = m.Key,
-                   GroupedMapdanda = m.Select(m => new GroupedMapdanda
+                   GroupedMapdanda = m.Select(m => new GroupedAdminMapdanda
                    {
                        Id = m.Id,
                        Name = m.Name,

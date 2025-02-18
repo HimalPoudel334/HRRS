@@ -53,6 +53,9 @@ namespace HRRS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("BedCount")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -124,18 +127,6 @@ namespace HRRS.Migrations
 
                     b.Property<string>("FiscalYear")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("Has100")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("Has200")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("Has25")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("Has50")
-                        .HasColumnType("bit");
 
                     b.Property<int>("HealthFacilityId")
                         .HasColumnType("int");

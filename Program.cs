@@ -51,7 +51,7 @@ builder.Services.AddScoped<IHealthFacilityRepositoroy, HealthFacilityRepository>
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("TestConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
 
 builder.Services.AddOpenApi();
 

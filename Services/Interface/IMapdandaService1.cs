@@ -1,5 +1,5 @@
 using HRRS.Dto;
-using HRRS.Dto.Mapdanda1;
+using HRRS.Dto.AdminMapdanda;
 
 namespace HRRS.Services.Interface;
 public interface IMapdandaService1

@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using HRRS.Dto;
 using HRRS.Dto.HealthStandard;
-using HRRS.Dto.Mapdanda1;
+using HRRS.Dto.Mapdanda;
 using HRRS.Dto.MasterStandardEntry;
 using HRRS.Persistence.Context;
 using HRRS.Services.Interface;
@@ -231,8 +232,15 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
     }
 
 
-    public async Task<ResultWithDataDto<List<HospitalStandardModel>>> GetHospitalStandardForEntry(int entryId)
+    public async Task<ResultWithDataDto<List<HospitalStandardModel>>> GetHospitalStandardForEntry(int entryId, int healthFacilityId)
     {
+
+
+        var bedCount = (await _dbContext.HospitalStandardEntrys.Include(x => x.MasterStandardEntry).FirstOrDefaultAsync(x => x.Id == entryId))?.MasterStandardEntry.BedCount;
+
+        if (bedCount is null)
+           return ResultWithDataDto<List<HospitalStandardModel>>.Failure("Health faciltiy not found");
+
         var standards = await _dbContext.HospitalStandards
             .AsSplitQuery()
             .Where(x => x.StandardEntryId == entryId)
@@ -255,6 +263,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                             Group = item.Mapdanda.Group,
                             FilePath = item.FilePath,
                             IsAvailable = item.IsAvailable,
+                            Value = determineValue(bedCount.Value, item.Mapdanda.Value25, item.Mapdanda.Value50, item.Mapdanda.Value100, item.Mapdanda.Value200),
                             IsAvailableDivided = item.Mapdanda.IsAvailableDivided,
                         }).ToList()
                     }).ToList()
@@ -381,23 +390,23 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
            })
            .ToList();
 
-        static string? determineValue(int bedCount, string? value25, string? value50, string? value100, string? value200)
-        {
-            if (bedCount == 25) return value25;
-            if (bedCount == 50) return value50;
-            if (bedCount == 100) return value100;
-            return value200;
-        }
-
-        static bool determineActive(int bedCount, bool value25, bool value50, bool value100, bool value200)
-        {
-            if (bedCount == 25) return value25;
-            if (bedCount == 50) return value50;
-            if (bedCount == 100) return value100;
-            return value200;
-        }
-
         return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(mapdandas);
+    }
+
+    private static string? determineValue(int bedCount, string? value25, string? value50, string? value100, string? value200)
+    {
+        if (bedCount >= 200) return value200;
+        if (bedCount >= 100) return value100;
+        if (bedCount >= 50) return value50;
+        return value25;
+    }
+
+    private static bool determineActive(int bedCount, bool value25, bool value50, bool value100, bool value200)
+    {
+        if (bedCount <= 25) return value25;
+        if (bedCount <= 50) return value50;
+        if (bedCount <= 100) return value100;
+        return value200;
     }
 
 }

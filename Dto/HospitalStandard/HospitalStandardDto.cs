@@ -59,6 +59,7 @@ public class MapdandaModel
     public string? FilePath { get; set; } 
     public string? Parimaad { get; set; }
     public string? Group { get; set; }
+    public string? Value { get; set; }
     public bool? IsAvailableDivided { get; set; }
 }
 

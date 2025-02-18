@@ -1,5 +1,6 @@
 ﻿using HRRS.Dto;
-using HRRS.Dto.Mapdanda1;
+using HRRS.Dto.AdminMapdanda;
+using HRRS.Dto.HealthStandard;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Repositories.Interfaces;
 using HRRS.Services.Interface;
@@ -144,57 +145,6 @@ public class MapdandaService : IMapdandaService
         return ResultDto.Success();
     }
 
-    public async Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetByAnusuchi(int? anusuchiId, string userType)
-    {
-        var mapdandas = _dbContext.Mapdandas.AsQueryable();
-
-        if (anusuchiId != null)
-        {
-            mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId && x.Parichhed == null && x.SubParichhed == null && x.SubSubParichhed == null);
-        }
-        if (userType == "Hospital") {
-            mapdandas = mapdandas.Where(x => x.Status == true);
-        }
-
-        var res = await mapdandas.ToListAsync();
-
-        var dto = res
-           .GroupBy(m => m.SubSubParichhed)
-           .Select(m => new GroupedSubSubParichhedAndMapdanda
-           {
-               HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
-               SubSubParixed = m.Key?.Name,
-               List = m
-               .GroupBy(m => m.Group)
-               .Select(m => new GroupedMapdandaByGroupName
-               {
-                   GroupName = m.Key,
-                   GroupedMapdanda = m.Select(m => new GroupedMapdanda
-                   {
-                       Id = m.Id,
-                       Name = m.Name,
-                       SerialNumber = m.SerialNumber,
-                       Is100Active = m.Is100Active,
-                       Is200Active = m.Is200Active,
-                       Is50Active = m.Is50Active,
-                       Is25Active = m.Is25Active,
-                       Value25 = m.Value25,
-                       Value50 = m.Value50,
-                       Value100 = m.Value100,
-                       Value200 = m.Value200,
-                       Status = m.Status,
-                       Parimaad = m.Parimaad,
-                       Group = m.Group,
-                       IsAvailableDivided = m.IsAvailableDivided,
-                   }).ToList()
-
-               }).ToList()
-           })
-           .ToList();
-
-        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(dto);
-    }
-
     public async Task<ResultDto> ToggleStatus(int mapdandaId)
     {
         var mapdanda = await _dbContext.Mapdandas.FindAsync(mapdandaId);
@@ -226,18 +176,15 @@ public class MapdandaService : IMapdandaService
         return ResultWithDataDto<List<string>>.Success(distinctGroups);
     }
 
-    public async Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetByParichhed(int parichhedId, int? anusuchiId)
+    public async Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetAdminMapdandas(HospitalStandardQueryParams dto)
     {
+        var mapdandaQuery = _dbContext.Mapdandas.AsQueryable();
 
-        var mapdandas = _dbContext.Mapdandas.Where(x => x.ParichhedId == parichhedId && x.SubParichhed == null && x.SubSubParichhed == null).AsQueryable();
+        if (dto.AnusuchiId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.AnusuchiId == dto.AnusuchiId.Value && x.ParichhedId == null);
+        if (dto.ParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.ParichhedId == dto.ParichhedId.Value && x.SubParichhedId == null);
+        if (dto.SubParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.SubParichhedId == dto.SubParichhedId.Value);
 
-        if (anusuchiId != null)
-        {
-            mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId);
-        }
-        var res = await mapdandas.ToListAsync();
-
-        var dto = res
+        var mapdandas = (await mapdandaQuery.ToListAsync())
            .GroupBy(m => m.SubSubParichhed)
            .Select(m => new GroupedSubSubParichhedAndMapdanda
            {
@@ -248,7 +195,7 @@ public class MapdandaService : IMapdandaService
                .Select(m => new GroupedMapdandaByGroupName
                {
                    GroupName = m.Key,
-                   GroupedMapdanda = m.Select(m => new GroupedMapdanda
+                   GroupedMapdanda = m.Select(m => new GroupedAdminMapdanda
                    {
                        Id = m.Id,
                        Name = m.Name,
@@ -271,7 +218,6 @@ public class MapdandaService : IMapdandaService
            })
            .ToList();
 
-        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(dto);
+        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(mapdandas);
     }
-
 }

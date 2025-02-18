@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRRS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250216162043_UploadTo25")]
-    partial class UploadTo25
+    [Migration("20250218154020_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,6 +55,9 @@ namespace HRRS.Migrations
                     b.Property<Guid>("SubmissionCode")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("BedCount")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -127,18 +130,6 @@ namespace HRRS.Migrations
 
                     b.Property<string>("FiscalYear")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("Has100")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("Has200")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("Has25")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("Has50")
-                        .HasColumnType("bit");
 
                     b.Property<int>("HealthFacilityId")
                         .HasColumnType("int");

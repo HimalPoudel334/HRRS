@@ -101,6 +101,7 @@ namespace HRRS.Migrations
                 columns: table => new
                 {
                     SubmissionCode = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BedCount = table.Column<int>(type: "int", nullable: false),
                     HealthFacilityId = table.Column<int>(type: "int", nullable: false),
                     EntryStatus = table.Column<int>(type: "int", nullable: false),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -172,8 +173,7 @@ namespace HRRS.Migrations
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     SubmissionType = table.Column<int>(type: "int", nullable: false),
-                    MasterStandardEntrySubmissionCode = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StandardEntryMasterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    MasterStandardEntrySubmissionCode = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -267,10 +267,6 @@ namespace HRRS.Migrations
                     HealthFacilityId = table.Column<int>(type: "int", nullable: false),
                     MapdandaId = table.Column<int>(type: "int", nullable: false),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: true),
-                    Has25 = table.Column<bool>(type: "bit", nullable: true),
-                    Has50 = table.Column<bool>(type: "bit", nullable: true),
-                    Has100 = table.Column<bool>(type: "bit", nullable: true),
-                    Has200 = table.Column<bool>(type: "bit", nullable: true),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FiscalYear = table.Column<string>(type: "nvarchar(max)", nullable: true),
