@@ -11,6 +11,7 @@ using HRRS.Persistence.Context;
 using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -140,6 +141,9 @@ public static class Endpoints
         endpoints.MapGet("api/v2/master/{submissionCode}", async (Guid submissionCode, IHospitalStandardService1 service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetStandardEntries(submissionCode))).RequireAuthorization();
         endpoints.MapGet("api/v2/standardentry/{entryId}", async (int entryId, IHospitalStandardService1 service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetHospitalEntryById(entryId))).RequireAuthorization();
         endpoints.MapGet("api/v2/standard/entry/{entryId}", async (int entryId, IHospitalStandardService1 service) => TypedResults.Ok(await service.GetHospitalStandardForEntry(entryId)));
+        endpoints.MapGet("api/standard/{submissionCode}", async (Guid submissionCode, [AsParameters] HospitalStandardQueryParams dto, IHospitalStandardService1 service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetHospitalStandardForEntry(submissionCode, dto, int.Parse(user.FindFirstValue("HealthFacilityId") ?? "0"))));
+
+
 
         endpoints.MapPost("api/v2/standard/status/approve/{entryId}", [Authorize(Roles = "SuperAdmin")] async (Guid entryId, StandardRemarkDto dto, IMasterStandardEntryService service) => TypedResults.Ok(await service.ApproveStandardsWithRemark(entryId, dto))).RequireAuthorization();
         endpoints.MapPost("api/v2/standard/status/reject/{entryId}", [Authorize(Roles = "SuperAdmin")] async (Guid entryId, StandardRemarkDto dto, IMasterStandardEntryService service) => TypedResults.Ok(await service.RejectStandardsWithRemark(entryId, dto))).RequireAuthorization();
@@ -158,103 +162,6 @@ public static class Endpoints
         endpoints.MapGet("api/v2/Mapdanda/SubSubParichhed", async ([FromQuery] int subSubParichhedId, [FromQuery] int? subParichhedId, [FromQuery] int? parichhedId, [FromQuery] int? anusuchiId, IMapdandaService1 service) => TypedResults.Ok(await service.GetBySubSubParichhed(subSubParichhedId, subParichhedId, parichhedId, anusuchiId)));
         endpoints.MapPost("api/v2/Mapdanda", async (MapdandaDto dto, IMapdandaService1 service) => TypedResults.Ok(await service.Add(dto)));
         endpoints.MapPost("api/v2/Mapdanda/{mapdandaId}/update", async (int mapdandaId, MapdandaDto dto, IMapdandaService1 service) => TypedResults.Ok(await service.UpdateMapdanda(mapdandaId, dto)));
-
-        endpoints.MapGet("api/v2/testgetanusuchi/{id}", async (int id, ApplicationDbContext context) =>
-        {
-            var groupedMapdandas = await context.Mapdandas
-                .Include(m => m.SubSubParichhed)
-                .Include(m => m.SubParichhed)
-                .Include(m => m.Parichhed)
-                .Include(m => m.SubMapdandas)
-                .Where(x => x.AnusuchiId == id)
-                .GroupBy(m => new
-                {
-                    SubSubParichhed = m.SubSubParichhed != null ? m.SubSubParichhed.Name : "",
-                    SubParichhed = m.SubParichhed != null ? m.SubParichhed.Name : "",
-                    Parichhed = m.Parichhed != null ? m.Parichhed.Name : "",
-                    m.IsAvailableDivided,
-                })
-                .Select(g => new HRRS.Dto.MapdandaAnusuchi.MapdandaByAnusuchiDto
-                {
-                    SubSubParichhed = g.Key.SubSubParichhed,
-                    SubParichhed = g.Key.SubParichhed,
-                    Parichhed = g.Key.Parichhed,
-                    IsAvailableDivided = g.Key.IsAvailableDivided,
-                    Mapdandas = g.Select(x => new GroupedMapdanda
-                    {
-                        Id = x.Id,
-                        Name = x.Name,
-                        SerialNumber = x.SerialNumber,
-                        Is100Active = x.Is100Active,
-                        Is200Active = x.Is200Active,
-                        Is50Active = x.Is50Active,
-                        Is25Active = x.Is25Active,
-                        IsAvailableDivided = g.Key.IsAvailableDivided,
-                        Status = x.Status,
-                    }).ToList()
-                })
-                .ToListAsync();
-
-            return TypedResults.Ok(new ResultWithDataDto<List<HRRS.Dto.MapdandaAnusuchi.MapdandaByAnusuchiDto>>(true, groupedMapdandas, null));
-
-        });
-
-
-
-        endpoints.MapGet("api/v3/testgetanusuchi/{id}", async (int id, ApplicationDbContext context) =>
-        {
-            var groupedMapdandas = await context.Mapdandas
-                .Include(m => m.SubSubParichhed)
-                .Include(m => m.SubParichhed)
-                .Include(m => m.Parichhed)
-                .Where(x => x.AnusuchiId == id)
-                .ToListAsync();
-
-            var res = groupedMapdandas.GroupBy(m => new
-            {
-                Parichhed = m.Parichhed != null ? m.Parichhed.Name : "",
-                m.IsAvailableDivided,
-            })
-            .Select(g => new Dto.Mapdanda1.MapdandaByAnusuchiDto
-            {
-                IsAvailableDivided = g.Key.IsAvailableDivided,
-                Parichhed = g.GroupBy(x => x.Parichhed).Select(x => new Dto.Mapdanda1.GroupdParichhed
-                {
-                    Name = x.Key != null ? x.Key.Name : "",
-                    GroupedPariched = x.GroupBy(y => y.SubParichhed).Select(a => new Dto.Mapdanda1.GroupdSubParichhed
-                    {
-                        Name = a.Key != null ? a.Key.Name : "",
-                        GroupdSubSubParichhed = a.GroupBy(b => b.SubSubParichhed).Select(c => new Dto.Mapdanda1.GroupdSubSubParichhed
-                        {
-                            Name = c.Key != null ? c.Key.Name : "",
-                            GroupedMapdandaGroup = c.GroupBy(e => e.Group).Select(f => new Dto.Mapdanda1.GroupedMapdandaByGroupName
-                            {
-                                GroupName = f.Key,
-                                GroupedMapdanda = f.Select(h => new Dto.Mapdanda1.GroupedMapdanda
-                                {
-                                    Id = h.Id,
-                                    Name = h.Name,
-                                    SerialNumber = h.SerialNumber,
-                                    Is100Active = h.Is100Active,
-                                    Is200Active = h.Is200Active,
-                                    Is50Active = h.Is50Active,
-                                    Is25Active = h.Is25Active,
-                                    IsAvailableDivided = g.Key.IsAvailableDivided,
-                                    Status = h.Status,
-                                    Parimaad = h.Parimaad
-                                }).ToList()
-                            }).ToList(),
-                        }).ToList(),
-                    }).ToList(),
-                        
-                }).ToList(),
-            })
-            .ToList();
-
-            return TypedResults.Ok(new ResultWithDataDto<List<Dto.Mapdanda1.MapdandaByAnusuchiDto>>(true, res, null));
-
-        });
-
 
         // mapdandas inside of anusuchi / parichheds / subparichheds / subsubparichheds
         endpoints.MapGet("api/mapdandas/anusuchi/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetMapdandasOfAnusuchi(id)));

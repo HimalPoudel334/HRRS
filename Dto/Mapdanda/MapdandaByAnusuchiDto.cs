@@ -123,6 +123,7 @@ namespace HRRS.Dto.Mapdanda1
         public string? Value50 { get; set; }
         public string? Value100 { get; set; }
         public string? Value200 { get; set; }
+        public string? Value { get; set; }
         public bool IsAvailableDivided { get; set; }
         public bool Status { get; set; }
         public string? Group { get; set; }

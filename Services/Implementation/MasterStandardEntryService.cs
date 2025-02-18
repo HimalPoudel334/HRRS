@@ -32,6 +32,7 @@ namespace HRRS.Services.Implementation
                 EntryStatus = EntryStatus.Draft,
                 HealthFacility = healthFacility,
                 SubmissionType = dto.Type,
+                BedCount = healthFacility.BedCount,
             };
 
             await _context.MasterStandardEntries.AddAsync(masterEntry);

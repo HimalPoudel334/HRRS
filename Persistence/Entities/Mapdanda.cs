@@ -32,6 +32,7 @@ public class Mapdanda
     public SubSubParichhed? SubSubParichhed { get; set; }
 
     public ICollection<SubMapdanda> SubMapdandas { get; set; }
+
 }
 
 public class SubMapdanda

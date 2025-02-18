@@ -8,6 +8,7 @@ namespace HRRS.Persistence.Entities
         [Key]
         public Guid SubmissionCode { get; set; }
         public HealthFacility HealthFacility { get; set; }
+        public int BedCount { get; set; }
         public int HealthFacilityId { get; set; }
         public EntryStatus EntryStatus { get; set; } = EntryStatus.Draft;
         public string? Remarks { get; set; }

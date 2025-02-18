@@ -6,10 +6,6 @@ public class HospitalStandard
     public int HealthFacilityId { get; set; }
     public int MapdandaId { get; set; }
     public bool? IsAvailable { get; set; }
-    public bool? Has25 { get; set; }
-    public bool? Has50 { get; set; }
-    public bool? Has100 { get; set; }
-    public bool? Has200 { get; set; }
     public string? Remarks { get; set; }
     public string? FilePath { get; set; }
     public string? FiscalYear { get; set; }

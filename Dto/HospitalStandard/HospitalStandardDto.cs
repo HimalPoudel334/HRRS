@@ -38,10 +38,6 @@ public class HospitalMapdandasDto1
     public int StandardId { get; set; }
     public int MapdandaId { get; set; }
     public string SerialNumber { get; set; }
-    public bool? Has25 { get; set; }
-    public bool? Has50 { get; set; }
-    public bool? Has100 { get; set; }
-    public bool? Has200 { get; set; }
     public string? MapdandaName { get; set; }
     public bool? IsAvailable { get; set; }
     public string? Remarks { get; set; }
@@ -79,10 +75,6 @@ public class MapdandaModel
     public int Id { get; set; } // Represents `m.Id`
     public string Name { get; set; } // Represents `m.Mapdanda.Name`
     public string SerialNumber { get; set; } // Represents `m.Mapdanda.SerialNumber`
-    public bool? Has100 { get; set; } // Represents `m.Has100`
-    public bool? Has200 { get; set; } // Represents `m.Has200`
-    public bool? Has50 { get; set; } // Represents `m.Has50`
-    public bool? Has25 { get; set; } 
     public bool? IsAvailable { get; set; } 
     public string? FilePath { get; set; } 
     public string? Parimaad { get; set; } // Represents `m.Mapdanda.Parimaad`
@@ -100,4 +92,11 @@ public class HospitalStandardModel
 public class StandardRemarkDto
 {
     public string Remarks { get; set; }
+}
+
+public class HospitalStandardQueryParams
+{
+    public int? AnusuchiId { get; set; }
+    public int? ParichhedId { get; set; }
+    public int? SubParichhedId { get; set; }
 }

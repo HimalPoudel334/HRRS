@@ -1,15 +1,10 @@
-using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Claims;
 using HRRS.Dto;
 using HRRS.Dto.HealthStandard;
 using HRRS.Dto.Mapdanda1;
 using HRRS.Dto.MasterStandardEntry;
 using HRRS.Persistence.Context;
-using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Entities;
 
 namespace HRRS.Services.Implementation;
 
@@ -51,10 +46,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                 Remarks = item.Remarks,
                 FilePath = item.FilePath,
                 FiscalYear = item.FiscalYear,
-                Has25 = item.Has25,
-                Has50 = item.Has50,
-                Has100 = item.Has100,
-                Has200 = item.Has200,
                 Status = false,
             });
         }
@@ -260,10 +251,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                             Id = item.Id,
                             Name = item.Mapdanda.Name,
                             SerialNumber = item.Mapdanda.SerialNumber,
-                            Has100 = item.Has100,
-                            Has200 = item.Has200,
-                            Has50 = item.Has50,
-                            Has25 = item.Has25,
                             Parimaad = item.Mapdanda.Parimaad,
                             Group = item.Mapdanda.Group,
                             FilePath = item.FilePath,
@@ -273,9 +260,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                     }).ToList()
             })
         .ToListAsync();
-
-        var res = standards;
-
 
         return new ResultWithDataDto<List<HospitalStandardModel>>(true, standards, null);
     }
@@ -297,10 +281,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                     SerialNumber = x.Mapdanda.SerialNumber,
                     MapdandaId = x.Mapdanda.Id,
                     Remarks = x.Remarks,
-                    Has25 = x.Has25,
-                    Has50 = x.Has50,
-                    Has100 = x.Has100,
-                    Has200 = x.Has200,
                     Status = x.Status
 
             }).ToListAsync();
@@ -317,10 +297,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
             MapdandaName = x.Name,
             MapdandaId = x.Id,
             Remarks = "",
-            Has25 = false,
-            Has50 = false,
-            Has100 = false,
-            Has200 = false,
             Status = false,
         }).ToListAsync();
 
@@ -340,30 +316,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
             return ResultDto.Failure("You have already submitted. You cannot edit now!");
         }
 
-        //var stdEntry = await _dbContext.HospitalStandardEntrys.Where(x => x.MasterStandardEntry == masterEntry).ToListAsync();
-        //foreach(var entry in stdEntry)
-        //{
-        //    var mapdandaStandards = await _dbContext.HospitalStandards.Where(x => x.StandardEntry == entry).ToListAsync();
-
-        //    foreach (var standard in mapdandaStandards)
-        //    {
-        //        var mapdanda = dto.Mapdandas.FirstOrDefault(x => x.MapdandaId == standard.MapdandaId);
-        //        if (mapdanda is not null)
-        //        {
-        //            standard.IsAvailable = mapdanda.IsAvailable;
-        //            standard.Remarks = mapdanda.Remarks;
-        //            standard.FilePath = mapdanda.FilePath;
-        //            standard.FiscalYear = mapdanda.FiscalYear;
-        //            standard.Has25 = mapdanda.Has25;
-        //            standard.Has50 = mapdanda.Has50;
-        //            standard.Has100 = mapdanda.Has100;
-        //            standard.Has200 = mapdanda.Has200;
-        //            standard.Status = mapdanda.Status;
-        //            standard.UpdatedAt = DateTime.Now;
-        //        }
-        //    }
-
-        //}
         foreach (var map in dto.Mapdandas)
         {
             var standard = await _dbContext.HospitalStandards.FindAsync(map.StandardId);
@@ -373,11 +325,6 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
                 standard.Remarks = map.Remarks;
                 standard.FilePath = map.FilePath;
                 standard.FiscalYear = map.FiscalYear;
-                standard.Has25 = map.Has25;
-                standard.Has50 = map.Has50;
-                standard.Has100 = map.Has100;
-                standard.Has200 = map.Has200;
-                standard.Status = map.Status;
                 standard.UpdatedAt = DateTime.Now;
 
             }
@@ -388,4 +335,64 @@ public class HospitalStandardService1(ApplicationDbContext dbContext) : IHospita
         
         return ResultDto.Success();
     }
+
+    public async Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetHospitalStandardForEntry(Guid submissionCode, HospitalStandardQueryParams dto, int healthFacilityId)
+    {
+        var healthFacility = await _dbContext.HealthFacilities.FindAsync(healthFacilityId);
+        if (healthFacility is null)
+        {
+            return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Failure("Health Facility not found");
+
+        }
+
+        int bedCount = healthFacility.BedCount;
+
+        var mapdandaQuery = _dbContext.Mapdandas.AsQueryable();
+
+        if(dto.AnusuchiId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.AnusuchiId == dto.AnusuchiId.Value && x.ParichhedId == null);
+        if(dto.ParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.ParichhedId == dto.ParichhedId.Value && x.SubParichhedId == null);
+        if(dto.SubParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.SubParichhedId == dto.SubParichhedId.Value);
+
+        var mapdandas = (await mapdandaQuery.ToListAsync())
+           .GroupBy(m => m.SubSubParichhed)
+           .Select(m => new GroupedSubSubParichhedAndMapdanda
+           {
+               HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
+               SubSubParixed = m.Key?.Name,
+               List = m
+               .GroupBy(m => m.Group)
+               .Select(m => new GroupedMapdandaByGroupName
+               {
+                   GroupName = m.Key,
+                   GroupedMapdanda = m.Select(m => new GroupedMapdanda
+                   {
+                       Id = m.Id,
+                       Name = m.Name,
+                       SerialNumber = m.SerialNumber,
+                       Is100Active = m.Is100Active,
+                       Is200Active = m.Is200Active,
+                       Is50Active = m.Is50Active,
+                       Is25Active = m.Is25Active,
+                       Value = determineValue(bedCount, m.Value25, m.Value50, m.Value100, m.Value200),
+                       Status = m.Status,
+                       Parimaad = m.Parimaad,
+                       Group = m.Group,
+                       IsAvailableDivided = m.IsAvailableDivided,
+                   }).ToList()
+
+               }).ToList()
+           })
+           .ToList();
+
+        static string? determineValue(int bedCount, string? value25, string? value50, string? value100, string? value200)
+        {
+            if (bedCount == 25) return value25;
+            if (bedCount == 50) return value50;
+            if (bedCount == 100) return value100;
+            return value200;
+        }
+
+        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(mapdandas);
+    }
+
 }

@@ -127,22 +127,17 @@ public class MapdandaService : IMapdandaService
         if (dto.SubParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.SubParichhedId == dto.SubParichhedId);
         if (dto.SubSubParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.SubSubParichhedId == dto.SubSubParichhedId);
 
-        //if (dto.SerialNumber != mapdanda.SerialNumber && await exsitingMapdanda.AnyAsync(x => x.SerialNumber == dto.SerialNumber))
-        //{
-        //    return ResultDto.Failure("सिरियल नम्बर पहिलेदेखि प्रयोगमा छ।");
-        //}
-
         mapdanda.Name = dto.Name;
         mapdanda.SerialNumber = dto.SerialNumber;
-        mapdanda.Is100Active = dto.Is100Active;
         mapdanda.Is25Active = dto.Is25Active;
-        mapdanda.Is200Active = dto.Is200Active;
         mapdanda.Is50Active = dto.Is50Active;
-        mapdanda.Group = dto.Group;
-        mapdanda.Value25 = dto.Is25Active ? dto.Value25 : null;
-        mapdanda.Value50 = dto.Is50Active ? dto.Value50 : null;
-        mapdanda.Value100 = dto.Is100Active ? dto.Value100 : null;
-        mapdanda.Value200 = dto.Is200Active ? dto.Value200 : null;
+        mapdanda.Is100Active = dto.Is100Active;
+        mapdanda.Is200Active = dto.Is200Active;
+        mapdanda.Value25 = dto.Value25;
+        mapdanda.Value50 = dto.Value50;
+        mapdanda.Value100 = dto.Value100;
+        mapdanda.Value200 = dto.Value200;
+        mapdanda.Parimaad = dto.Parimaad;
 
         //mapdanda.AnusuchiId = dto.AnusuchiId;
         await _dbContext.SaveChangesAsync();

@@ -10,6 +10,7 @@ public interface IHospitalStandardService1
     Task<ResultDto> Create(HospitalStandardDto1 dto, int id);
     Task<ResultDto> Update(HospitalStandardDto1 dto, int id);
     Task<ResultWithDataDto<List<HospitalStandardModel>>> GetHospitalStandardForEntry(int entryId);
+    Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetHospitalStandardForEntry(Guid submissionCode, HospitalStandardQueryParams dto, int healthFacilityId);
     Task<ResultWithDataDto<HospitalEntryDto>> GetHospitalEntryById(int entryId);
     Task<ResultWithDataDto<List<MasterStandardEntryDto>>> AdminGetMasterStandardsEntry(int hospitalId);
     Task<ResultWithDataDto<List<MasterStandardEntryDto>>> UserGetMasterStandardsEntry(int hospitalId);
