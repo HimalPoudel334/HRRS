@@ -4,7 +4,7 @@ using HRRS.Dto.Mapdanda1;
 namespace HRRS.Services.Interface;
 public interface IMapdandaService1
 {
-    Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int? anusuchi_id);
+    Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetByAnusuchi(int? anusuchi_id, string userType);
     Task<ResultDto> Add(MapdandaDto dto);
     Task<ResultDto> UpdateMapdanda(int mapdandaId, MapdandaDto dto);
     Task<ResultDto> ToggleStatus(int mapdandaId);

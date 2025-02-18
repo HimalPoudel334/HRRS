@@ -119,6 +119,7 @@ namespace HRRS.Dto.Mapdanda1
         public bool Is200Active { get; set; }
         public bool Is50Active { get; set; }
         public bool Is25Active { get; set; }
+        public bool IsActive { get; set; }
         public string? Value25 { get; set; }
         public string? Value50 { get; set; }
         public string? Value100 { get; set; }

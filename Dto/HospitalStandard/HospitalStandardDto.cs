@@ -2,26 +2,6 @@ using Persistence.Entities;
 
 namespace HRRS.Dto.HealthStandard;
 
-public class HospitalStandardDto
-{
-    public int HealthFacilityId { get; set; }
-    public required List<HospitalMapdandasDto> HospitalMapdandas { get; set; }
-
-}
-
-
-public class HospitalMapdandasDto
-{
-    public int StandardId { get; set; }
-    public int MapdandaId { get; set; }
-    public string SerialNumber { get; set; }
-    public string? MapdandaName { get; set; }
-    public bool? IsAvailable { get; set; }
-    public string? Remarks { get; set; }
-    public string? FilePath { get; set; }
-    public string? FiscalYear { get; set; }
-}
-
 public class HospitalStandardPartialDto {
 
     public int HealthFacilityId { get; set; }
@@ -33,7 +13,7 @@ public class HospitalStandardPartialDto {
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
 
-public class HospitalMapdandasDto1
+public class HospitalMapdandasDto
 {
     public int StandardId { get; set; }
     public int MapdandaId { get; set; }
@@ -46,10 +26,10 @@ public class HospitalMapdandasDto1
     public bool Status { get; set; }
 }
 
-public class HospitalStandardDto1
+public class HospitalStandardDto
 {
     public Guid SubmissionCode { get; set; }
-    public ICollection<HospitalMapdandasDto1> Mapdandas { get; set; } = [];
+    public ICollection<HospitalMapdandasDto> Mapdandas { get; set; } = [];
 }
 
 public class HospitalEntryDto
@@ -66,29 +46,30 @@ public class HospitalEntryDto
 
 public class StandardGroupModel
 {
-    public string? GroupName { get; set; } // Represents `GroupName`
-    public List<MapdandaModel> GroupedMapdanda { get; set; } // Represents `GroupedMapdanda`
+    public string? GroupName { get; set; }
+    public List<MapdandaModel> GroupedMapdanda { get; set; }
 }
 
 public class MapdandaModel
 {
-    public int Id { get; set; } // Represents `m.Id`
-    public string Name { get; set; } // Represents `m.Mapdanda.Name`
-    public string SerialNumber { get; set; } // Represents `m.Mapdanda.SerialNumber`
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string SerialNumber { get; set; }
     public bool? IsAvailable { get; set; } 
     public string? FilePath { get; set; } 
-    public string? Parimaad { get; set; } // Represents `m.Mapdanda.Parimaad`
-    public string? Group { get; set; } // Represents `m.Mapdanda.Group`
-    public bool? IsAvailableDivided { get; set; } // Represents `m.Mapdanda.IsAvailableDivided`
+    public string? Parimaad { get; set; }
+    public string? Group { get; set; }
+    public bool? IsAvailableDivided { get; set; }
 }
 
 public class HospitalStandardModel
 {
-    public bool? HasBedCount { get; set; } // Represents `HasBedCount`
-    public string SubSubParixed { get; set; } // Represents `SubSubParixed`
-    public List<StandardGroupModel> List { get; set; } // Represents `List`
-}
+    public bool? HasBedCount { get; set; }
+    public string SubSubParixed { get; set; }
+    public List<StandardGroupModel> List { get; set; }
 
+
+}
 public class StandardRemarkDto
 {
     public string Remarks { get; set; }

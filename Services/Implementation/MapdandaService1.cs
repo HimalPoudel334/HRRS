@@ -1,4 +1,4 @@
-using HRRS.Dto;
+﻿using HRRS.Dto;
 using HRRS.Dto.Mapdanda1;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Repositories.Interfaces;
@@ -18,25 +18,51 @@ public class MapdandaService1 : IMapdandaService1
 
     public async Task<ResultDto> Add(MapdandaDto dto)
     {
-        var serialNo = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == dto.AnusuchiId).MaxAsync(x => x.SerialNumber);
-        var maxAnusuchiNo = await _dbContext.Mapdandas.MaxAsync(x => x.AnusuchiId);
-        if (dto.AnusuchiId > (maxAnusuchiNo + 1))
+        if (string.IsNullOrEmpty(dto.Name) || string.IsNullOrEmpty(dto.SerialNumber))
         {
-            return ResultDto.Failure($"Anusuchi number should not be greater than {maxAnusuchiNo + 1}");
-
+            return ResultDto.Failure("मापदण्डामा नाम र क्रम सङ्ख्या हुनु पर्छ।");
         }
+
         var anusuchi = await _dbContext.Anusuchis.FindAsync(dto.AnusuchiId);
         if (anusuchi == null)
         {
-            return ResultDto.Failure("Anusuchi Not Found");
+            return ResultDto.Failure("अनुसूची फेला परेन।");
         }
+
+        var exsitingMapdanda = _dbContext.Mapdandas
+            .Where(x => x.AnusuchiId == dto.AnusuchiId);
+
+        if (dto.ParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.ParichhedId == dto.ParichhedId);
+        if (dto.SubParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.SubParichhedId == dto.SubParichhedId);
+        if (dto.SubSubParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.SubSubParichhedId == dto.SubSubParichhedId);
+
+        // Validations 
+
+        var testDanda = exsitingMapdanda.FirstOrDefault();
+
+        if (testDanda != null)
+        {
+            if (testDanda.IsAvailableDivided && !dto.IsAvailableDivided)
+            {
+                var msg = testDanda.IsAvailableDivided ? "मापदण्डामा शय्या सङ्ख्याको गणना हुनु पर्छ।" : "मापदण्डामा शय्या सङ्ख्याको गणना हुनु हुँदैन।";
+                return ResultDto.Failure(msg);
+            }
+
+            if (!string.IsNullOrEmpty(testDanda.Parimaad) && string.IsNullOrEmpty(dto.Parimaad))
+                return ResultDto.Failure("मापदण्डामा परिमाण हुनु पर्छ।");
+
+            if (string.IsNullOrEmpty(testDanda.Parimaad) && !string.IsNullOrEmpty(dto.Parimaad))
+                return ResultDto.Failure("मापदण्डामा परिमाण हुनु हुँदैन।");
+        }
+
 
         var mapdanda = new Mapdanda()
         {
             Name = dto.Name,
-            SerialNumber = serialNo + 1,
+            SerialNumber = dto.SerialNumber,
             Anusuchi = anusuchi,
             Parimaad = dto.Parimaad,
+            IsAvailableDivided = dto.IsAvailableDivided,
             Group = dto.Group,
         };
 
@@ -45,29 +71,42 @@ public class MapdandaService1 : IMapdandaService1
             var parichhed = await _dbContext.Parichheds.FindAsync(dto.ParichhedId);
             if (parichhed == null)
             {
-                return ResultDto.Failure("Parichhed Not Found");
+                return ResultDto.Failure("परिच्छेद फेला परेन।");
             }
             mapdanda.Parichhed = parichhed;
+
+            if (dto.SubParichhedId.HasValue)
+            {
+                var subParichhed = await _dbContext.SubParichheds.FindAsync(dto.SubParichhedId);
+                if (subParichhed == null)
+                {
+                    return ResultDto.Failure("उपपरिच्छेद फेला परेन।");
+                }
+
+                mapdanda.SubParichhed = subParichhed;
+
+                if (dto.SubSubParichhedId.HasValue)
+                {
+                    var subSubParichhed = await _dbContext.SubSubParichheds.FindAsync(dto.SubSubParichhedId);
+                    if (subSubParichhed == null)
+                    {
+                        return ResultDto.Failure("उपपरिच्छेदको भाग परिच्छेद फेला परेन।");
+                    }
+                    mapdanda.SubSubParichhed = subSubParichhed;
+                }
+            }
         }
 
-        if (dto.SubParichhedId.HasValue)
+        if (dto.IsAvailableDivided)
         {
-            var subParichhed = await _dbContext.SubParichheds.FindAsync(dto.SubParichhedId);
-            if (subParichhed == null)
-            {
-                return ResultDto.Failure("Sub Parichhed Not Found");
-            }
-            mapdanda.SubParichhed = subParichhed;
-        }
-
-        if (dto.SubSubParichhedId.HasValue)
-        {
-            var subSubParichhed = await _dbContext.SubSubParichheds.FindAsync(dto.SubSubParichhedId);
-            if (subSubParichhed == null)
-            {
-                return ResultDto.Failure("Sub Sub Parichhed Not Found");
-            }
-            mapdanda.SubSubParichhed = subSubParichhed;
+            mapdanda.Is25Active = dto.Is25Active;
+            mapdanda.Is50Active = dto.Is50Active;
+            mapdanda.Is100Active = dto.Is100Active;
+            mapdanda.Is200Active = dto.Is200Active;
+            mapdanda.Value25 = dto.Value25;
+            mapdanda.Value50 = dto.Value50;
+            mapdanda.Value100 = dto.Value100;
+            mapdanda.Value200 = dto.Value200;
         }
 
         await _dbContext.Mapdandas.AddAsync(mapdanda);
@@ -81,92 +120,82 @@ public class MapdandaService1 : IMapdandaService1
         var mapdanda = await _dbContext.Mapdandas.FindAsync(mapdandaId);
         if (mapdanda == null)
         {
-            return ResultDto.Failure("Mapdanda not found");
+            return ResultDto.Failure("मापदण्ड फेला परेन।");
         }
+
+        var exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.AnusuchiId == dto.AnusuchiId);
+
+        if (dto.ParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.ParichhedId == dto.ParichhedId);
+        if (dto.SubParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.SubParichhedId == dto.SubParichhedId);
+        if (dto.SubSubParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.SubSubParichhedId == dto.SubSubParichhedId);
 
         mapdanda.Name = dto.Name;
-        mapdanda.Parimaad = dto.Parimaad;
+        mapdanda.SerialNumber = dto.SerialNumber;
         mapdanda.Is25Active = dto.Is25Active;
-        mapdanda.Is100Active = dto.Is100Active;
         mapdanda.Is50Active = dto.Is50Active;
+        mapdanda.Is100Active = dto.Is100Active;
         mapdanda.Is200Active = dto.Is200Active;
-        mapdanda.Group = dto.Group;
+        mapdanda.Value25 = dto.Value25;
+        mapdanda.Value50 = dto.Value50;
+        mapdanda.Value100 = dto.Value100;
+        mapdanda.Value200 = dto.Value200;
+        mapdanda.Parimaad = dto.Parimaad;
 
-
-        if (mapdanda.SerialNumber != dto.SerialNumber )
-
-        if (dto.ParichhedId.HasValue)
-        {
-            var parichhed = await _dbContext.Parichheds.FindAsync(dto.ParichhedId);
-            if (parichhed == null)
-            {
-                return ResultDto.Failure("Parichhed Not Found");
-            }
-            mapdanda.Parichhed = parichhed;
-        }
-
-        if (dto.SubParichhedId.HasValue)
-        {
-            var subParichhed = await _dbContext.SubParichheds.FindAsync(dto.SubParichhedId);
-            if (subParichhed == null)
-            {
-                return ResultDto.Failure("Sub Parichhed Not Found");
-            }
-            mapdanda.SubParichhed = subParichhed;
-        }
-
-        if (dto.SubSubParichhedId.HasValue)
-        {
-            var subSubParichhed = await _dbContext.SubSubParichheds.FindAsync(dto.SubSubParichhedId);
-            if (subSubParichhed == null)
-            {
-                return ResultDto.Failure("Sub Sub Parichhed Not Found");
-            }
-            mapdanda.SubSubParichhed = subSubParichhed;
-        }
-
-        //mapdanda.SerialNumber = dto.SerialNumber;
-        //mapdanda.AnusuchiNumber = dto.AnusuchiNumber;
+        //mapdanda.AnusuchiId = dto.AnusuchiId;
         await _dbContext.SaveChangesAsync();
         return ResultDto.Success();
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaDto>>> GetByAnusuchi(int? anusuchiId)
+    public async Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetByAnusuchi(int? anusuchiId, string userType)
     {
-
         var mapdandas = _dbContext.Mapdandas.AsQueryable();
 
         if (anusuchiId != null)
         {
             mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId && x.Parichhed == null && x.SubParichhed == null && x.SubSubParichhed == null);
         }
-
-        var res = await mapdandas.Select(mapdanda => new MapdandaDto()
+        if (userType == "Hospital")
         {
-            Id = mapdanda.Id,
-            Name = mapdanda.Name,
-            SerialNumber = mapdanda.SerialNumber,
-            AnusuchiId = mapdanda.AnusuchiId,
-            ParichhedId = mapdanda.ParichhedId,
-            SubParichhedId = mapdanda.SubParichhedId,
-            SubSubParichhedId = mapdanda.SubSubParichhedId,
-            Is100Active = mapdanda.Is100Active,
-            Is200Active = mapdanda.Is200Active,
-            Is50Active = mapdanda.Is50Active,
-            Is25Active = mapdanda.Is25Active,
-            Value25 = mapdanda.Value25,
-            Value50 = mapdanda.Value50,
-            Value100 = mapdanda.Value100,
-            Value200 = mapdanda.Value200,
-            Status = mapdanda.Status,
-            IsAvailableDivided = mapdanda.IsAvailableDivided,
-            Parimaad = mapdanda.Parimaad,
-            Group = mapdanda.Group,
-        }).OrderBy(x => x.SerialNumber)
-        .OrderBy(x => x.AnusuchiId)
-        .ToListAsync();
+            mapdandas = mapdandas.Where(x => x.Status == true);
+        }
 
-        return ResultWithDataDto<List<MapdandaDto>>.Success(res);
+        var res = await mapdandas.ToListAsync();
+
+        var dto = res
+           .GroupBy(m => m.SubSubParichhed)
+           .Select(m => new GroupedSubSubParichhedAndMapdanda
+           {
+               HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
+               SubSubParixed = m.Key?.Name,
+               List = m
+               .GroupBy(m => m.Group)
+               .Select(m => new GroupedMapdandaByGroupName
+               {
+                   GroupName = m.Key,
+                   GroupedMapdanda = m.Select(m => new GroupedMapdanda
+                   {
+                       Id = m.Id,
+                       Name = m.Name,
+                       SerialNumber = m.SerialNumber,
+                       Is100Active = m.Is100Active,
+                       Is200Active = m.Is200Active,
+                       Is50Active = m.Is50Active,
+                       Is25Active = m.Is25Active,
+                       Value25 = m.Value25,
+                       Value50 = m.Value50,
+                       Value100 = m.Value100,
+                       Value200 = m.Value200,
+                       Status = m.Status,
+                       Parimaad = m.Parimaad,
+                       Group = m.Group,
+                       IsAvailableDivided = m.IsAvailableDivided,
+                   }).ToList()
+
+               }).ToList()
+           })
+           .ToList();
+
+        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(dto);
     }
 
     public async Task<ResultWithDataDto<MapdandaDto>> GetById(int id)
