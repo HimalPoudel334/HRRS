@@ -201,7 +201,7 @@ public class MapdandaService1 : IMapdandaService1
         return ResultWithDataDto<MapdandaDto>.Success(dto);
     }
 
-    public async Task<ResultWithDataDto<List<GroupedMapdandaByGroupName>>> GetByParichhed(int parichhedId, int? anusuchiId)
+    public async Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetByParichhed(int parichhedId, int? anusuchiId)
     {
 
         var mapdandas = _dbContext.Mapdandas.Where(x => x.ParichhedId == parichhedId && x.SubParichhed == null && x.SubSubParichhed == null).AsQueryable();
@@ -210,34 +210,43 @@ public class MapdandaService1 : IMapdandaService1
         {
             mapdandas = mapdandas.Where(x => x.AnusuchiId == anusuchiId);
         }
+        var res = await mapdandas.ToListAsync();
 
-        var res = await mapdandas.GroupBy(m => new {m.IsAvailableDivided, m.Group})
-            .Select(m => new GroupedMapdandaByGroupName
-            {
-                HasBedCount = m.Key.IsAvailableDivided,
-                GroupName = m.Key.Group,
-                GroupedMapdanda = m.Select(m => new GroupedMapdanda
-                {
-                    Id = m.Id,  
-                    Name = m.Name,
-                    SerialNumber = m.SerialNumber,
-                    Is100Active = m.Is100Active,
-                    Is200Active = m.Is200Active,
-                    Is50Active = m.Is50Active,
-                    Is25Active = m.Is25Active,
-                    Value25 = m.Value25,
-                    Value50 = m.Value50,
-                    Value100 = m.Value100,
-                    Value200 = m.Value200,
-                    Status = m.Status,
-                    Parimaad = m.Parimaad,
-                    Group = m.Group,
-                    IsAvailableDivided = m.IsAvailableDivided,
-                }).ToList()
+        var dto = res
+           .GroupBy(m => m.SubSubParichhed)
+           .Select(m => new GroupedSubSubParichhedAndMapdanda
+           {
+               HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
+               SubSubParixed = m.Key?.Name,
+               List = m
+               .GroupBy(m => m.Group)
+               .Select(m => new GroupedMapdandaByGroupName
+               {
+                   GroupName = m.Key,
+                   GroupedMapdanda = m.Select(m => new GroupedMapdanda
+                   {
+                       Id = m.Id,
+                       Name = m.Name,
+                       SerialNumber = m.SerialNumber,
+                       Is100Active = m.Is100Active,
+                       Is200Active = m.Is200Active,
+                       Is50Active = m.Is50Active,
+                       Is25Active = m.Is25Active,
+                       Value25 = m.Value25,
+                       Value50 = m.Value50,
+                       Value100 = m.Value100,
+                       Value200 = m.Value200,
+                       Status = m.Status,
+                       Parimaad = m.Parimaad,
+                       Group = m.Group,
+                       IsAvailableDivided = m.IsAvailableDivided,
+                   }).ToList()
 
-            }).ToListAsync();
+               }).ToList()
+           })
+           .ToList();
 
-        return ResultWithDataDto<List<GroupedMapdandaByGroupName>>.Success(res);
+        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(dto);
     }
 
     public async Task<ResultWithDataDto<List<MapdandaDto>>> GetBySubParichhed(int subParichhedId, int? parichhedId, int? anusuchiId)
