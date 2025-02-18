@@ -35,7 +35,6 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRegisterService, RegisterService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<IMapdandaService, MapdandaService>();
-builder.Services.AddScoped<IMapdandaService1, MapdandaService1>();
 builder.Services.AddScoped<IHospitalStandardService, HospitalStandardService>();
 builder.Services.AddScoped<IHospitalStandardService, HospitalStandardService>();
 builder.Services.AddScoped<IHealthFacilityService, HealthFacilityService>();
