@@ -231,15 +231,12 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
     }
 
-
-    public async Task<ResultWithDataDto<List<HospitalStandardModel>>> GetHospitalStandardForEntry(int entryId, int healthFacilityId)
+    public async Task<ResultWithDataDto<List<HospitalStandardModel>>> AdminGetHospitalStandardForEntry(int entryId)
     {
-
-
         var bedCount = (await _dbContext.HospitalStandardEntrys.Include(x => x.MasterStandardEntry).FirstOrDefaultAsync(x => x.Id == entryId))?.MasterStandardEntry.BedCount;
 
         if (bedCount is null)
-           return ResultWithDataDto<List<HospitalStandardModel>>.Failure("Health faciltiy not found");
+            return ResultWithDataDto<List<HospitalStandardModel>>.Failure("Health faciltiy not found");
 
         var standards = await _dbContext.HospitalStandards
             .AsSplitQuery()
@@ -282,15 +279,15 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             .Where(x => x.HealthFacilityId == hospitalId && x.Mapdanda.AnusuchiId == anusuchiId)
             .Select(x => new HospitalMapdandasDto()
             {
-                    StandardId = x.Id,
-                    FilePath = x.FilePath,
-                    FiscalYear = x.FiscalYear,
-                    IsAvailable = x.IsAvailable,
-                    MapdandaName = x.Mapdanda.Name,
-                    SerialNumber = x.Mapdanda.SerialNumber,
-                    MapdandaId = x.Mapdanda.Id,
-                    Remarks = x.Remarks,
-                    Status = x.Status
+                StandardId = x.Id,
+                FilePath = x.FilePath,
+                FiscalYear = x.FiscalYear,
+                IsAvailable = x.IsAvailable,
+                MapdandaName = x.Mapdanda.Name,
+                SerialNumber = x.Mapdanda.SerialNumber,
+                MapdandaId = x.Mapdanda.Id,
+                Remarks = x.Remarks,
+                Status = x.Status
 
             }).ToListAsync();
 
