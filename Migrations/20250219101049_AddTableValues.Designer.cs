@@ -4,6 +4,7 @@ using HRRS.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRRS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250219101049_AddTableValues")]
+    partial class AddTableValues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,9 +89,6 @@ namespace HRRS.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<int>("MapdandaId")
                         .HasColumnType("int");
@@ -290,24 +290,6 @@ namespace HRRS.Migrations
                     b.Property<int>("AnusuchiId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Col5")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Col6")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Col7")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Col8")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Col9")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("FormType")
-                        .HasColumnType("int");
-
                     b.Property<string>("Group")
                         .HasColumnType("nvarchar(max)");
 
@@ -324,21 +306,6 @@ namespace HRRS.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsAvailableDivided")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCol5Active")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCol6Active")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCol7Active")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCol8Active")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCol9Active")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")

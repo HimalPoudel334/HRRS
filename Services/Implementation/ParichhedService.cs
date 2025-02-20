@@ -360,6 +360,7 @@ public class ParichhedService : IParichhedService
                         Value50 = m.Value50,
                         Value100 = m.Value100,
                         Value200 = m.Value200,
+                        FormType = m.FormType,
                         Status = m.Status,
                         Parimaad = m.Parimaad,
                         Group = m.Group,

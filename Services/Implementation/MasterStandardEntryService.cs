@@ -164,5 +164,9 @@ namespace HRRS.Services.Implementation
 
         }
 
+        public async Task<ResultWithDataDto<MasterStandardEntry>> GetMasterEntryById(Guid submissionCode)
+        {
+            return ResultWithDataDto<MasterStandardEntry>.Success(await _context.MasterStandardEntries.FindAsync(submissionCode));
+        }
     }
 }
