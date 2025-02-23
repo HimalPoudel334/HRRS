@@ -13,6 +13,9 @@ public class HospitalStandardEntry
     public SubmissionType SubmissionType { get; set; } = SubmissionType.Registration;
     public MasterStandardEntry MasterStandardEntry { get; set; }
     public ICollection<HospitalStandard> HospitalStandards { get; set; } = [];
+
+    public ICollection<Approval> Approvals { get; set; } = [];
+    public User? RejectedBy { get; set; }
 }
 
 public enum EntryStatus

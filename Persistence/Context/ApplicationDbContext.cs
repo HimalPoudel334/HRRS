@@ -23,7 +23,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<SubMapdanda> SubMapdandas { get; set; }
     public DbSet<HospitalStandardEntry> HospitalStandardEntrys { get; set; }
     public DbSet<MasterStandardEntry> MasterStandardEntries { get; set; }
-
+    public DbSet<Approval> Approvals { get; set; }
 
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
