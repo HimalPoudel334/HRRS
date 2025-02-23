@@ -4,6 +4,7 @@ using HRRS.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRRS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250219122332_AddedIsActiveFlag")]
+    partial class AddedIsActiveFlag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,6 +48,72 @@ namespace HRRS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Anusuchis");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.MapdandaTableHeader", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AnusuchiId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ColumnName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ParichhedId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubParichhedId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnusuchiId");
+
+                    b.HasIndex("ParichhedId");
+
+                    b.HasIndex("SubParichhedId");
+
+                    b.ToTable("MapdandaTableHeaders");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.MapdandaTableValue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MapdandaId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("MapdandaTableHeaderId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubHeaderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MapdandaId");
+
+                    b.HasIndex("MapdandaTableHeaderId");
+
+                    b.HasIndex("SubHeaderId");
+
+                    b.ToTable("MapdandaTableValues");
                 });
 
             modelBuilder.Entity("HRRS.Persistence.Entities.MasterStandardEntry", b =>
@@ -79,6 +148,28 @@ namespace HRRS.Migrations
                     b.HasIndex("HealthFacilityId");
 
                     b.ToTable("MasterStandardEntries");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.SubHeader", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ColumnName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MapdandaTableId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MapdandaTableId");
+
+                    b.ToTable("SubHeaders");
                 });
 
             modelBuilder.Entity("HRRS.Persistence.Entities.User", b =>
@@ -202,24 +293,6 @@ namespace HRRS.Migrations
                     b.Property<int>("AnusuchiId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Col5")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Col6")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Col7")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Col8")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Col9")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("FormType")
-                        .HasColumnType("int");
-
                     b.Property<string>("Group")
                         .HasColumnType("nvarchar(max)");
 
@@ -236,21 +309,6 @@ namespace HRRS.Migrations
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsAvailableDivided")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCol5Active")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCol6Active")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCol7Active")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCol8Active")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsCol9Active")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -546,6 +604,46 @@ namespace HRRS.Migrations
                     b.ToTable("SubSubParichheds");
                 });
 
+            modelBuilder.Entity("HRRS.Persistence.Entities.MapdandaTableHeader", b =>
+                {
+                    b.HasOne("Anusuchi", "Anusuchi")
+                        .WithMany()
+                        .HasForeignKey("AnusuchiId");
+
+                    b.HasOne("Parichhed", "Parichhed")
+                        .WithMany()
+                        .HasForeignKey("ParichhedId");
+
+                    b.HasOne("SubParichhed", "SubParichhed")
+                        .WithMany()
+                        .HasForeignKey("SubParichhedId");
+
+                    b.Navigation("Anusuchi");
+
+                    b.Navigation("Parichhed");
+
+                    b.Navigation("SubParichhed");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.MapdandaTableValue", b =>
+                {
+                    b.HasOne("Mapdanda", "Mapdanda")
+                        .WithMany("TableValues")
+                        .HasForeignKey("MapdandaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRRS.Persistence.Entities.MapdandaTableHeader", null)
+                        .WithMany("TableValues")
+                        .HasForeignKey("MapdandaTableHeaderId");
+
+                    b.HasOne("HRRS.Persistence.Entities.SubHeader", null)
+                        .WithMany("TableValues")
+                        .HasForeignKey("SubHeaderId");
+
+                    b.Navigation("Mapdanda");
+                });
+
             modelBuilder.Entity("HRRS.Persistence.Entities.MasterStandardEntry", b =>
                 {
                     b.HasOne("Persistence.Entities.HealthFacility", "HealthFacility")
@@ -555,6 +653,17 @@ namespace HRRS.Migrations
                         .IsRequired();
 
                     b.Navigation("HealthFacility");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.SubHeader", b =>
+                {
+                    b.HasOne("HRRS.Persistence.Entities.MapdandaTableHeader", "MapdandaTable")
+                        .WithMany("SubHeaders")
+                        .HasForeignKey("MapdandaTableId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MapdandaTable");
                 });
 
             modelBuilder.Entity("HRRS.Persistence.Entities.User", b =>
@@ -674,9 +783,21 @@ namespace HRRS.Migrations
                     b.Navigation("Parichheds");
                 });
 
+            modelBuilder.Entity("HRRS.Persistence.Entities.MapdandaTableHeader", b =>
+                {
+                    b.Navigation("SubHeaders");
+
+                    b.Navigation("TableValues");
+                });
+
             modelBuilder.Entity("HRRS.Persistence.Entities.MasterStandardEntry", b =>
                 {
                     b.Navigation("HospitalStandardEntries");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.SubHeader", b =>
+                {
+                    b.Navigation("TableValues");
                 });
 
             modelBuilder.Entity("HospitalStandardEntry", b =>
@@ -687,6 +808,8 @@ namespace HRRS.Migrations
             modelBuilder.Entity("Mapdanda", b =>
                 {
                     b.Navigation("SubMapdandas");
+
+                    b.Navigation("TableValues");
                 });
 
             modelBuilder.Entity("Parichhed", b =>

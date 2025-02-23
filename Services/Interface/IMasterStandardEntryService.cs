@@ -14,6 +14,7 @@ namespace HRRS.Services.Interface
         Task<ResultDto> ApproveStandardsWithRemark(Guid entryId, StandardRemarkDto dto);
         Task<ResultDto> RejectStandardsWithRemark(Guid entryId, StandardRemarkDto dto);
         Task<ResultDto> PendingHospitalStandardsEntry(Guid entryId, long facilityId);
+        Task<ResultWithDataDto<MasterStandardEntry>> GetMasterEntryById(Guid submissionCode);
 
     }
 }

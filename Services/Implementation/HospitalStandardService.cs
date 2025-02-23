@@ -6,6 +6,7 @@ using HRRS.Dto.MasterStandardEntry;
 using HRRS.Persistence.Context;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Update.Internal;
 
 namespace HRRS.Services.Implementation;
 
@@ -32,6 +33,17 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         if (masterEntry == null)
         {
             return ResultDto.Failure("Registrations type unknown for health facility");
+        }
+
+        if(masterEntry.EntryStatus != EntryStatus.Draft)
+            return ResultDto.Failure("You cannot add or update standards after submission!");
+
+
+        if (dto.Mapdandas.Any(x => x.EntryId > 0))
+        {
+
+            await Up(dto);
+            return ResultDto.Success();
         }
 
         List<HospitalStandard> stdrs = [];
@@ -124,8 +136,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         return new ResultWithDataDto<List<HospitalStandard>>(true, res, null);
     }
 
-
-
     public async Task<ResultWithDataDto<HospitalEntryDto>> GetHospitalEntryById(int entryId)
     {
         var entry = await _dbContext.HospitalStandardEntrys.FirstOrDefaultAsync(x => x.Id == entryId);
@@ -145,92 +155,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         return new ResultWithDataDto<HospitalEntryDto>(true, dto, null);
     }
 
-    public async Task<ResultDto> ApproveStandardsWithRemark(int entryId, StandardRemarkDto dto)
-    {
-        var entry = await _dbContext.HospitalStandardEntrys.FindAsync(entryId);
-        
-        if (entry == null) {
-            return ResultDto.Failure("Cannot find entry");
-        }
-
-        var stds = await _dbContext.HospitalStandards.Where(x => x.StandardEntry == entry).ToListAsync();
-        foreach(var std in stds)
-        {
-            std.Status = true;
-        }
-
-        entry.Status = EntryStatus.Approved;
-        entry.Remarks = dto.Remarks;
-        entry.UpdatedAt = DateTime.Now;
-
-        _dbContext.HospitalStandards.UpdateRange(stds);
-        await _dbContext.SaveChangesAsync();
-
-        return ResultDto.Success();
-    }
-
-    public async Task<ResultDto> RejectStandardsWithRemark(int entryId, StandardRemarkDto dto)
-    {
-
-        var entry = await _dbContext.HospitalStandardEntrys.FindAsync(entryId);
-
-        if (entry == null)
-        {
-            return ResultDto.Failure("Cannot find entry");
-        }
-
-        var stds = await _dbContext.HospitalStandards.Where(x => x.StandardEntry == entry).ToListAsync();
-        foreach (var std in stds)
-        {
-            std.Status = false;
-        }
-
-        entry.Status = EntryStatus.Rejected;
-        entry.Remarks = dto.Remarks;
-        entry.UpdatedAt = DateTime.Now;
-
-        _dbContext.HospitalStandards.UpdateRange(stds);
-        await _dbContext.SaveChangesAsync();
-
-        return ResultDto.Success();
-
-    }
-
-
-    public async Task<ResultDto> PendingHospitalStandardsEntry(Guid entryId, int userId)
-    {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.UserId == userId);
-        if (user is null)
-        {
-            return ResultDto.Failure("Cannot find user");
-        }
-
-        var entry = await _dbContext.HospitalStandardEntrys.FindAsync(entryId);
-
-        if (entry == null)
-        {
-            return ResultDto.Failure("Cannot find entry");
-        }
-        var healthFacility = await _dbContext.HealthFacilities.FirstOrDefaultAsync(x => x.Id == user.HealthFacilityId);
-        if (healthFacility is null)
-        {
-            return ResultDto.Failure("You are not allowed to preform this action");
-        }
-        var isAlreadyPending = await _dbContext.HospitalStandards.Where(x => x.HealthFacilityId == healthFacility!.Id).AnyAsync(x => x.StandardEntry.Status == EntryStatus.Pending);
-        if (isAlreadyPending)
-        {
-            return ResultDto.Failure("You have alread a pending submission");
-        }
-
-
-        entry.Status = EntryStatus.Pending;
-
-        await _dbContext.SaveChangesAsync();
-
-        return ResultDto.Success();
-
-    }
-
     public async Task<ResultWithDataDto<List<HospitalStandardModel>>> AdminGetHospitalStandardForEntry(int entryId)
     {
         var bedCount = (await _dbContext.HospitalStandardEntrys.Include(x => x.MasterStandardEntry).FirstOrDefaultAsync(x => x.Id == entryId))?.MasterStandardEntry.BedCount;
@@ -244,6 +168,10 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             .GroupBy(m => m.Mapdanda.SubSubParichhed)
             .Select(m => new HospitalStandardModel
             {
+                AnusuchiId = m.FirstOrDefault() != null ? m.First().Mapdanda.AnusuchiId: null,
+                ParichhedId = m.FirstOrDefault() != null ? m.First().Mapdanda.ParichhedId : null,
+                SubParichhedId = m.FirstOrDefault() != null ? m.First().Mapdanda.SubParichhedId : null,
+                FormType = m.FirstOrDefault() != null ? m.First().Mapdanda.FormType : FormType.A1,
                 HasBedCount = m.FirstOrDefault() != null ? m.First().Mapdanda.IsAvailableDivided : false,
                 SubSubParixed = m.Key != null ? m.Key.Name : "",
                 List = m
@@ -253,6 +181,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                         GroupName = group.Key,
                         GroupedMapdanda = group.Select(item => new MapdandaModel
                         {
+                            EntryId = item.Id,
                             Id = item.Id,
                             Name = item.Mapdanda.Name,
                             SerialNumber = item.Mapdanda.SerialNumber,
@@ -260,7 +189,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                             Group = item.Mapdanda.Group,
                             FilePath = item.FilePath,
                             IsAvailable = item.IsAvailable,
-                            Value = determineValue(bedCount.Value, item.Mapdanda.Value25, item.Mapdanda.Value50, item.Mapdanda.Value100, item.Mapdanda.Value200),
+                            Value = determineValue(bedCount.Value, item.Mapdanda.FormType, item.Mapdanda.Value25, item.Mapdanda.Value50, item.Mapdanda.Value100, item.Mapdanda.Value200),
                             IsAvailableDivided = item.Mapdanda.IsAvailableDivided,
                         }).ToList()
                     }).ToList()
@@ -270,62 +199,32 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         return new ResultWithDataDto<List<HospitalStandardModel>>(true, standards, null);
     }
 
-
-
-    public async Task<ResultWithDataDto<List<HospitalMapdandasDto>>> Get(int hospitalId, int anusuchiId)
-    {
-        var res = await _dbContext.HospitalStandards
-            .Include(x => x.Mapdanda)
-            .Where(x => x.HealthFacilityId == hospitalId && x.Mapdanda.AnusuchiId == anusuchiId)
-            .Select(x => new HospitalMapdandasDto()
-            {
-                StandardId = x.Id,
-                FilePath = x.FilePath,
-                FiscalYear = x.FiscalYear,
-                IsAvailable = x.IsAvailable,
-                MapdandaName = x.Mapdanda.Name,
-                SerialNumber = x.Mapdanda.SerialNumber,
-                MapdandaId = x.Mapdanda.Id,
-                Remarks = x.Remarks,
-                Status = x.Status
-
-            }).ToListAsync();
-
-        if (res is not null) return ResultWithDataDto<List<HospitalMapdandasDto>>.Success(res);
-
-        var mapdandas = await _dbContext.Mapdandas.Where(x => x.AnusuchiId == anusuchiId).Select(x => new HospitalMapdandasDto()
-        {
-            StandardId = 0,
-            FilePath = "",
-            FiscalYear = null,
-            IsAvailable = false,
-            SerialNumber = x.SerialNumber,
-            MapdandaName = x.Name,
-            MapdandaId = x.Id,
-            Remarks = "",
-            Status = false,
-        }).ToListAsync();
-
-        return ResultWithDataDto<List<HospitalMapdandasDto>>.Success(mapdandas);
-    }
-
     public async Task<ResultDto> Update(HospitalStandardDto dto, int id)
     {
-        var masterEntry = await _dbContext.MasterStandardEntries.FirstOrDefaultAsync(x => x.SubmissionCode==dto.SubmissionCode && x.HealthFacilityId==id);
-        if(masterEntry is null)
+        var masterEntry = await _dbContext.MasterStandardEntries.FirstOrDefaultAsync(x => x.SubmissionCode == dto.SubmissionCode && x.HealthFacilityId == id);
+        if (masterEntry is null)
         {
             return ResultDto.Failure("Entry not found for hospital");
         }
 
-        if(masterEntry.EntryStatus != EntryStatus.Draft)
+        if (masterEntry.EntryStatus != EntryStatus.Draft)
         {
             return ResultDto.Failure("You have already submitted. You cannot edit now!");
         }
 
+        bool success = await Up(dto);
+
+        if (success) return ResultDto.Success();
+
+        return ResultDto.Failure("Something Went Wrong");
+    }
+
+    private async Task<bool> Up(HospitalStandardDto dto)
+    {
         foreach (var map in dto.Mapdandas)
         {
-            var standard = await _dbContext.HospitalStandards.FindAsync(map.StandardId);
-            if(standard is not null)
+            var standard = await _dbContext.HospitalStandards.FindAsync(map.EntryId);
+            if (standard is not null)
             {
                 standard.IsAvailable = map.IsAvailable;
                 standard.Remarks = map.Remarks;
@@ -334,12 +233,9 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 standard.UpdatedAt = DateTime.Now;
 
             }
-
         }
-
         await _dbContext.SaveChangesAsync();
-        
-        return ResultDto.Success();
+        return true;
     }
 
     public async Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetHospitalStandardForEntry(Guid submissionCode, HospitalStandardQueryParams dto, int healthFacilityId)
@@ -350,8 +246,52 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Failure("Health Facility not found");
 
         }
-
         int bedCount = healthFacility.BedCount;
+
+        var existing = _dbContext.HospitalStandards.Where(x => x.StandardEntry.MasterStandardEntry.SubmissionCode == submissionCode);
+        if (dto.AnusuchiId.HasValue) existing = existing.Where(x => x.Mapdanda.AnusuchiId == dto.AnusuchiId.Value && x.Mapdanda.ParichhedId == null);
+        if (dto.ParichhedId.HasValue) existing = existing.Where(x => x.Mapdanda.ParichhedId == dto.ParichhedId.Value && x.Mapdanda.SubParichhedId == null);
+        if (dto.SubParichhedId.HasValue) existing = existing.Where(x => x.Mapdanda.SubParichhedId == dto.SubParichhedId.Value);
+
+
+        if (existing.Any())
+        {
+            var res = await existing
+                .AsSplitQuery()
+                .GroupBy(m => m.Mapdanda.SubSubParichhed)
+                .Select(m => new GroupedSubSubParichhedAndMapdanda
+                {
+                    AnusuchiId = m.First().Mapdanda.AnusuchiId,
+                    ParichhedId = m.First().Mapdanda.ParichhedId,
+                    SubParichhedId = m.First().Mapdanda.SubParichhedId,
+                    FormType = m.First().Mapdanda.FormType,
+                    HasBedCount = m.First().Mapdanda.IsAvailableDivided,
+                    SubSubParixed = m.Key != null ? m.Key.Name : null,
+                    List = m
+                        .GroupBy(m => m.Mapdanda.Group)
+                        .Select(m => new GroupedMapdandaByGroupName
+                        {
+                            GroupName = m.Key,
+                            GroupedMapdanda = m.Select(m => new GroupedMapdanda
+                            {
+                                Id = m.MapdandaId,
+                                EntryId = m.Id,
+                                Name = m.Mapdanda.Name,
+                                SerialNumber = m.Mapdanda.SerialNumber,
+                                IsAvailable = m.IsAvailable,
+                                FilePath = m.FilePath,
+                                IsActive = determineActive(bedCount, m.Mapdanda.Is25Active, m.Mapdanda.Is50Active, m.Mapdanda.Is100Active, m.Mapdanda.Is200Active),
+                                Status = m.Status,
+                                Group = m.Mapdanda.Group,
+                            }).ToList()
+
+                        }).ToList()
+                }).ToListAsync();
+
+            return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(res);
+
+        }
+
 
         var mapdandaQuery = _dbContext.Mapdandas.AsQueryable();
 
@@ -363,6 +303,10 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
            .GroupBy(m => m.SubSubParichhed)
            .Select(m => new GroupedSubSubParichhedAndMapdanda
            {
+               AnusuchiId = m.FirstOrDefault()?.AnusuchiId,
+               ParichhedId = m.FirstOrDefault()?.ParichhedId,
+               SubParichhedId = m.FirstOrDefault()?.SubParichhedId,
+               FormType = m.FirstOrDefault()?.FormType,
                HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
                SubSubParixed = m.Key?.Name,
                List = m
@@ -376,7 +320,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                        Name = m.Name,
                        SerialNumber = m.SerialNumber,
                        IsActive = determineActive(bedCount, m.Is25Active, m.Is50Active, m.Is100Active, m.Is200Active),
-                       Value = determineValue(bedCount, m.Value25, m.Value50, m.Value100, m.Value200),
+                       Value = determineValue(bedCount, m.FormType, m.Value25, m.Value50, m.Value100, m.Value200),
                        Status = m.Status,
                        Parimaad = m.Parimaad,
                        Group = m.Group,
@@ -390,11 +334,20 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(mapdandas);
     }
 
-    private static string? determineValue(int bedCount, string? value25, string? value50, string? value100, string? value200)
+
+
+    private static string? determineValue(int bedCount, FormType formType, string? value25, string? value50, string? value100, string? value200)
     {
-        if (bedCount >= 200) return value200;
-        if (bedCount >= 100) return value100;
-        if (bedCount >= 50) return value50;
+        if (formType == FormType.A1 && bedCount >= 200) return value200;
+        if (formType == FormType.A1 && bedCount >= 100) return value100;
+        if (formType == FormType.A1 && bedCount >= 50) return value50;
+        if (formType == FormType.A4 && bedCount >= 200) return value200;
+        if (formType == FormType.A4 && bedCount >= 100) return value100;
+        if (formType == FormType.A4 && bedCount >= 50) return value50;
+        if (formType == FormType.A4 && bedCount >= 25) return value25;
+        if (formType == FormType.A5P3 && bedCount >= 100) return value100;
+        if (formType == FormType.A5P3 && bedCount >= 50) return value50;
+        if (formType == FormType.A5P3 && bedCount >= 25) return value25;
         return value25;
     }
 

@@ -1,3 +1,5 @@
+using HRRS.Persistence.Entities;
+
 public class Anusuchi
 {
     public int Id { get; set; }

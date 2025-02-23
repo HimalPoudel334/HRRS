@@ -75,6 +75,7 @@ namespace HRRS.Services.Implementation
             }
 
             entry.EntryStatus = EntryStatus.Pending;
+            entry.UpdatedAt = DateTime.Now;
             await _context.SaveChangesAsync();
             return ResultDto.Success();
 
@@ -153,9 +154,10 @@ namespace HRRS.Services.Implementation
 
 
             entry.EntryStatus = EntryStatus.Pending;
+            entry.UpdatedAt = DateTime.Now;
 
             var entries = await _context.HospitalStandardEntrys.Where(x => x.MasterStandardEntry == entry).ToListAsync();
-            foreach (var item in entries) { item.Status = entry.EntryStatus; }
+            foreach (var item in entries) { item.Status = entry.EntryStatus; item.UpdatedAt = entry.UpdatedAt; }
 
             
             await _context.SaveChangesAsync();
@@ -164,5 +166,9 @@ namespace HRRS.Services.Implementation
 
         }
 
+        public async Task<ResultWithDataDto<MasterStandardEntry>> GetMasterEntryById(Guid submissionCode)
+        {
+            return ResultWithDataDto<MasterStandardEntry>.Success(await _context.MasterStandardEntries.FindAsync(submissionCode));
+        }
     }
 }

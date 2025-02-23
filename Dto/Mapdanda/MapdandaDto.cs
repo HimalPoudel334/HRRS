@@ -27,6 +27,17 @@ public class MapdandaDto
     public string? Value50 { get; set; }
     public string? Value100 { get; set; }
     public string? Value200 { get; set; }
+    public string? Col5 { get; set; }
+    public string? Col6 { get; set; }
+    public string? Col7 { get; set; }
+    public string? Col8 { get; set; }
+    public string? Col9 { get; set; }
+    public bool IsCol5Active { get; set; }
+    public bool IsCol6Active { get; set; }
+    public bool IsCol7Active { get; set; }
+    public bool IsCol8Active { get; set; }
+    public bool IsCol9Active { get; set; }
+    public FormType FormType { get; set; }
     public bool Status { get; set; }
     public string? Group { get; set; }
     public int? ParichhedId { get; set; }

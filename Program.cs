@@ -1,4 +1,5 @@
 using HRRS.Endpoints;
+using HRRS.MIddlewares;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Repositories.Implementations;
 using HRRS.Persistence.Repositories.Interfaces;
@@ -47,10 +48,13 @@ builder.Services.AddScoped<IMapdandaRepository, MapdandaRepository>();
 builder.Services.AddScoped<IHospitalStandardRespository, HospitalStandardRepository>();
 builder.Services.AddScoped<IHealthFacilityRepositoroy, HealthFacilityRepository>();
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddOpenApi();
 
@@ -77,9 +81,12 @@ app.MapScalarApiReference();
 //    app.MapOpenApi();
 //    app.MapScalarApiReference();
 //}
+
 app.UseCors("AllowAllOrigins");
 
 app.UseHttpsRedirection();
+
+app.UseExceptionHandler();
 
 app.UseStaticFiles();
 app.UseAuthentication();

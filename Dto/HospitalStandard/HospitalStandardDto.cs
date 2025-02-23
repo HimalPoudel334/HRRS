@@ -15,8 +15,8 @@ public class HospitalStandardPartialDto {
 
 public class HospitalMapdandasDto
 {
-    public int StandardId { get; set; }
     public int MapdandaId { get; set; }
+    public int? EntryId { get; set; }
     public string SerialNumber { get; set; }
     public string? MapdandaName { get; set; }
     public bool? IsAvailable { get; set; }
@@ -60,11 +60,17 @@ public class MapdandaModel
     public string? Parimaad { get; set; }
     public string? Group { get; set; }
     public string? Value { get; set; }
+    public int EntryId { get; set; }
+
     public bool? IsAvailableDivided { get; set; }
 }
 
 public class HospitalStandardModel
 {
+    public int? AnusuchiId { get; set; }
+    public int? ParichhedId { get; set; }
+    public int? SubParichhedId { get; set; }
+    public FormType FormType { get; set; }
     public bool? HasBedCount { get; set; }
     public string SubSubParixed { get; set; }
     public List<StandardGroupModel> List { get; set; }

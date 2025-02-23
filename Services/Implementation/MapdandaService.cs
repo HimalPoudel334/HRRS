@@ -41,6 +41,9 @@ public class MapdandaService : IMapdandaService
 
         if(testDanda != null)
         {
+            if(testDanda.FormType != dto.FormType) 
+                return ResultDto.Failure($"Invalid Form Type for Mapdanda. Mapdanda should have Form Type {testDanda.FormType}");
+
             if (testDanda.IsAvailableDivided && !dto.IsAvailableDivided)
             {
                 var msg = testDanda.IsAvailableDivided ? "मापदण्डामा शय्या सङ्ख्याको गणना हुनु पर्छ।" : "मापदण्डामा शय्या सङ्ख्याको गणना हुनु हुँदैन।";
@@ -63,6 +66,7 @@ public class MapdandaService : IMapdandaService
             Parimaad = dto.Parimaad,
             IsAvailableDivided = dto.IsAvailableDivided,
             Group = dto.Group,
+            FormType = dto.FormType
         };
 
         if (dto.ParichhedId.HasValue)
@@ -96,17 +100,27 @@ public class MapdandaService : IMapdandaService
             }
         }
 
-        if (dto.IsAvailableDivided)
-        {
-            mapdanda.Is25Active = dto.Is25Active;
-            mapdanda.Is50Active = dto.Is50Active;
-            mapdanda.Is100Active = dto.Is100Active;
-            mapdanda.Is200Active = dto.Is200Active;
-            mapdanda.Value25 = dto.Value25;
-            mapdanda.Value50 = dto.Value50;
-            mapdanda.Value100 = dto.Value100;
-            mapdanda.Value200 = dto.Value200;
-        }
+        
+        mapdanda.Is25Active = dto.Is25Active;
+        mapdanda.Is50Active = dto.Is50Active;
+        mapdanda.Is100Active = dto.Is100Active;
+        mapdanda.Is200Active = dto.Is200Active;
+        mapdanda.IsCol5Active = dto.IsCol5Active;
+        mapdanda.IsCol6Active   = dto.IsCol6Active;
+        mapdanda.IsCol7Active = dto.IsCol7Active;
+        mapdanda.IsCol8Active = dto.IsCol8Active;
+        mapdanda.IsCol9Active = dto.IsCol9Active;
+        mapdanda.Value25 = dto.Value25;
+        mapdanda.Value50 = dto.Value50;
+        mapdanda.Value100 = dto.Value100;
+        mapdanda.Value200 = dto.Value200;
+        mapdanda.Col5 = dto.Col5;
+        mapdanda.Col6 = dto.Col6;
+        mapdanda.Col7 = dto.Col7;
+        mapdanda.Col8 = dto.Col8;
+        mapdanda.Col9 = dto.Col9;
+
+        
 
         await _dbContext.Mapdandas.AddAsync(mapdanda);
         await _dbContext.SaveChangesAsync();
@@ -128,17 +142,24 @@ public class MapdandaService : IMapdandaService
         if (dto.SubParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.SubParichhedId == dto.SubParichhedId);
         if (dto.SubSubParichhedId.HasValue) exsitingMapdanda = _dbContext.Mapdandas.Where(x => x.SubSubParichhedId == dto.SubSubParichhedId);
 
-        mapdanda.Name = dto.Name;
-        mapdanda.SerialNumber = dto.SerialNumber;
         mapdanda.Is25Active = dto.Is25Active;
         mapdanda.Is50Active = dto.Is50Active;
         mapdanda.Is100Active = dto.Is100Active;
         mapdanda.Is200Active = dto.Is200Active;
+        mapdanda.IsCol5Active = dto.IsCol5Active;
+        mapdanda.IsCol6Active = dto.IsCol6Active;
+        mapdanda.IsCol7Active = dto.IsCol7Active;
+        mapdanda.IsCol8Active = dto.IsCol8Active;
+        mapdanda.IsCol9Active = dto.IsCol9Active;
         mapdanda.Value25 = dto.Value25;
         mapdanda.Value50 = dto.Value50;
         mapdanda.Value100 = dto.Value100;
         mapdanda.Value200 = dto.Value200;
-        mapdanda.Parimaad = dto.Parimaad;
+        mapdanda.Col5 = dto.Col5;
+        mapdanda.Col6 = dto.Col6;
+        mapdanda.Col7 = dto.Col7;
+        mapdanda.Col8 = dto.Col8;
+        mapdanda.Col9 = dto.Col9;
 
         //mapdanda.AnusuchiId = dto.AnusuchiId;
         await _dbContext.SaveChangesAsync();
@@ -188,12 +209,14 @@ public class MapdandaService : IMapdandaService
            .GroupBy(m => m.SubSubParichhed)
            .Select(m => new GroupedSubSubParichhedAndMapdanda
            {
+               FormType = m.FirstOrDefault()?.FormType ?? FormType.A1,
                HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
                SubSubParixed = m.Key?.Name,
                List = m
                .GroupBy(m => m.Group)
                .Select(m => new GroupedMapdandaByGroupName
                {
+                   FormType = m.FirstOrDefault()?.FormType ?? FormType.A1,
                    GroupName = m.Key,
                    GroupedMapdanda = m.Select(m => new GroupedAdminMapdanda
                    {
@@ -204,10 +227,21 @@ public class MapdandaService : IMapdandaService
                        Is200Active = m.Is200Active,
                        Is50Active = m.Is50Active,
                        Is25Active = m.Is25Active,
+                       IsCol5Active = m.IsCol5Active,
+                       IsCol6Active = m.IsCol6Active,
+                       IsCol7Active = m.IsCol7Active,
+                       IsCol8Active = m.IsCol8Active,
+                       IsCol9Active = m.IsCol9Active,
                        Value25 = m.Value25,
                        Value50 = m.Value50,
                        Value100 = m.Value100,
                        Value200 = m.Value200,
+                       Col5 = m.Col5,
+                       Col6 = m.Col6,
+                       Col7 = m.Col7,
+                       Col8 = m.Col8,
+                       Col9 = m.Col9,
+                       FormType = m.FormType,
                        Status = m.Status,
                        Parimaad = m.Parimaad,
                        Group = m.Group,
