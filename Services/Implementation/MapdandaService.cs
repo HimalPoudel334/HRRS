@@ -41,6 +41,9 @@ public class MapdandaService : IMapdandaService
 
         if(testDanda != null)
         {
+            if(testDanda.FormType != dto.FormType) 
+                return ResultDto.Failure($"Invalid Form Type for Mapdanda. Mapdanda should have Form Type {testDanda.FormType}");
+
             if (testDanda.IsAvailableDivided && !dto.IsAvailableDivided)
             {
                 var msg = testDanda.IsAvailableDivided ? "मापदण्डामा शय्या सङ्ख्याको गणना हुनु पर्छ।" : "मापदण्डामा शय्या सङ्ख्याको गणना हुनु हुँदैन।";

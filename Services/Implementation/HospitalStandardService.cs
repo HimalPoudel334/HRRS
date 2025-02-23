@@ -35,9 +35,15 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             return ResultDto.Failure("Registrations type unknown for health facility");
         }
 
-        if(dto.Mapdandas.Any(x => x.EntryId > 0))
+        if(masterEntry.EntryStatus != EntryStatus.Draft)
+            return ResultDto.Failure("You cannot add or update standards after submission!");
+
+
+        if (dto.Mapdandas.Any(x => x.EntryId > 0))
         {
+
             await Up(dto);
+            return ResultDto.Success();
         }
 
         List<HospitalStandard> stdrs = [];
