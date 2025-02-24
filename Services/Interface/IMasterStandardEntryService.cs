@@ -16,5 +16,7 @@ namespace HRRS.Services.Interface
         Task<ResultDto> PendingHospitalStandardsEntry(Guid entryId, long facilityId);
         Task<ResultWithDataDto<MasterStandardEntryDto>> GetMasterEntryById(Guid submissionCode, long userId);
 
+        Task<ResultWithDataDto<List<SubmissionStatusDto>>> SubmissionStatus(Guid submissionCode);
+
     }
 }
