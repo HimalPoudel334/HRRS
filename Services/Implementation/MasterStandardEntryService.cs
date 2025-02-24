@@ -193,9 +193,25 @@ namespace HRRS.Services.Implementation
 
         }
 
-        public async Task<ResultWithDataDto<MasterStandardEntry>> GetMasterEntryById(Guid submissionCode)
+        public async Task<ResultWithDataDto<MasterStandardEntryDto>> GetMasterEntryById(Guid submissionCode, long userId)
         {
-            return ResultWithDataDto<MasterStandardEntry>.Success(await _context.MasterStandardEntries.FindAsync(submissionCode));
+
+            var res = await _context.MasterStandardEntries
+                .Include(x => x.Status)
+                .FirstOrDefaultAsync(x => x.SubmissionCode == submissionCode);
+
+            if (res is null) return ResultWithDataDto<MasterStandardEntryDto>.Failure($"Submission with code: {submissionCode} not found");
+
+            var dto = new MasterStandardEntryDto
+            {
+                EntryStatus = res.EntryStatus,
+                HealthFacilityId = res.HealthFacilityId,
+                SubmissionCode = res.SubmissionCode,
+                SubmissionType = res.SubmissionType,
+                Decision = res.Status.FirstOrDefault(dto => dto.CreatedById == userId) != null ? res.Status.First(x => x.CreatedById == userId).Status : null
+
+            };
+            return ResultWithDataDto<MasterStandardEntryDto>.Success(dto);
         }
 
         private async Task<bool> ApprovalExist(long userId, Guid entryId)
