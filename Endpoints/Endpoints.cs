@@ -117,6 +117,7 @@ public static class Endpoints
         endpoints.MapGet("api/submission/{submissionCode}", async (Guid submissionCode, IMasterStandardEntryService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetMasterEntryById(submissionCode, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"))));
         endpoints.MapGet("api/submission/hospital/{hospitalId}", async (int hospitalId, IMasterStandardEntryService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetByHospitalId(hospitalId, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization();
         endpoints.MapPost("api/submissions/update", async (HospitalStandardDto dto, IHospitalStandardService service, ClaimsPrincipal user) => TypedResults.Ok(await service.Update(dto, int.Parse(user.FindFirstValue("HealthFacilityId")?.Trim() ?? "0")))).RequireAuthorization();
+        endpoints.MapGet("api/submissions/{submissionCode}/status", async (Guid submissionCode, IMasterStandardEntryService service) => TypedResults.Ok(await service.SubmissionStatus(submissionCode))).RequireAuthorization();
 
 
         return endpoints;

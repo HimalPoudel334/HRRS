@@ -12,7 +12,6 @@ namespace HRRS.Services.Implementation
     public class MasterStandardEntryService : IMasterStandardEntryService
     {
         private readonly ApplicationDbContext _context;
-
         public MasterStandardEntryService(ApplicationDbContext context)
         {
             _context = context;
@@ -41,6 +40,7 @@ namespace HRRS.Services.Implementation
 
             return ResultWithDataDto<string>.Success(masterEntry.SubmissionCode.ToString());
         }
+
         public async Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetByHospitalId(int healthFacilityId, long userId)
         {
             var masterEntry = await _context.MasterStandardEntries
@@ -185,7 +185,6 @@ namespace HRRS.Services.Implementation
 
             var entries = await _context.HospitalStandardEntrys.Where(x => x.MasterStandardEntry == entry).ToListAsync();
             foreach (var item in entries) { item.UpdatedAt = entry.UpdatedAt; }
-
             
             await _context.SaveChangesAsync();
 
@@ -220,6 +219,26 @@ namespace HRRS.Services.Implementation
                .Where(x => x.EntryId == entryId)
                .Where(x => x.CreatedById == userId)
                .AnyAsync();
+        }
+
+        public async Task<ResultWithDataDto<List<SubmissionStatusDto>>> SubmissionStatus(Guid submissionCode)
+        {
+            var submission = await _context.MasterStandardEntries
+                .Include(x => x.Status)
+                .ThenInclude(x => x.CreatedBy)
+                .FirstOrDefaultAsync(x => x.SubmissionCode == submissionCode);
+
+            if(submission is null) return ResultWithDataDto<List<SubmissionStatusDto>>.Failure("Submission not found");
+
+            var details = submission.Status.Select(x => new SubmissionStatusDto
+            {
+                Date = x.CreatedDate,
+                IsApproved = x.Status == ApprovalStatus.Approved ? true : false,
+                UserId = x.CreatedById,
+                UserName = x.CreatedBy.UserName,
+            }).ToList();
+
+            return ResultWithDataDto<List<SubmissionStatusDto>>.Success(details);
         }
     }
 }
