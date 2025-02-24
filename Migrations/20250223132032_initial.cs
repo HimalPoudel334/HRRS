@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HRRS.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -171,8 +171,6 @@ namespace HRRS.Migrations
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    SubmissionType = table.Column<int>(type: "int", nullable: false),
                     MasterStandardEntrySubmissionCode = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -183,6 +181,35 @@ namespace HRRS.Migrations
                         column: x => x.MasterStandardEntrySubmissionCode,
                         principalTable: "MasterStandardEntries",
                         principalColumn: "SubmissionCode",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Approvals",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedById = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EntryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Approvals", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Approvals_MasterStandardEntries_EntryId",
+                        column: x => x.EntryId,
+                        principalTable: "MasterStandardEntries",
+                        principalColumn: "SubmissionCode",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Approvals_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -222,15 +249,26 @@ namespace HRRS.Migrations
                     Is50Active = table.Column<bool>(type: "bit", nullable: false),
                     Is100Active = table.Column<bool>(type: "bit", nullable: false),
                     Is200Active = table.Column<bool>(type: "bit", nullable: false),
+                    IsCol5Active = table.Column<bool>(type: "bit", nullable: false),
+                    IsCol6Active = table.Column<bool>(type: "bit", nullable: false),
+                    IsCol7Active = table.Column<bool>(type: "bit", nullable: false),
+                    IsCol8Active = table.Column<bool>(type: "bit", nullable: false),
+                    IsCol9Active = table.Column<bool>(type: "bit", nullable: false),
                     Value25 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Value50 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Value100 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Value200 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Col5 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Col6 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Col7 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Col8 = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Col9 = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: false),
                     AnusuchiId = table.Column<int>(type: "int", nullable: false),
                     ParichhedId = table.Column<int>(type: "int", nullable: true),
                     SubParichhedId = table.Column<int>(type: "int", nullable: true),
-                    SubSubParichhedId = table.Column<int>(type: "int", nullable: true)
+                    SubSubParichhedId = table.Column<int>(type: "int", nullable: true),
+                    FormType = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -316,6 +354,16 @@ namespace HRRS.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Approvals_CreatedById",
+                table: "Approvals",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Approvals_EntryId",
+                table: "Approvals",
+                column: "EntryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_HealthFacilities_PanNumber",
                 table: "HealthFacilities",
                 column: "PanNumber",
@@ -390,6 +438,9 @@ namespace HRRS.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Approvals");
+
             migrationBuilder.DropTable(
                 name: "HospitalStandards");
 

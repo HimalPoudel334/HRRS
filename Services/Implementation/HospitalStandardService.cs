@@ -65,10 +65,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
         var standardEntry = new HospitalStandardEntry
         {
-            Status = EntryStatus.Draft,
             HospitalStandards = stdrs,
             MasterStandardEntry = masterEntry,
-
         };
 
         await _dbContext.HospitalStandardEntrys.AddAsync(standardEntry);
@@ -85,7 +83,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         {
             EntryStatus = x.EntryStatus,
             HealthFacilityId = x.HealthFacilityId,
-            Remarks = x.Remarks,
             SubmissionCode = x.SubmissionCode,
             SubmissionType = x.SubmissionType
         }).ToListAsync();
@@ -101,7 +98,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         {
             EntryStatus = x.EntryStatus,
             HealthFacilityId = x.HealthFacilityId,
-            Remarks = x.Remarks,
             SubmissionCode = x.SubmissionCode,
             SubmissionType = x.SubmissionType
         }).ToListAsync();
@@ -117,9 +113,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             .Select(x => new HospitalEntryDto
             {
                 Id = x.Id,
-                SubmissionType = x.SubmissionType,
                 Remarks = x.Remarks,
-                Status = x.Status,
                 Anusuchi = x.HospitalStandards.First().Mapdanda.Anusuchi.Name,
                 Parichhed = x.HospitalStandards.First().Mapdanda.Parichhed != null ? x.HospitalStandards.First().Mapdanda.Parichhed!.Name : "",
                 SubParichhed = x.HospitalStandards.First().Mapdanda.SubParichhed != null ? x.HospitalStandards.First().Mapdanda.SubParichhed!.Name : ""
@@ -146,9 +140,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         var dto = new HospitalEntryDto
         {
             Id = entry.Id,
-            Status = entry.Status,
             Remarks = entry.Remarks,
-            SubmissionType = entry.SubmissionType
         };
 
         return new ResultWithDataDto<HospitalEntryDto>(true, dto, null);
@@ -292,7 +284,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         }
 
 
-        var mapdandaQuery = _dbContext.Mapdandas.AsQueryable();
+        var mapdandaQuery = _dbContext.Mapdandas.Where(x => x.Status).AsQueryable();
 
         if(dto.AnusuchiId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.AnusuchiId == dto.AnusuchiId.Value && x.ParichhedId == null);
         if(dto.ParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.ParichhedId == dto.ParichhedId.Value && x.SubParichhedId == null);

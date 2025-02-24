@@ -9,10 +9,12 @@ public class HospitalStandardEntry
     public string? Remarks { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; set; }
-    public EntryStatus Status { get; set; } = EntryStatus.Draft;
-    public SubmissionType SubmissionType { get; set; } = SubmissionType.Registration;
+
+   // public EntryStatus Status { get; set; } = EntryStatus.Draft;
+   // public SubmissionType SubmissionType { get; set; } = SubmissionType.Registration;
     public MasterStandardEntry MasterStandardEntry { get; set; }
     public ICollection<HospitalStandard> HospitalStandards { get; set; } = [];
+
 }
 
 public enum EntryStatus

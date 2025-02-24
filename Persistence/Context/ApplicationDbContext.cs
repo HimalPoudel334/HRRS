@@ -23,7 +23,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<SubMapdanda> SubMapdandas { get; set; }
     public DbSet<HospitalStandardEntry> HospitalStandardEntrys { get; set; }
     public DbSet<MasterStandardEntry> MasterStandardEntries { get; set; }
-
+    public DbSet<SubmissionStatus> Approvals { get; set; }
 
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
@@ -41,6 +41,26 @@ public class ApplicationDbContext : DbContext
                     UserType = "SuperAdmin"
                 };
                 context.Set<User>().Add(newUser);
+                context.SaveChanges();
+            }
+
+            var otherAdmins = context.Set<User>().Where(x => x.UserType == "localadmin");
+            if(!otherAdmins.Any())
+            {
+                var local1 = new User()
+                {
+                    UserName = "LocalAdmin",
+                    Password = BCrypt.Net.BCrypt.HashPassword("12345", 12),
+                    UserType = "localadmin"
+                };
+
+                var local2 = new User()
+                {
+                    UserName = "LocalAdmin1",
+                    Password = BCrypt.Net.BCrypt.HashPassword("12345", 12),
+                    UserType = "localadmin"
+                };
+                context.Set<User>().AddRange([local1, local2]);
                 context.SaveChanges();
             }
 
@@ -140,6 +160,26 @@ public class ApplicationDbContext : DbContext
                 };
                 await context.Set<User>().AddAsync(newUser, cancellationToken);
                 await context.SaveChangesAsync(cancellationToken);
+            }
+
+            var otherAdmins = context.Set<User>().Where(x => x.UserType == "localadmin");
+            if (!await otherAdmins.AnyAsync(cancellationToken))
+            {
+                var local1 = new User()
+                {
+                    UserName = "LocalAdmin",
+                    Password = BCrypt.Net.BCrypt.HashPassword("12345", 12),
+                    UserType = "localadmin"
+                };
+
+                var local2 = new User()
+                {
+                    UserName = "LocalAdmin1",
+                    Password = BCrypt.Net.BCrypt.HashPassword("12345", 12),
+                    UserType = "localadmin"
+                };
+               await context.Set<User>().AddRangeAsync([local1, local2], cancellationToken);
+               await context.SaveChangesAsync(cancellationToken);
             }
 
             List<Anusuchi> anusuchis = [

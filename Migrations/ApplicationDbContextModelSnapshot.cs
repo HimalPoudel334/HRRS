@@ -81,6 +81,40 @@ namespace HRRS.Migrations
                     b.ToTable("MasterStandardEntries");
                 });
 
+            modelBuilder.Entity("HRRS.Persistence.Entities.SubmissionStatus", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("CreatedById")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("EntryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Remarks")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("EntryId");
+
+                    b.ToTable("Approvals");
+                });
+
             modelBuilder.Entity("HRRS.Persistence.Entities.User", b =>
                 {
                     b.Property<long>("UserId")
@@ -174,12 +208,6 @@ namespace HRRS.Migrations
 
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubmissionType")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -557,6 +585,25 @@ namespace HRRS.Migrations
                     b.Navigation("HealthFacility");
                 });
 
+            modelBuilder.Entity("HRRS.Persistence.Entities.SubmissionStatus", b =>
+                {
+                    b.HasOne("HRRS.Persistence.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRRS.Persistence.Entities.MasterStandardEntry", "Entry")
+                        .WithMany("Status")
+                        .HasForeignKey("EntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Entry");
+                });
+
             modelBuilder.Entity("HRRS.Persistence.Entities.User", b =>
                 {
                     b.HasOne("Persistence.Entities.HealthFacility", "HealthFacility")
@@ -677,6 +724,8 @@ namespace HRRS.Migrations
             modelBuilder.Entity("HRRS.Persistence.Entities.MasterStandardEntry", b =>
                 {
                     b.Navigation("HospitalStandardEntries");
+
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("HospitalStandardEntry", b =>
