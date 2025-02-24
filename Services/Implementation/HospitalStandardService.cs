@@ -151,7 +151,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             SubmissionType = entry.SubmissionType
         };
 
-
         return new ResultWithDataDto<HospitalEntryDto>(true, dto, null);
     }
 
@@ -309,12 +308,12 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                FormType = m.FirstOrDefault()?.FormType,
                HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
                SubSubParixed = m.Key?.Name,
-               List = m
+               List = [.. m
                .GroupBy(m => m.Group)
                .Select(m => new GroupedMapdandaByGroupName
                {
                    GroupName = m.Key,
-                   GroupedMapdanda = m.Select(m => new GroupedMapdanda
+                   GroupedMapdanda = [.. m.Select(m => new GroupedMapdanda
                    {
                        Id = m.Id,
                        Name = m.Name,
@@ -325,9 +324,9 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                        Parimaad = m.Parimaad,
                        Group = m.Group,
                        IsAvailableDivided = m.IsAvailableDivided,
-                   }).ToList()
+                   })]
 
-               }).ToList()
+               })]
            })
            .ToList();
 
