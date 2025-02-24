@@ -5,6 +5,7 @@ using HRRS.Persistence.Context;
 using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 
 namespace HRRS.Services.Implementation
 {
@@ -40,23 +41,36 @@ namespace HRRS.Services.Implementation
 
             return ResultWithDataDto<string>.Success(masterEntry.SubmissionCode.ToString());
         }
-        public async Task<ResultWithDataDto<List<MasterStandardEntry>>> GetByHospitalId(int healthFacilityId)
+        public async Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetByHospitalId(int healthFacilityId, long userId)
         {
             var masterEntry = await _context.MasterStandardEntries
-                .Where(m => m.HealthFacilityId == healthFacilityId).Where(x => x.EntryStatus != EntryStatus.Draft).OrderByDescending(x => x.CreatedAt).ToListAsync();
+                .Where(m => m.HealthFacilityId == healthFacilityId)
+                .Where(x => x.EntryStatus != EntryStatus.Draft)
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new MasterStandardEntryDto
+                {
+                    EntryStatus = x.EntryStatus,
+                    HealthFacilityId = x.HealthFacilityId,
+                    SubmissionCode = x.SubmissionCode,
+                    SubmissionType = x.SubmissionType,
+                    Decision = x.Status.FirstOrDefault(x => x.CreatedById == userId) != null ? x.Status.First(x => x.CreatedById == userId).Status : null
+                })
+                .ToListAsync();
 
             if (masterEntry is null)
             {
-                return new ResultWithDataDto<List<MasterStandardEntry>>(false, null, "Master standard entry not found");
+                return new ResultWithDataDto<List<MasterStandardEntryDto>>(false, null, "Master standard entry not found");
             }
 
-            return ResultWithDataDto<List<MasterStandardEntry>>.Success(masterEntry);
+            return ResultWithDataDto<List<MasterStandardEntryDto>>.Success(masterEntry);
         }
 
         public async Task<ResultWithDataDto<List<MasterStandardEntry>>> GetByUserHospitalId(int healthFacilityId)
         {
             var masterEntry = await _context.MasterStandardEntries
-                .Where(m => m.HealthFacilityId == healthFacilityId).OrderByDescending(x => x.CreatedAt).ToListAsync();
+                .Where(m => m.HealthFacilityId == healthFacilityId)
+                .OrderByDescending(x => x.CreatedAt)
+                .ToListAsync();
 
             if (masterEntry is null)
             {
@@ -81,7 +95,7 @@ namespace HRRS.Services.Implementation
 
         }
 
-        public async Task<ResultDto> ApproveStandardsWithRemark(Guid entryId, StandardRemarkDto dto)
+        public async Task<ResultDto> ApproveStandardsWithRemark(Guid entryId, long userId, StandardRemarkDto dto)
         {
             var entry = await _context.MasterStandardEntries.FindAsync(entryId);
 
@@ -90,22 +104,30 @@ namespace HRRS.Services.Implementation
                 return ResultDto.Failure("Cannot find entry");
             }
 
-            entry.EntryStatus = EntryStatus.Approved;
-            entry.Remarks = dto.Remarks;
-            entry.UpdatedAt = DateTime.Now;
-
-            var stds = await _context.HospitalStandardEntrys.Where(x => x.MasterStandardEntry == entry).ToListAsync();
-            foreach (var std in stds)
+            if (!await ApprovalExist(userId, entryId))
             {
-                std.Status = entry.EntryStatus;
+                var status = new SubmissionStatus
+                {
+                    Status = ApprovalStatus.Approved,
+                    CreatedById = userId,
+                    Remarks = dto.Remarks,
+                };
+
+                if (await _context.Approvals.Where(x => x.EntryId == entryId && x.Status == ApprovalStatus.Approved).CountAsync() >= 2)
+                {
+                    entry.EntryStatus = EntryStatus.Approved;
+                }
+
+                entry.Status.Add(status);
+                entry.UpdatedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
 
             return ResultDto.Success();
         }
 
-        public async Task<ResultDto> RejectStandardsWithRemark(Guid entryId, StandardRemarkDto dto)
+        public async Task<ResultDto> RejectStandardsWithRemark(Guid entryId, long userId, StandardRemarkDto dto)
         {
 
             var entry = await _context.MasterStandardEntries.FindAsync(entryId);
@@ -115,17 +137,22 @@ namespace HRRS.Services.Implementation
                 return ResultDto.Failure("Cannot find entry");
             }
 
-            entry.EntryStatus = EntryStatus.Rejected;
-            entry.Remarks = dto.Remarks;
-            entry.UpdatedAt = DateTime.Now;
+            
 
-            var stds = await _context.HospitalStandardEntrys.Where(x => x.MasterStandardEntry == entry).ToListAsync();
-            foreach (var std in stds)
+            if (!await ApprovalExist(userId, entryId))
             {
-                std.Status = entry.EntryStatus;
-            }
+                var status = new SubmissionStatus
+                {
+                    Status = ApprovalStatus.Rejected,
+                    CreatedById = userId,
+                    Remarks = dto.Remarks,
+                };
+                entry.Status.Add(status);
+                entry.EntryStatus = EntryStatus.Rejected;
 
-            await _context.SaveChangesAsync();
+                entry.UpdatedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
+            }
 
             return ResultDto.Success();
 
@@ -157,7 +184,7 @@ namespace HRRS.Services.Implementation
             entry.UpdatedAt = DateTime.Now;
 
             var entries = await _context.HospitalStandardEntrys.Where(x => x.MasterStandardEntry == entry).ToListAsync();
-            foreach (var item in entries) { item.Status = entry.EntryStatus; item.UpdatedAt = entry.UpdatedAt; }
+            foreach (var item in entries) { item.UpdatedAt = entry.UpdatedAt; }
 
             
             await _context.SaveChangesAsync();
@@ -169,6 +196,14 @@ namespace HRRS.Services.Implementation
         public async Task<ResultWithDataDto<MasterStandardEntry>> GetMasterEntryById(Guid submissionCode)
         {
             return ResultWithDataDto<MasterStandardEntry>.Success(await _context.MasterStandardEntries.FindAsync(submissionCode));
+        }
+
+        private async Task<bool> ApprovalExist(long userId, Guid entryId)
+        {
+            return  await _context.Approvals
+               .Where(x => x.EntryId == entryId)
+               .Where(x => x.CreatedById == userId)
+               .AnyAsync();
         }
     }
 }
