@@ -12,7 +12,8 @@ namespace Persistence.Entities
         public int Id { get; set; }
         public string FacilityName { get; set; }
 
-        public string FacilityType { get; set; }
+        public int FacilityTypeId { get; set; }
+        public FacilityType FacilityType { get; set; }
 
         public string PanNumber { get; set; }
 
@@ -91,5 +92,11 @@ namespace Persistence.Entities
         public string? ApplicationSubmittedDate { get; set; }
 
         public string? ApplicationSubmittedAuthority { get; set; }
+    }
+
+    public class FacilityType
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 }

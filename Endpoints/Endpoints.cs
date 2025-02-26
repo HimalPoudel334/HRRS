@@ -7,6 +7,7 @@ using HRRS.Dto.HealthStandard;
 using HRRS.Dto.Mapdanda;
 using HRRS.Dto.MasterStandardEntry;
 using HRRS.Dto.Parichhed;
+using HRRS.Dto.User;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
@@ -71,6 +72,18 @@ public static class Endpoints
         endpoints.MapGet("api/healthfacility", async (IHealthFacilityService service, HttpContext context) => TypedResults.Ok(await service.GetAll(context))).RequireAuthorization();
         endpoints.MapPost("api/healthfacility", [Authorize(Roles = "SuperAdmin")] async (RegisterHospitalDto dto, IAuthService service) => TypedResults.Ok(await service.RegisterHospitalAsync(dto))).RequireAuthorization();
         endpoints.MapGet("api/healthfacility/{id}", async (int id, IHealthFacilityService service) => TypedResults.Ok(await service.GetById(id)));
+
+        //health facility type
+        endpoints.MapGet("api/facilitytypes", async (IFacilityTypeService service) => TypedResults.Ok(await service.GetAll()));
+        endpoints.MapPost("api/facilitytypes", [Authorize(Roles = "SuperAdmin")] async (FacilityTypeDto dto, IFacilityTypeService service) => TypedResults.Ok(await service.Create(dto))).RequireAuthorization();
+
+        //user get
+        endpoints.MapGet("api/users", [Authorize(Roles = "SuperAdmin")] async (IAuthService service) => TypedResults.Ok(await service.GetAllUsers())).RequireAuthorization();
+
+
+        //user role services
+        endpoints.MapGet("api/userrole", [Authorize(Roles = "SuperAdmin")] async (IUserRoleService service) => TypedResults.Ok(await service.GetAll())).RequireAuthorization();
+        endpoints.MapPost("api/userrole", [Authorize(Roles = "SuperAdmin")] async (UserRoleDto dto, IUserRoleService service) => TypedResults.Ok(await service.Create(dto))).RequireAuthorization();
 
         // anusuchi services
         endpoints.MapPost("api/anusuchi", async (AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Create(dto)));

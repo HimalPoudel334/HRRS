@@ -3,7 +3,9 @@ using System.Numerics;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using HRRS.Dto;
+using HRRS.Dto.Auth;
 using HRRS.Persistence.Context;
+using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -21,10 +23,15 @@ namespace HRRS.Services.Implementation
         }
         public async Task<ResultDto> Create(HealthFacilityDto dto)
         {
+            var facilityType = await _context.FacilityTypes.FindAsync(dto.FacilityTypeId);
+            if (facilityType is null)
+                return ResultDto.Failure("Facility type cannot be found");
+
+
             var facility = new HealthFacility
             {
                 FacilityName = dto.FacilityName,
-                FacilityType = dto.FacilityType,
+                FacilityType = facilityType,
                 PanNumber = dto.PanNumber,
                 BedCount = dto.BedCount,
                 SpecialistCount = dto.SpecialistCount,
@@ -72,7 +79,7 @@ namespace HRRS.Services.Implementation
 
         public async Task<ResultWithDataDto<HealthFacilityDto>> GetById(int id)
         {
-            var healthFacility = await _context.HealthFacilities.FindAsync(id);
+            var healthFacility = await _context.HealthFacilities.Include(x => x.FacilityType).FirstOrDefaultAsync(x => x.Id == id);
             if(healthFacility == null)
             {
                 return ResultWithDataDto<HealthFacilityDto>.Failure("स्वास्थ्य संस्था फेला परेन।");
@@ -81,7 +88,8 @@ namespace HRRS.Services.Implementation
             {
                 Id = id,
                 FacilityName = healthFacility.FacilityName,
-                FacilityType = healthFacility.FacilityType,
+                FacilityType = healthFacility.FacilityType.Name,
+                FacilityTypeId = healthFacility.FacilityTypeId,
                 PanNumber = healthFacility.PanNumber,
                 BedCount = healthFacility.BedCount,
                 SpecialistCount = healthFacility.SpecialistCount,
@@ -132,14 +140,66 @@ namespace HRRS.Services.Implementation
             }
 
             var userIdInt = long.Parse(userId);
-            var user = await _context.Users.FindAsync(userIdInt);
+            var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userIdInt);
             if (user == null) {
                 return ResultWithDataDto<List<HealthFacilityDto>>.Failure("Cannot find user");
             }
 
+            if (user.Role is not null) 
+            { 
+                var res =  await _context.HealthFacilities
+                    .Include(x => x.FacilityType)
+                    .Where(x => x.BedCount == user.Role.BedCount)
+                    .Select(facility => new HealthFacilityDto() {
+                    Id = facility.Id,
+                    FacilityName = facility.FacilityName,
+                    FacilityType = facility.FacilityType.Name,
+                    FacilityTypeId = facility.FacilityTypeId,
+                    PanNumber = facility.PanNumber,
+                    BedCount = facility.BedCount,
+                    SpecialistCount = facility.SpecialistCount,
+                    AvailableServices = facility.AvailableServices,
+                    District = facility.District,
+                    LocalLevel = facility.LocalLevel,
+                    WardNumber = facility.WardNumber,
+                    Tole = facility.Tole,
+                    DateOfInspection = facility.DateOfInspection,
+                    FacilityEmail = facility.FacilityEmail,
+                    FacilityPhoneNumber = facility.FacilityPhoneNumber,
+                    FacilityHeadName = facility.FacilityHeadName,
+                    FacilityHeadPhone = facility.FacilityHeadPhone,
+                    FacilityHeadEmail = facility.FacilityHeadEmail,
+                    ExecutiveHeadName = facility.ExecutiveHeadName,
+                    ExecutiveHeadMobile = facility.ExecutiveHeadMobile,
+                    ExecutiveHeadEmail = facility.ExecutiveHeadEmail,
+                    PermissionReceivedDate = facility.PermissionReceivedDate,
+                    LastRenewedDate = facility.LastRenewedDate,
+                    ApporvingAuthority = facility.ApporvingAuthority,
+                    RenewingAuthority = facility.RenewingAuthority,
+                    ApprovalValidityTill = facility.ApprovalValidityTill,
+                    RenewalValidityTill = facility.RenewalValidityTill,
+                    UpgradeDate = facility.UpgradeDate,
+                    UpgradingAuthority = facility.UpgradingAuthority,
+                    IsLetterOfIntent = facility.IsLetterOfIntent,
+                    IsExecutionPermission = facility.IsExecutionPermission,
+                    IsRenewal = facility.IsRenewal,
+                    IsUpgrade = facility.IsUpgrade,
+                    IsServiceExtension = facility.IsServiceExtension,
+                    IsBranchExtension = facility.IsBranchExtension,
+                    IsRelocation = facility.IsRelocation,
+                    Others = facility.Others,
+                    ApplicationSubmittedAuthority = facility.ApplicationSubmittedAuthority,
+                    ApplicationSubmittedDate = facility.ApplicationSubmittedDate
+                })
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
+
+                return ResultWithDataDto<List<HealthFacilityDto>>.Success(res);
+            }
+
             if (role == "Hospital")
             {
-                var facility = await _context.HealthFacilities.Where(x=> x.Id == user.HealthFacilityId).SingleOrDefaultAsync();
+                var facility = await _context.HealthFacilities.Include(x => x.FacilityType).Where(x=> x.Id == user.HealthFacilityId).SingleOrDefaultAsync();
                 if (facility == null) {
                     return new ResultWithDataDto<List<HealthFacilityDto>>(true, null, "स्वास्थ्य संस्था फेला परेन।");
                 }
@@ -147,7 +207,8 @@ namespace HRRS.Services.Implementation
                 {
                     Id = facility.Id,
                     FacilityName = facility.FacilityName,
-                    FacilityType = facility.FacilityType,
+                    FacilityType = facility.FacilityType.Name,
+                    FacilityTypeId = facility.FacilityTypeId,
                     PanNumber = facility.PanNumber,
                     BedCount = facility.BedCount,
                     SpecialistCount = facility.SpecialistCount,
@@ -190,11 +251,12 @@ namespace HRRS.Services.Implementation
             }
 
 
-            var facilityDto = await _context.HealthFacilities.Select(facility => new HealthFacilityDto()
+            var facilityDto = await _context.HealthFacilities.Include(x => x.FacilityType).Select(facility => new HealthFacilityDto()
                 {
                 Id = facility.Id,
                 FacilityName = facility.FacilityName,
-                FacilityType = facility.FacilityType,
+                FacilityType = facility.FacilityType.Name,
+                FacilityTypeId = facility.FacilityTypeId,
                 PanNumber = facility.PanNumber,
                 BedCount = facility.BedCount,
                 SpecialistCount = facility.SpecialistCount,
@@ -241,6 +303,7 @@ namespace HRRS.Services.Implementation
             return ResultWithDataDto<List<HealthFacilityDto>>.Success(facilityDto);
         }
 
+        
         public async Task Update(int id, HealthFacilityDto healthFacilityDto)
         {
             throw new NotImplementedException();

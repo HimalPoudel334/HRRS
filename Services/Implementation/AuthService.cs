@@ -41,11 +41,18 @@ public class AuthService : IAuthService
             return ResultWithDataDto<AuthResponseDto>.Failure("Username already exists");
         }
 
+        var role = await _context.UserRoles.FindAsync(dto.RoleId);
+        if(role is null)
+        {
+            return ResultWithDataDto<AuthResponseDto>.Failure("Cannot find user role");
+        }
+
         User newUser = new User
         {
             UserName = dto.Username,
             Password = GenerateHashedPassword(dto.Password),
-            UserType = "Admin"
+            UserType = "Admin",
+            Role = role,
         };
 
         await _context.Users.AddAsync(newUser);
@@ -66,10 +73,14 @@ public class AuthService : IAuthService
             return ResultWithDataDto<AuthResponseDto>.Failure("Username already exists");
         }
 
+        var facilityType = await _context.FacilityTypes.FindAsync(dto.FacilityDto.FacilityTypeId);
+        if(facilityType is null)
+            return ResultWithDataDto<AuthResponseDto>.Failure("Facility type cannot be found");
+
         var healthFacility = new HealthFacility()
         {
             FacilityName = dto.FacilityDto.FacilityName,
-            FacilityType = dto.FacilityDto.FacilityType,
+            FacilityType = facilityType,
             PanNumber = dto.FacilityDto.PanNumber,
             BedCount = dto.FacilityDto.BedCount,
             SpecialistCount = dto.FacilityDto.SpecialistCount,
@@ -136,4 +147,18 @@ public class AuthService : IAuthService
         return ResultWithDataDto<AuthResponseDto>.Success(authResponse);
     }
 
+    public async Task<ResultWithDataDto<List<UserDto>>> GetAllUsers()
+    {
+        var users = await _context.Users.Include(x => x.Role).Select(x => new UserDto
+        {
+            UserId = x.UserId,
+            Username = x.UserName,
+            UserType = x.UserType,
+            RoleId = x.RoleId,
+            Role = x.Role != null? x.Role.Title : "",
+            BedCount = x.Role != null ? x.Role.BedCount : 0
+        }).ToListAsync();
+
+        return ResultWithDataDto<List<UserDto>>.Success(users);
+    }
 }

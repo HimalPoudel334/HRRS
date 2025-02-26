@@ -12,4 +12,9 @@ public class User
 
     public HealthFacility? HealthFacility { get; set; }
     public int? HealthFacilityId { get; set; }
+    public int? RoleId { get; set; }
+    public Role? Role { get; set; }
 }
+
+
+

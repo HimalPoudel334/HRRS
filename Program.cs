@@ -47,6 +47,8 @@ builder.Services.AddScoped<IMasterStandardEntryService, MasterStandardEntryServi
 builder.Services.AddScoped<IMapdandaRepository, MapdandaRepository>();
 builder.Services.AddScoped<IHospitalStandardRespository, HospitalStandardRepository>();
 builder.Services.AddScoped<IHealthFacilityRepositoroy, HealthFacilityRepository>();
+builder.Services.AddScoped<IFacilityTypeService, FacilityTypeService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();

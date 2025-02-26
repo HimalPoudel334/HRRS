@@ -24,6 +24,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<HospitalStandardEntry> HospitalStandardEntrys { get; set; }
     public DbSet<MasterStandardEntry> MasterStandardEntries { get; set; }
     public DbSet<SubmissionStatus> Approvals { get; set; }
+    public DbSet<FacilityType> FacilityTypes { get; set; }
+    public DbSet<Role> UserRoles { get; set; }
 
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
@@ -62,6 +64,38 @@ public class ApplicationDbContext : DbContext
                 };
                 context.Set<User>().AddRange([local1, local2]);
                 context.SaveChanges();
+            }
+
+            var roles = context.Set<Role>().FirstOrDefault();
+            if (roles is null)
+            {
+                var role1 = new Role()
+                {
+                    BedCount = 25,
+                    Title = "Jilla",
+                };
+
+                var role2 = new Role()
+                {
+                    BedCount = 50,
+                    Title = "Inrdesanalaya",
+                };
+
+                var role3 = new Role()
+                {
+                    BedCount = 100,
+                    Title = "Mantralaya",
+                };
+
+                var role4 = new Role()
+                {
+                    BedCount = 200,
+                    Title = "SuperAdmin",
+                };
+
+                context.Set<Role>().AddRange([role1, role2, role3, role4]);
+                context.SaveChanges();
+
             }
 
             List<Anusuchi> anusuchis = [
@@ -180,6 +214,38 @@ public class ApplicationDbContext : DbContext
                 };
                await context.Set<User>().AddRangeAsync([local1, local2], cancellationToken);
                await context.SaveChangesAsync(cancellationToken);
+            }
+
+            var roles = context.Set<Role>().FirstOrDefaultAsync(cancellationToken);
+            if (roles is null)
+            {
+                var role1 = new Role()
+                {
+                    BedCount = 25,
+                    Title = "Jilla",
+                };
+
+                var role2 = new Role()
+                {
+                    BedCount = 50,
+                    Title = "Nirdesanalaya",
+                };
+
+                var role3 = new Role()
+                {
+                    BedCount = 100,
+                    Title = "Mantraalaya",
+                };
+
+                var role4 = new Role()
+                {
+                    BedCount = 200,
+                    Title = "SuperAdmin",
+                };
+
+                await context.Set<Role>().AddRangeAsync([role1, role2, role3, role4], cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+
             }
 
             List<Anusuchi> anusuchis = [

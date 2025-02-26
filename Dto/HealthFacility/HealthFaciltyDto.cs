@@ -4,6 +4,7 @@ public class HealthFacilityDto
     public int? Id { get; set; }
     public string FacilityName { get; set; }
 
+    public int FacilityTypeId { get; set; }
     public string FacilityType { get; set; }
 
     public string PanNumber { get; set; }
@@ -84,4 +85,10 @@ public class HealthFacilityDto
 
     public string? ApplicationSubmittedAuthority { get; set; }
 
+}
+
+public class FacilityTypeDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
 }

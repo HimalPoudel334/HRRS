@@ -173,7 +173,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                         GroupedMapdanda = group.Select(item => new MapdandaModel
                         {
                             EntryId = item.Id,
-                            Id = item.Id,
+                            Id = item.MapdandaId,
                             Name = item.Mapdanda.Name,
                             SerialNumber = item.Mapdanda.SerialNumber,
                             Parimaad = item.Mapdanda.Parimaad,
