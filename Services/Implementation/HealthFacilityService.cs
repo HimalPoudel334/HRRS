@@ -23,7 +23,7 @@ namespace HRRS.Services.Implementation
         }
         public async Task<ResultDto> Create(HealthFacilityDto dto)
         {
-            var facilityType = await _context.FacilityTypes.FindAsync(dto.FacilityTypeId);
+            var facilityType = await _context.HospitalType.FindAsync(dto.FacilityTypeId);
             if (facilityType is null)
                 return ResultDto.Failure("Facility type cannot be found");
 
@@ -88,7 +88,7 @@ namespace HRRS.Services.Implementation
             {
                 Id = id,
                 FacilityName = healthFacility.FacilityName,
-                FacilityType = healthFacility.FacilityType.Name,
+                FacilityType = healthFacility.FacilityType.HOSP_TYPE,
                 FacilityTypeId = healthFacility.FacilityTypeId,
                 PanNumber = healthFacility.PanNumber,
                 BedCount = healthFacility.BedCount,
@@ -153,7 +153,7 @@ namespace HRRS.Services.Implementation
                     .Select(facility => new HealthFacilityDto() {
                     Id = facility.Id,
                     FacilityName = facility.FacilityName,
-                    FacilityType = facility.FacilityType.Name,
+                    FacilityType = facility.FacilityType.HOSP_CODE,
                     FacilityTypeId = facility.FacilityTypeId,
                     PanNumber = facility.PanNumber,
                     BedCount = facility.BedCount,
@@ -207,7 +207,7 @@ namespace HRRS.Services.Implementation
                 {
                     Id = facility.Id,
                     FacilityName = facility.FacilityName,
-                    FacilityType = facility.FacilityType.Name,
+                    FacilityType = facility.FacilityType.HOSP_CODE,
                     FacilityTypeId = facility.FacilityTypeId,
                     PanNumber = facility.PanNumber,
                     BedCount = facility.BedCount,
@@ -255,7 +255,7 @@ namespace HRRS.Services.Implementation
                 {
                 Id = facility.Id,
                 FacilityName = facility.FacilityName,
-                FacilityType = facility.FacilityType.Name,
+                FacilityType = facility.FacilityType.HOSP_CODE,
                 FacilityTypeId = facility.FacilityTypeId,
                 PanNumber = facility.PanNumber,
                 BedCount = facility.BedCount,

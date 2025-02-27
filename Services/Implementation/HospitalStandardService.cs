@@ -60,6 +60,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 FilePath = item.FilePath,
                 FiscalYear = item.FiscalYear,
                 Status = false,
+                IsApproved = item.IsApproved
             });
         }
 
@@ -180,6 +181,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                             Group = item.Mapdanda.Group,
                             FilePath = item.FilePath,
                             IsAvailable = item.IsAvailable,
+                            IsApproved = item.IsApproved,
+                            Remarks = item.Remarks,
                             Value = determineValue(bedCount.Value, item.Mapdanda.FormType, item.Mapdanda.Value25, item.Mapdanda.Value50, item.Mapdanda.Value100, item.Mapdanda.Value200),
                             IsAvailableDivided = item.Mapdanda.IsAvailableDivided,
                         }).ToList()
@@ -222,6 +225,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 standard.FilePath = map.FilePath;
                 standard.FiscalYear = map.FiscalYear;
                 standard.UpdatedAt = DateTime.Now;
+                standard.IsApproved = map.IsApproved;
+                standard.Remarks = map.Remarks;
 
             }
         }
@@ -274,6 +279,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                                 IsActive = determineActive(bedCount, m.Mapdanda.Is25Active, m.Mapdanda.Is50Active, m.Mapdanda.Is100Active, m.Mapdanda.Is200Active),
                                 Status = m.Status,
                                 Group = m.Mapdanda.Group,
+                                Remarks = m.Remarks,
+                                IsApproved = m.IsApproved
                             }).ToList()
 
                         }).ToList()

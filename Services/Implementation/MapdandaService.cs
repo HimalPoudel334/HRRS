@@ -251,7 +251,22 @@ public class MapdandaService : IMapdandaService
                }).ToList()
            })
            .ToList();
+        
+        var res = mapdandas.OrderBy(x => x.List.OrderBy(x => x.GroupedMapdanda.OrderBy(x => x.SerialNumber))).ToList();
 
-        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(mapdandas);
+        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(res);
     }
+
+    public async Task<ResultWithDataDto<FormType?>> GetFormTypeForMapdanda(HospitalStandardQueryParams dto)
+    {
+        var mapdandaQuery = _dbContext.Mapdandas.AsQueryable();
+
+        if (dto.AnusuchiId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.AnusuchiId == dto.AnusuchiId.Value && x.ParichhedId == null);
+        if (dto.ParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.ParichhedId == dto.ParichhedId.Value && x.SubParichhedId == null);
+        if (dto.SubParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.SubParichhedId == dto.SubParichhedId.Value);
+
+        var mapdanda = await mapdandaQuery.FirstOrDefaultAsync();
+        var formType = mapdanda?.FormType;
+        return ResultWithDataDto<FormType?>.Success(formType);
+    } 
 }

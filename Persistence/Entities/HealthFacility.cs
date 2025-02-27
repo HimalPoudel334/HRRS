@@ -96,7 +96,11 @@ namespace Persistence.Entities
 
     public class FacilityType
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        [Key]
+        public int SN { get; set; }
+        public string HOSP_CODE { get; set; }
+        public string HOSP_TYPE { get; set; }
+
+        public bool ACTIVE { get; set; }
     }
 }

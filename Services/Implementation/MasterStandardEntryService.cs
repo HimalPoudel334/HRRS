@@ -81,37 +81,48 @@ namespace HRRS.Services.Implementation
 
         }
 
-        public async Task<ResultDto> ApproveStandardsWithRemark(Guid entryId, StandardRemarkDto dto)
+        public async Task<ResultDto> ApproveStandardsWithRemark(Guid entryId, StandardRemarkDto dto, long userId)
         {
             var entry = await _context.MasterStandardEntries.FindAsync(entryId);
-
             if (entry == null)
-            {
                 return ResultDto.Failure("Cannot find entry");
-            }
+            
+            var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId);
+            if(user!.Role is null)
+                return ResultDto.Failure("Cannot find entry");
+
+            if(user!.Role.BedCount.HasValue && user!.Role.BedCount != entry.BedCount)
+                return ResultDto.Failure("Cannot find entry");
 
             entry.EntryStatus = EntryStatus.Approved;
             entry.Remarks = dto.Remarks;
             entry.UpdatedAt = DateTime.Now;
+            entry.ApprovedBy = user;
 
             await _context.SaveChangesAsync();
 
             return ResultDto.Success();
         }
 
-        public async Task<ResultDto> RejectStandardsWithRemark(Guid entryId, StandardRemarkDto dto)
+        public async Task<ResultDto> RejectStandardsWithRemark(Guid entryId, StandardRemarkDto dto, long userId)
         {
 
             var entry = await _context.MasterStandardEntries.FindAsync(entryId);
-
             if (entry == null)
-            {
                 return ResultDto.Failure("Cannot find entry");
-            }
+
+            var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId);
+            if (user!.Role is null)
+                return ResultDto.Failure("Cannot find entry");
+
+            if (user!.Role.BedCount.HasValue && user!.Role.BedCount != entry.BedCount)
+                return ResultDto.Failure("Cannot find entry");
+
 
             entry.EntryStatus = EntryStatus.Rejected;
             entry.Remarks = dto.Remarks;
             entry.UpdatedAt = DateTime.Now;
+            entry.RejectedBy = user;
 
             await _context.SaveChangesAsync();
 

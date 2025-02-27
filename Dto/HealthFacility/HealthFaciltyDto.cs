@@ -91,4 +91,6 @@ public class FacilityTypeDto
 {
     public int Id { get; set; }
     public string Name { get; set; }
+    public string? HospitalCode { get; set; }
+    public bool IsActive { get; set; }
 }

@@ -24,6 +24,8 @@ public class HospitalMapdandasDto
     public string? FilePath { get; set; }
     public string? FiscalYear { get; set; }
     public bool Status { get; set; }
+    public bool IsApproved { get; set; }
+
 }
 
 public class HospitalStandardDto
@@ -61,6 +63,8 @@ public class MapdandaModel
     public string? Group { get; set; }
     public string? Value { get; set; }
     public int EntryId { get; set; }
+    public bool IsApproved { get; set; }
+    public string? Remarks { get; set; }
 
     public bool? IsAvailableDivided { get; set; }
 }

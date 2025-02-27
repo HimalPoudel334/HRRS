@@ -53,6 +53,9 @@ namespace HRRS.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<long?>("ApprovedById")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("BedCount")
                         .HasColumnType("int");
 
@@ -65,6 +68,12 @@ namespace HRRS.Migrations
                     b.Property<int>("HealthFacilityId")
                         .HasColumnType("int");
 
+                    b.Property<long?>("RejectedById")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("SubmissionType")
                         .HasColumnType("int");
 
@@ -73,7 +82,11 @@ namespace HRRS.Migrations
 
                     b.HasKey("SubmissionCode");
 
+                    b.HasIndex("ApprovedById");
+
                     b.HasIndex("HealthFacilityId");
+
+                    b.HasIndex("RejectedById");
 
                     b.ToTable("MasterStandardEntries");
                 });
@@ -186,6 +199,9 @@ namespace HRRS.Migrations
 
                     b.Property<int>("HealthFacilityId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
 
                     b.Property<bool?>("IsAvailable")
                         .HasColumnType("bit");
@@ -379,19 +395,26 @@ namespace HRRS.Migrations
 
             modelBuilder.Entity("Persistence.Entities.FacilityType", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("SN")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SN"));
 
-                    b.Property<string>("Name")
+                    b.Property<bool>("ACTIVE")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("HOSP_CODE")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("HOSP_TYPE")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("FacilityTypes");
+                    b.HasKey("SN");
+
+                    b.ToTable("HospitalType");
                 });
 
             modelBuilder.Entity("Persistence.Entities.HealthFacility", b =>
@@ -616,13 +639,25 @@ namespace HRRS.Migrations
 
             modelBuilder.Entity("HRRS.Persistence.Entities.MasterStandardEntry", b =>
                 {
+                    b.HasOne("HRRS.Persistence.Entities.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById");
+
                     b.HasOne("Persistence.Entities.HealthFacility", "HealthFacility")
                         .WithMany()
                         .HasForeignKey("HealthFacilityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("HRRS.Persistence.Entities.User", "RejectedBy")
+                        .WithMany()
+                        .HasForeignKey("RejectedById");
+
+                    b.Navigation("ApprovedBy");
+
                     b.Navigation("HealthFacility");
+
+                    b.Navigation("RejectedBy");
                 });
 
             modelBuilder.Entity("HRRS.Persistence.Entities.SubmissionStatus", b =>
@@ -634,7 +669,7 @@ namespace HRRS.Migrations
                         .IsRequired();
 
                     b.HasOne("HRRS.Persistence.Entities.MasterStandardEntry", "Entry")
-                        .WithMany("Status")
+                        .WithMany()
                         .HasForeignKey("EntryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -781,8 +816,6 @@ namespace HRRS.Migrations
             modelBuilder.Entity("HRRS.Persistence.Entities.MasterStandardEntry", b =>
                 {
                     b.Navigation("HospitalStandardEntries");
-
-                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("HRRS.Persistence.Entities.Role", b =>

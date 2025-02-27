@@ -24,7 +24,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<HospitalStandardEntry> HospitalStandardEntrys { get; set; }
     public DbSet<MasterStandardEntry> MasterStandardEntries { get; set; }
     public DbSet<SubmissionStatus> Approvals { get; set; }
-    public DbSet<FacilityType> FacilityTypes { get; set; }
+    public DbSet<FacilityType> HospitalType { get; set; }
     public DbSet<Role> UserRoles { get; set; }
 
     

@@ -5,7 +5,7 @@ namespace HRRS.Services.Interface
 {
     public interface IFacilityTypeService
     {
-        Task<ResultWithDataDto<List<FacilityType>>> GetAll();
+        Task<ResultWithDataDto<List<FacilityTypeDto>>> GetAll();
         Task<ResultDto> Create(FacilityTypeDto dto);
     }
 }

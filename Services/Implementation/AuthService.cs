@@ -73,7 +73,7 @@ public class AuthService : IAuthService
             return ResultWithDataDto<AuthResponseDto>.Failure("Username already exists");
         }
 
-        var facilityType = await _context.FacilityTypes.FindAsync(dto.FacilityDto.FacilityTypeId);
+        var facilityType = await _context.HospitalType.FindAsync(dto.FacilityDto.FacilityTypeId);
         if(facilityType is null)
             return ResultWithDataDto<AuthResponseDto>.Failure("Facility type cannot be found");
 

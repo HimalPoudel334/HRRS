@@ -27,16 +27,18 @@ namespace HRRS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FacilityTypes",
+                name: "HospitalType",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    SN = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    HOSP_CODE = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HOSP_TYPE = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ACTIVE = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FacilityTypes", x => x.Id);
+                    table.PrimaryKey("PK_HospitalType", x => x.SN);
                 });
 
             migrationBuilder.CreateTable(
@@ -122,10 +124,10 @@ namespace HRRS.Migrations
                 {
                     table.PrimaryKey("PK_HealthFacilities", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_HealthFacilities_FacilityTypes_FacilityTypeId",
+                        name: "FK_HealthFacilities_HospitalType_FacilityTypeId",
                         column: x => x.FacilityTypeId,
-                        principalTable: "FacilityTypes",
-                        principalColumn: "Id",
+                        principalTable: "HospitalType",
+                        principalColumn: "SN",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -146,29 +148,6 @@ namespace HRRS.Migrations
                         name: "FK_SubParichheds_Parichheds_ParichhedId",
                         column: x => x.ParichhedId,
                         principalTable: "Parichheds",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "MasterStandardEntries",
-                columns: table => new
-                {
-                    SubmissionCode = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BedCount = table.Column<int>(type: "int", nullable: false),
-                    HealthFacilityId = table.Column<int>(type: "int", nullable: false),
-                    EntryStatus = table.Column<int>(type: "int", nullable: false),
-                    SubmissionType = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MasterStandardEntries", x => x.SubmissionCode);
-                    table.ForeignKey(
-                        name: "FK_MasterStandardEntries_HealthFacilities_HealthFacilityId",
-                        column: x => x.HealthFacilityId,
-                        principalTable: "HealthFacilities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -222,54 +201,39 @@ namespace HRRS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "HospitalStandardEntrys",
+                name: "MasterStandardEntries",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SubmissionCode = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    BedCount = table.Column<int>(type: "int", nullable: false),
+                    HealthFacilityId = table.Column<int>(type: "int", nullable: false),
+                    EntryStatus = table.Column<int>(type: "int", nullable: false),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ApprovedById = table.Column<long>(type: "bigint", nullable: true),
+                    RejectedById = table.Column<long>(type: "bigint", nullable: true),
+                    SubmissionType = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    MasterStandardEntrySubmissionCode = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_HospitalStandardEntrys", x => x.Id);
+                    table.PrimaryKey("PK_MasterStandardEntries", x => x.SubmissionCode);
                     table.ForeignKey(
-                        name: "FK_HospitalStandardEntrys_MasterStandardEntries_MasterStandardEntrySubmissionCode",
-                        column: x => x.MasterStandardEntrySubmissionCode,
-                        principalTable: "MasterStandardEntries",
-                        principalColumn: "SubmissionCode",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Approvals",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedById = table.Column<long>(type: "bigint", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EntryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Approvals", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Approvals_MasterStandardEntries_EntryId",
-                        column: x => x.EntryId,
-                        principalTable: "MasterStandardEntries",
-                        principalColumn: "SubmissionCode",
+                        name: "FK_MasterStandardEntries_HealthFacilities_HealthFacilityId",
+                        column: x => x.HealthFacilityId,
+                        principalTable: "HealthFacilities",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Approvals_Users_CreatedById",
-                        column: x => x.CreatedById,
+                        name: "FK_MasterStandardEntries_Users_ApprovedById",
+                        column: x => x.ApprovedById,
                         principalTable: "Users",
-                        principalColumn: "UserId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "UserId");
+                    table.ForeignKey(
+                        name: "FK_MasterStandardEntries_Users_RejectedById",
+                        column: x => x.RejectedById,
+                        principalTable: "Users",
+                        principalColumn: "UserId");
                 });
 
             migrationBuilder.CreateTable(
@@ -335,36 +299,53 @@ namespace HRRS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "HospitalStandards",
+                name: "Approvals",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedById = table.Column<long>(type: "bigint", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EntryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Approvals", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Approvals_MasterStandardEntries_EntryId",
+                        column: x => x.EntryId,
+                        principalTable: "MasterStandardEntries",
+                        principalColumn: "SubmissionCode",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Approvals_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "HospitalStandardEntrys",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    HealthFacilityId = table.Column<int>(type: "int", nullable: false),
-                    MapdandaId = table.Column<int>(type: "int", nullable: false),
-                    IsAvailable = table.Column<bool>(type: "bit", nullable: true),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FiscalYear = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<bool>(type: "bit", nullable: false),
-                    StandardEntryId = table.Column<int>(type: "int", nullable: false)
+                    MasterStandardEntrySubmissionCode = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_HospitalStandards", x => x.Id);
+                    table.PrimaryKey("PK_HospitalStandardEntrys", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_HospitalStandards_HospitalStandardEntrys_StandardEntryId",
-                        column: x => x.StandardEntryId,
-                        principalTable: "HospitalStandardEntrys",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_HospitalStandards_Mapdandas_MapdandaId",
-                        column: x => x.MapdandaId,
-                        principalTable: "Mapdandas",
-                        principalColumn: "Id",
+                        name: "FK_HospitalStandardEntrys_MasterStandardEntries_MasterStandardEntrySubmissionCode",
+                        column: x => x.MasterStandardEntrySubmissionCode,
+                        principalTable: "MasterStandardEntries",
+                        principalColumn: "SubmissionCode",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -385,6 +366,41 @@ namespace HRRS.Migrations
                     table.PrimaryKey("PK_SubMapdandas", x => x.Id);
                     table.ForeignKey(
                         name: "FK_SubMapdandas_Mapdandas_MapdandaId",
+                        column: x => x.MapdandaId,
+                        principalTable: "Mapdandas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "HospitalStandards",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    HealthFacilityId = table.Column<int>(type: "int", nullable: false),
+                    MapdandaId = table.Column<int>(type: "int", nullable: false),
+                    IsAvailable = table.Column<bool>(type: "bit", nullable: true),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FiscalYear = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<bool>(type: "bit", nullable: false),
+                    StandardEntryId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HospitalStandards", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_HospitalStandards_HospitalStandardEntrys_StandardEntryId",
+                        column: x => x.StandardEntryId,
+                        principalTable: "HospitalStandardEntrys",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_HospitalStandards_Mapdandas_MapdandaId",
                         column: x => x.MapdandaId,
                         principalTable: "Mapdandas",
                         principalColumn: "Id",
@@ -448,9 +464,19 @@ namespace HRRS.Migrations
                 column: "SubSubParichhedId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MasterStandardEntries_ApprovedById",
+                table: "MasterStandardEntries",
+                column: "ApprovedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_MasterStandardEntries_HealthFacilityId",
                 table: "MasterStandardEntries",
                 column: "HealthFacilityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MasterStandardEntries_RejectedById",
+                table: "MasterStandardEntries",
+                column: "RejectedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Parichheds_AnusuchiId",
@@ -496,16 +522,10 @@ namespace HRRS.Migrations
                 name: "SubMapdandas");
 
             migrationBuilder.DropTable(
-                name: "Users");
-
-            migrationBuilder.DropTable(
                 name: "HospitalStandardEntrys");
 
             migrationBuilder.DropTable(
                 name: "Mapdandas");
-
-            migrationBuilder.DropTable(
-                name: "UserRoles");
 
             migrationBuilder.DropTable(
                 name: "MasterStandardEntries");
@@ -514,16 +534,22 @@ namespace HRRS.Migrations
                 name: "SubSubParichheds");
 
             migrationBuilder.DropTable(
-                name: "HealthFacilities");
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "SubParichheds");
 
             migrationBuilder.DropTable(
-                name: "FacilityTypes");
+                name: "HealthFacilities");
+
+            migrationBuilder.DropTable(
+                name: "UserRoles");
 
             migrationBuilder.DropTable(
                 name: "Parichheds");
+
+            migrationBuilder.DropTable(
+                name: "HospitalType");
 
             migrationBuilder.DropTable(
                 name: "Anusuchis");

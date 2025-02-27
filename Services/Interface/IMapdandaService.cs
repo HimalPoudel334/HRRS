@@ -10,5 +10,6 @@ public interface IMapdandaService
     Task<ResultDto> UpdateMapdanda(int mapdandaId, MapdandaDto dto);
     Task<ResultDto> ToggleStatus(int mapdandaId);
     Task<ResultWithDataDto<List<string>>> GetMapdandaGroups(string? searchKey);
+    Task<ResultWithDataDto<FormType?>> GetFormTypeForMapdanda(HospitalStandardQueryParams dto);
 
 }
