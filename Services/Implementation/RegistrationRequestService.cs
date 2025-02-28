@@ -11,7 +11,7 @@ namespace HRRS.Services.Implementation
 
         public RegistrationRequestService(ApplicationDbContext context) => _context = context;
 
-        //get all registration requests
+        
         public async Task<ResultWithDataDto<List<RegistrationRequest?>>> GetAllRegistrationRequestsAsync()
         {
             var requests =  await _context.RegistrationRequests
@@ -21,7 +21,6 @@ namespace HRRS.Services.Implementation
             return ResultWithDataDto<List<RegistrationRequest?>>.Success(requests);
         }
 
-        //get registration request by id
         public async Task<ResultWithDataDto<RegistrationRequest?>> GetRegistrationRequestByIdAsync(int id)
         {
             var request = await _context.RegistrationRequests
@@ -32,7 +31,6 @@ namespace HRRS.Services.Implementation
                 : ResultWithDataDto<RegistrationRequest?>.Success(request);
         }
 
-        //approve registration request
         public async Task<ResultWithDataDto<string>> ApproveRegistrationRequestAsync(int id, long handledById)
         {
             var request = await _context.RegistrationRequests
@@ -50,12 +48,13 @@ namespace HRRS.Services.Implementation
             _context.Entry(healthFacility).State = EntityState.Detached;
             await _context.HealthFacilities.AddAsync(healthFacility);
 
-            var password = AuthService.GenerateRandomPassword();
+            var password = "12345"; //AuthService.GenerateRandomPassword();
             var newUser = new User
             {
                 UserName = request.HealthFacility.PanNumber,
                 Password = AuthService.GenerateHashedPassword(password),
-                HealthFacility = healthFacility
+                HealthFacility = healthFacility,
+                IsFirstLogin = true
             };
 
             await _context.Users.AddAsync(newUser);
@@ -67,7 +66,6 @@ namespace HRRS.Services.Implementation
             return ResultWithDataDto<string>.Success($"Registration request approved successfully.\n The username is {newUser.UserName} and password is {password}");
         }
 
-        //reject registration request
         public async Task<ResultWithDataDto<string>> RejectRegistrationRequestAsync(int id, long handledById)
         {
             var request = await _context.RegistrationRequests
@@ -82,8 +80,6 @@ namespace HRRS.Services.Implementation
             await _context.SaveChangesAsync();
             return ResultWithDataDto<string>.Success("Registration request rejected successfully");
         }
-
-
 
     }
 }

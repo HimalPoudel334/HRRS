@@ -30,6 +30,10 @@ public class AuthService : IAuthService
         {
             return ResultWithDataDto<AuthResponseDto>.Failure("Invalid Username or Password");
         }
+
+        if(user.IsFirstLogin)
+            return ResultWithDataDto<AuthResponseDto>.Failure("Please change your password to continue");
+
         return GenerateAuthResponse(user);
     }
 
@@ -126,6 +130,8 @@ public class AuthService : IAuthService
             ApplicationSubmittedDate = dto.FacilityDto.ApplicationSubmittedDate
         };
 
+        await _context.TempHealthFacilities.AddAsync(healthFacility);
+
         var registrationRequest = new RegistrationRequest()
         {
             HealthFacility = healthFacility,
@@ -133,17 +139,9 @@ public class AuthService : IAuthService
             CreatedAt = DateTime.Now
         };
 
-        //User newUser = new User
-        //{
-        //    UserName = dto.Username,
-        //    Password = GenerateHashedPassword(dto.Password),
-        //    HealthFacility = healthFacility
-        //};
-
-        await _context.TempHealthFacilities.AddAsync(healthFacility);
         await _context.RegistrationRequests.AddAsync(registrationRequest);
         await _context.SaveChangesAsync();
-        //return GenerateAuthResponse(newUser);
+         
         return ResultWithDataDto<string>.Success("Registration request submitted successfully");
     }
 
@@ -183,5 +181,18 @@ public class AuthService : IAuthService
         var random = new Random();
         return new string(Enumerable.Repeat(chars, 5)
             .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+    public async Task<ResultWithDataDto<string>> ChangePasswordAsync(ChangePasswordDto dto)
+    {
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
+        if (user == null || !BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.Password))
+        {
+            return ResultWithDataDto<string>.Failure("Invalid Username or Password");
+        }
+        user.Password = GenerateHashedPassword(dto.NewPassword);
+        user.IsFirstLogin = false;
+        await _context.SaveChangesAsync();
+        return ResultWithDataDto<string>.Success("Password changed successfully");
     }
 }
