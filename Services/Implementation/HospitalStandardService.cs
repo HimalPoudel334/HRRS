@@ -325,6 +325,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         if(dto.AnusuchiId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.AnusuchiId == dto.AnusuchiId.Value && x.ParichhedId == null);
         if(dto.ParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.ParichhedId == dto.ParichhedId.Value && x.SubParichhedId == null);
         if(dto.SubParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.SubParichhedId == dto.SubParichhedId.Value);
+
         if(bedCount <= 25) mapdandaQuery = mapdandaQuery.Where(x => x.Is25Active);
         if(bedCount <= 50) mapdandaQuery = mapdandaQuery.Where(x => x.Is50Active);
         if(bedCount <= 100) mapdandaQuery = mapdandaQuery.Where(x => x.Is100Active);
