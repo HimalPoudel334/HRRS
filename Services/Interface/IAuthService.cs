@@ -10,5 +10,6 @@ public interface IAuthService
     Task<ResultWithDataDto<AuthResponseDto>> RegisterAdminAsync(RegisterDto dto);
     Task<ResultWithDataDto<string>> RegisterHospitalAsync(RegisterHospitalDto dto);
     Task<ResultWithDataDto<List<UserDto>>> GetAllUsers();
+    Task<ResultWithDataDto<string>> ChangePasswordAsync(ChangePasswordDto dto);
 
 }

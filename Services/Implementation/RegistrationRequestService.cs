@@ -1,11 +1,13 @@
 ﻿using HRRS.Dto;
+using HRRS.Dto.HealthStandard;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Entities;
+using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace HRRS.Services.Implementation
 {
-    public class RegistrationRequestService
+    public class RegistrationRequestService : IRegistrationRequestService
     {
         private readonly ApplicationDbContext _context;
 
@@ -66,7 +68,7 @@ namespace HRRS.Services.Implementation
             return ResultWithDataDto<string>.Success($"Registration request approved successfully.\n The username is {newUser.UserName} and password is {password}");
         }
 
-        public async Task<ResultWithDataDto<string>> RejectRegistrationRequestAsync(int id, long handledById)
+        public async Task<ResultWithDataDto<string>> RejectRegistrationRequestAsync(int id, long handledById, StandardRemarkDto dto)
         {
             var request = await _context.RegistrationRequests
                 .Include(x => x.HealthFacility)
@@ -76,6 +78,7 @@ namespace HRRS.Services.Implementation
             request.Status = RequestStatus.Rejected;
             request.HandledById = handledById;
             request.UpdatedAt = DateTime.Now;
+            request.Remarks = dto.Remarks;
 
             await _context.SaveChangesAsync();
             return ResultWithDataDto<string>.Success("Registration request rejected successfully");
