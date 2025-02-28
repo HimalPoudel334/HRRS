@@ -77,6 +77,14 @@ public class AuthService : IAuthService
         if(facilityType is null)
             return ResultWithDataDto<AuthResponseDto>.Failure("Facility type cannot be found");
 
+        var localLevel = await _context.LocalLevels.FindAsync(dto.FacilityDto.LocalLevelId);
+        if (localLevel is null)
+            return ResultWithDataDto<AuthResponseDto>.Failure("Local level cannot be found");
+
+        var district = await _context.Districts.FindAsync(dto.FacilityDto.DistrictId);
+        if (district is null)
+            return ResultWithDataDto<AuthResponseDto>.Failure("District cannot be found");
+
         var healthFacility = new HealthFacility()
         {
             FacilityName = dto.FacilityDto.FacilityName,
@@ -85,8 +93,8 @@ public class AuthService : IAuthService
             BedCount = dto.FacilityDto.BedCount,
             SpecialistCount = dto.FacilityDto.SpecialistCount,
             AvailableServices = dto.FacilityDto.AvailableServices,
-            District = dto.FacilityDto.District,
-            LocalLevel = dto.FacilityDto.LocalLevel,
+            District = district,
+            LocalLevel = localLevel,
             WardNumber = dto.FacilityDto.WardNumber,
             Tole = dto.FacilityDto.Tole,
             DateOfInspection = dto.FacilityDto.DateOfInspection,

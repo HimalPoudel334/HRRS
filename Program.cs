@@ -49,6 +49,7 @@ builder.Services.AddScoped<IHospitalStandardRespository, HospitalStandardReposit
 builder.Services.AddScoped<IHealthFacilityRepositoroy, HealthFacilityRepository>();
 builder.Services.AddScoped<IFacilityTypeService, FacilityTypeService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+builder.Services.AddScoped<IFacilityAddressService, FacilityAddressService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -56,7 +57,7 @@ builder.Services.AddProblemDetails();
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
 
 builder.Services.AddOpenApi();
 

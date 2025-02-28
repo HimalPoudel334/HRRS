@@ -1,15 +1,10 @@
-﻿using System.Net.Http;
-using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
+﻿
 using System.Security.Claims;
 using HRRS.Dto;
-using HRRS.Dto.Auth;
 using HRRS.Persistence.Context;
-using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Entities;
+
 
 namespace HRRS.Services.Implementation
 {
@@ -21,65 +16,10 @@ namespace HRRS.Services.Implementation
         {
             _context = context;
         }
-        public async Task<ResultDto> Create(HealthFacilityDto dto)
-        {
-            var facilityType = await _context.HospitalType.FindAsync(dto.FacilityTypeId);
-            if (facilityType is null)
-                return ResultDto.Failure("Facility type cannot be found");
-
-
-            var facility = new HealthFacility
-            {
-                FacilityName = dto.FacilityName,
-                FacilityType = facilityType,
-                PanNumber = dto.PanNumber,
-                BedCount = dto.BedCount,
-                SpecialistCount = dto.SpecialistCount,
-                AvailableServices = dto.AvailableServices,
-                District = dto.District,
-                LocalLevel = dto.LocalLevel,
-                WardNumber = dto.WardNumber,
-                Tole = dto.Tole,
-                DateOfInspection = dto.DateOfInspection,
-                FacilityEmail = dto.FacilityEmail,
-                FacilityPhoneNumber = dto.FacilityPhoneNumber,
-                FacilityHeadName = dto.FacilityHeadName,
-                FacilityHeadPhone = dto.FacilityHeadPhone,
-                FacilityHeadEmail = dto.FacilityHeadEmail,
-                ExecutiveHeadName = dto.ExecutiveHeadName,
-                ExecutiveHeadMobile = dto.ExecutiveHeadMobile,
-                ExecutiveHeadEmail = dto.ExecutiveHeadEmail,
-                PermissionReceivedDate = dto.PermissionReceivedDate,
-                LastRenewedDate = dto.LastRenewedDate,
-                ApporvingAuthority = dto.ApporvingAuthority,
-                RenewingAuthority = dto.RenewingAuthority,
-                ApprovalValidityTill = dto.ApprovalValidityTill,
-                RenewalValidityTill = dto.RenewalValidityTill,
-                UpgradeDate = dto.UpgradeDate,
-                UpgradingAuthority = dto.UpgradingAuthority,
-                IsLetterOfIntent = dto.IsLetterOfIntent,
-                IsExecutionPermission = dto.IsExecutionPermission,
-                IsRenewal = dto.IsRenewal,
-                IsUpgrade = dto.IsUpgrade,
-                IsServiceExtension = dto.IsServiceExtension,
-                IsBranchExtension = dto.IsBranchExtension,
-                IsRelocation = dto.IsRelocation,
-                Others = dto.Others,
-                ApplicationSubmittedAuthority = dto.ApplicationSubmittedAuthority,
-                ApplicationSubmittedDate = dto.ApplicationSubmittedDate
-
-            };
-
-
-            await _context.HealthFacilities.AddAsync(facility);
-            await _context.SaveChangesAsync();
-
-            return ResultDto.Success();
-        }
 
         public async Task<ResultWithDataDto<HealthFacilityDto>> GetById(int id)
         {
-            var healthFacility = await _context.HealthFacilities.Include(x => x.FacilityType).FirstOrDefaultAsync(x => x.Id == id);
+            var healthFacility = await _context.HealthFacilities.Include(x => x.FacilityType).Include(x => x.District).Include(x => x.LocalLevel).FirstOrDefaultAsync(x => x.Id == id);
             if(healthFacility == null)
             {
                 return ResultWithDataDto<HealthFacilityDto>.Failure("स्वास्थ्य संस्था फेला परेन।");
@@ -94,8 +34,10 @@ namespace HRRS.Services.Implementation
                 BedCount = healthFacility.BedCount,
                 SpecialistCount = healthFacility.SpecialistCount,
                 AvailableServices = healthFacility.AvailableServices,
-                District = healthFacility.District,
-                LocalLevel = healthFacility.LocalLevel,
+                District = healthFacility.District.Name,
+                DistrictId = healthFacility.DistrictId,
+                LocalLevel = healthFacility.LocalLevel.Name,
+                LocalLevelId = healthFacility.LocalLevelId,
                 WardNumber = healthFacility.WardNumber,
                 Tole = healthFacility.Tole,
                 DateOfInspection = healthFacility.DateOfInspection,
@@ -149,6 +91,8 @@ namespace HRRS.Services.Implementation
             { 
                 var res =  await _context.HealthFacilities
                     .Include(x => x.FacilityType)
+                    .Include(x => x.District)
+                    .Include(x => x.LocalLevel)
                     .Where(x => x.BedCount == user.Role.BedCount)
                     .Select(facility => new HealthFacilityDto() {
                     Id = facility.Id,
@@ -159,8 +103,10 @@ namespace HRRS.Services.Implementation
                     BedCount = facility.BedCount,
                     SpecialistCount = facility.SpecialistCount,
                     AvailableServices = facility.AvailableServices,
-                    District = facility.District,
-                    LocalLevel = facility.LocalLevel,
+                    District = facility.District.Name,
+                    DistrictId = facility.DistrictId,
+                    LocalLevel = facility.LocalLevel.Name,
+                    LocalLevelId = facility.LocalLevelId,
                     WardNumber = facility.WardNumber,
                     Tole = facility.Tole,
                     DateOfInspection = facility.DateOfInspection,
@@ -199,7 +145,7 @@ namespace HRRS.Services.Implementation
 
             if (role == "Hospital")
             {
-                var facility = await _context.HealthFacilities.Include(x => x.FacilityType).Where(x=> x.Id == user.HealthFacilityId).SingleOrDefaultAsync();
+                var facility = await _context.HealthFacilities.Include(x => x.District).Include(x => x.LocalLevel).Include(x => x.FacilityType).Where(x=> x.Id == user.HealthFacilityId).SingleOrDefaultAsync();
                 if (facility == null) {
                     return new ResultWithDataDto<List<HealthFacilityDto>>(true, null, "स्वास्थ्य संस्था फेला परेन।");
                 }
@@ -213,8 +159,10 @@ namespace HRRS.Services.Implementation
                     BedCount = facility.BedCount,
                     SpecialistCount = facility.SpecialistCount,
                     AvailableServices = facility.AvailableServices,
-                    District = facility.District,
-                    LocalLevel = facility.LocalLevel,
+                    District = facility.District.Name,
+                    DistrictId = facility.DistrictId,
+                    LocalLevel = facility.LocalLevel.Name,
+                    LocalLevelId = facility.LocalLevelId,
                     WardNumber = facility.WardNumber,
                     Tole = facility.Tole,
                     DateOfInspection = facility.DateOfInspection,
@@ -251,7 +199,7 @@ namespace HRRS.Services.Implementation
             }
 
 
-            var facilityDto = await _context.HealthFacilities.Include(x => x.FacilityType).Select(facility => new HealthFacilityDto()
+            var facilityDto = await _context.HealthFacilities.Include(x => x.District).Include(x => x.LocalLevel).Include(x => x.FacilityType).Select(facility => new HealthFacilityDto()
                 {
                 Id = facility.Id,
                 FacilityName = facility.FacilityName,
@@ -261,8 +209,10 @@ namespace HRRS.Services.Implementation
                 BedCount = facility.BedCount,
                 SpecialistCount = facility.SpecialistCount,
                 AvailableServices = facility.AvailableServices,
-                District = facility.District,
-                LocalLevel = facility.LocalLevel,
+                District = facility.District.Name,
+                DistrictId = facility.DistrictId,
+                LocalLevel = facility.LocalLevel.Name,
+                LocalLevelId = facility.LocalLevelId,
                 WardNumber = facility.WardNumber,
                 Tole = facility.Tole,
                 DateOfInspection = facility.DateOfInspection,

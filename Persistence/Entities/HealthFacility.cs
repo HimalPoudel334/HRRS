@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Mail;
+using HRRS.Persistence.Entities;
 
 namespace Persistence.Entities
 {
@@ -23,9 +24,11 @@ namespace Persistence.Entities
 
         public string AvailableServices { get; set; }
 
-        public string District { get; set; }
+        public int DistrictId { get; set; }
+        public District District { get; set; }
 
-        public string LocalLevel { get; set; }
+        public int LocalLevelId { get; set; }
+        public LocalLevel LocalLevel { get; set; }
 
         public int WardNumber { get; set; }
 

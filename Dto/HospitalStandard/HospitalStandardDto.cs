@@ -92,3 +92,10 @@ public class HospitalStandardQueryParams
     public int? ParichhedId { get; set; }
     public int? SubParichhedId { get; set; }
 }
+
+public class StandardApprovalDto
+{
+    public int EntryId { get; set; }
+    public bool IsApproved { get; set; }
+    public string? Remarks { get; set; }
+}

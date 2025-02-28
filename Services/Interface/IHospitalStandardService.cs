@@ -17,6 +17,7 @@ public interface IHospitalStandardService
     Task<ResultWithDataDto<List<MasterStandardEntryDto>>> UserGetMasterStandardsEntry(int hospitalId);
     Task<ResultWithDataDto<List<HospitalEntryDto>>> GetStandardEntries(Guid submissionCode);
     Task<ResultWithDataDto<List<HospitalStandard>>> GetStandards(int entryId);
+    Task<ResultDto> UpdateStandardDecisionByAdmin(List<StandardApprovalDto> dto);
 
 
 

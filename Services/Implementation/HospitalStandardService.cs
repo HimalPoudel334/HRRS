@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using HRRS.Dto;
 using HRRS.Dto.HealthStandard;
 using HRRS.Dto.Mapdanda;
@@ -213,6 +214,36 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         return ResultDto.Failure("Something Went Wrong");
     }
 
+    public async Task<ResultDto> UpdateStandardDecisionByAdmin(List<StandardApprovalDto> dto)
+    {
+
+        var id = dto.First().EntryId;
+
+        var mas = await _dbContext.HospitalStandards
+            .Include(x => x.StandardEntry)
+            .ThenInclude(x => x.MasterStandardEntry)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if(mas is null) return ResultDto.Failure("Entry not found");
+
+        if (mas.StandardEntry.MasterStandardEntry.EntryStatus != EntryStatus.Pending)
+            return ResultDto.Failure("You have already submitted. You cannot edit now!");
+
+        foreach (var map in dto)
+        {
+            var standard = await _dbContext.HospitalStandards.FindAsync(map.EntryId);
+            if (standard is not null)
+            {
+                standard.IsApproved = map.IsApproved;
+                standard.Remarks = map.Remarks;
+                standard.UpdatedAt = DateTime.Now;
+            }
+        }
+
+        await _dbContext.SaveChangesAsync();
+        return ResultDto.Success();
+    }
+
     private async Task<bool> Up(HospitalStandardDto dto)
     {
         foreach (var map in dto.Mapdandas)
@@ -225,8 +256,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 standard.FilePath = map.FilePath;
                 standard.FiscalYear = map.FiscalYear;
                 standard.UpdatedAt = DateTime.Now;
-                standard.IsApproved = map.IsApproved;
-                standard.Remarks = map.Remarks;
 
             }
         }
@@ -296,6 +325,10 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         if(dto.AnusuchiId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.AnusuchiId == dto.AnusuchiId.Value && x.ParichhedId == null);
         if(dto.ParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.ParichhedId == dto.ParichhedId.Value && x.SubParichhedId == null);
         if(dto.SubParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.SubParichhedId == dto.SubParichhedId.Value);
+        if(bedCount <= 25) mapdandaQuery = mapdandaQuery.Where(x => x.Is25Active);
+        if(bedCount <= 50) mapdandaQuery = mapdandaQuery.Where(x => x.Is50Active);
+        if(bedCount <= 100) mapdandaQuery = mapdandaQuery.Where(x => x.Is100Active);
+        if(bedCount <= 200) mapdandaQuery = mapdandaQuery.Where(x => x.Is200Active);
 
         var mapdandas = (await mapdandaQuery.ToListAsync())
            .GroupBy(m => m.SubSubParichhed)

@@ -26,6 +26,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<SubmissionStatus> Approvals { get; set; }
     public DbSet<FacilityType> HospitalType { get; set; }
     public DbSet<Role> UserRoles { get; set; }
+    public DbSet<Province> Provinces { get; set; }
+    public DbSet<District> Districts { get; set; }
+    public DbSet<LocalLevel> LocalLevels { get; set; }
+    public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
 
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
@@ -96,6 +100,108 @@ public class ApplicationDbContext : DbContext
                 context.Set<Role>().AddRange([role1, role2, role3, role4]);
                 context.SaveChanges();
 
+            }
+
+            var provincesList = context.Set<Province>().FirstOrDefault();
+            if (provincesList is null)
+            {
+                List<Province> provinces = [
+                    new Province { Name = "Koshi" },
+                    new Province { Name = "Madhesh Pradesh" },
+                    new Province { Name = "Bagmati" },
+                    new Province { Name = "Gandaki" },
+                    new Province { Name = "Lumbini" },
+                    new Province { Name = "Karnali" },
+                    new Province { Name = "Sudurpaschim" }
+                ];
+
+                context.Set<Province>().AddRange(provinces);
+
+                var districts = context.Set<District>().FirstOrDefault();
+                if (districts is null)
+                {
+                    List<District> list = [
+                        new District { Name = "Taplejung", Province = provinces[0] },
+                        new District { Name = "Sankhuwasabha", Province = provinces[0] },
+                        new District { Name = "Solukhumbu", Province = provinces[0] },
+                        new District { Name = "Okhaldhunga", Province = provinces[0] },
+                        new District { Name = "Khotang", Province = provinces[0] },
+                        new District { Name = "Bhojpur", Province = provinces[0] },
+                        new District { Name = "Dhankuta", Province = provinces[0] },
+                        new District { Name = "Terhathum", Province = provinces[0] },
+                        new District { Name = "Panchthar", Province = provinces[0] },
+                        new District { Name = "Ilam", Province = provinces[0] },
+                        new District { Name = "Jhapa", Province = provinces[0] },
+                        new District { Name = "Morang", Province = provinces[0] },
+                        new District { Name = "Sunsari", Province = provinces[0] },
+                        new District { Name = "Udayapur", Province = provinces[0] },
+                        new District { Name = "Saptari", Province = provinces[1] },
+                        new District { Name = "Siraha", Province = provinces[1] },
+                        new District { Name = "Dhanusa", Province = provinces[1] },
+                        new District { Name = "Mahottari", Province = provinces[1] },
+                        new District { Name = "Sarlahi", Province = provinces[1] },
+                        new District { Name = "Rautahat", Province = provinces[1] },
+                        new District { Name = "Bara", Province = provinces[1] },
+                        new District { Name = "Parsa", Province = provinces[1] },
+                        new District { Name = "Dolakha", Province = provinces[2] },
+                        new District { Name = "Sindhupalchok", Province = provinces[2] },
+                        new District { Name = "Rasuwa", Province = provinces[2] },
+                        new District { Name = "Dhading", Province = provinces[2] },
+                        new District { Name = "Nuwakot", Province = provinces[2] },
+                        new District { Name = "Kathmandu", Province = provinces[2] },
+                        new District { Name = "Bhaktapur", Province = provinces[2] },
+                        new District { Name = "Lalitpur", Province = provinces[2] },
+                        new District { Name = "Kavrepalanchok", Province = provinces[2] },
+                        new District { Name = "Ramechhap", Province = provinces[2] },
+                        new District { Name = "Sindhuli", Province = provinces[2] },
+                        new District { Name = "Makwanpur", Province = provinces[2] },
+                        new District { Name = "Chitawan", Province = provinces[2] },
+                        new District { Name = "Gorkha", Province = provinces[3] },
+                        new District { Name = "Manang", Province = provinces[3] },
+                        new District { Name = "Myagdi", Province = provinces[3] },
+                        new District { Name = "Kaski", Province = provinces[3] },
+                        new District { Name = "Lamjung", Province = provinces[3] },
+                        new District { Name = "Tanahu", Province = provinces[3] },
+                        new District { Name = "Nawalparasi (Bardaghat Susta East)", Province = provinces[3] },
+                        new District { Name = "Syangja", Province = provinces[3] },
+                        new District { Name = "Parbat", Province = provinces[3] },
+                        new District { Name = "Baglung", Province = provinces[3] },
+                        new District { Name = "Rukum (East)", Province = provinces[4] },
+                        new District { Name = "Rolpa", Province = provinces[4] },
+                        new District { Name = "Pyuthan", Province = provinces[4] },
+                        new District { Name = "Gulmi", Province = provinces[4] },
+                        new District { Name = "Arghakhanchi", Province = provinces[4] },
+                        new District { Name = "Palpa", Province = provinces[4] },
+                        new District { Name = "Nawalparasi (Bardaghat Susta West)", Province = provinces[4] },
+                        new District { Name = "Rupandehi", Province = provinces[4] },
+                        new District { Name = "Kapilbastu", Province = provinces[4] },
+                        new District { Name = "Dang", Province = provinces[4] },
+                        new District { Name = "Banke", Province = provinces[4] },
+                        new District { Name = "Bardiya", Province = provinces[4] },
+                        new District { Name = "Dolpa", Province = provinces[4] },
+                        new District { Name = "Mugu", Province = provinces[4] },
+                        new District { Name = "Humla", Province = provinces[4] },
+                        new District { Name = "Jumla", Province = provinces[4] },
+                        new District { Name = "Kalikot", Province = provinces[4] },
+                        new District { Name = "Dailekh", Province = provinces[4] },
+                        new District { Name = "Jajarkot", Province = provinces[4] },
+                        new District { Name = "Rukum (West)", Province = provinces[4] },
+                        new District { Name = "Salyan", Province = provinces[4] },
+                        new District { Name = "Surkhet", Province = provinces[4] },
+                        new District { Name = "Bajura", Province = provinces[5] },
+                        new District { Name = "Bajhang", Province = provinces[5] },
+                        new District { Name = "Darchula", Province = provinces[5] },
+                        new District { Name = "Baitadi", Province = provinces[5] },
+                        new District { Name = "Dadeldhura", Province = provinces[5] },
+                        new District { Name = "Doti", Province = provinces[5] },
+                        new District { Name = "Achham", Province = provinces[5] },
+                        new District { Name = "Kailali", Province = provinces[5] },
+                        new District { Name = "Kanchanpur", Province = provinces[5] }
+                        
+                    ];
+                   context.Set<District>().AddRange(list);
+                }
+                context.SaveChanges();
             }
 
             List<Anusuchi> anusuchis = [
@@ -246,6 +352,108 @@ public class ApplicationDbContext : DbContext
                 await context.Set<Role>().AddRangeAsync([role1, role2, role3, role4], cancellationToken);
                 await context.SaveChangesAsync(cancellationToken);
 
+            }
+
+            var provincesList = await context.Set<Province>().FirstOrDefaultAsync(cancellationToken);
+            if (provincesList is null)
+            {
+                List<Province> provinces = [
+                    new Province { Name = "Koshi" },
+                    new Province { Name = "Madhesh Pradesh" },
+                    new Province { Name = "Bagmati" },
+                    new Province { Name = "Gandaki" },
+                    new Province { Name = "Lumbini" },
+                    new Province { Name = "Karnali" },
+                    new Province { Name = "Sudurpaschim" }
+                ];
+
+                await context.Set<Province>().AddRangeAsync(provinces, cancellationToken);
+
+                var districts = await context.Set<District>().FirstOrDefaultAsync(cancellationToken);
+                if (districts is null)
+                {
+                    List<District> list = [
+                        new District { Name = "Taplejung", Province = provinces[0] },
+                        new District { Name = "Sankhuwasabha", Province = provinces[0] },
+                        new District { Name = "Solukhumbu", Province = provinces[0] },
+                        new District { Name = "Okhaldhunga", Province = provinces[0] },
+                        new District { Name = "Khotang", Province = provinces[0] },
+                        new District { Name = "Bhojpur", Province = provinces[0] },
+                        new District { Name = "Dhankuta", Province = provinces[0] },
+                        new District { Name = "Terhathum", Province = provinces[0] },
+                        new District { Name = "Panchthar", Province = provinces[0] },
+                        new District { Name = "Ilam", Province = provinces[0] },
+                        new District { Name = "Jhapa", Province = provinces[0] },
+                        new District { Name = "Morang", Province = provinces[0] },
+                        new District { Name = "Sunsari", Province = provinces[0] },
+                        new District { Name = "Udayapur", Province = provinces[0] },
+                        new District { Name = "Saptari", Province = provinces[1] },
+                        new District { Name = "Siraha", Province = provinces[1] },
+                        new District { Name = "Dhanusa", Province = provinces[1] },
+                        new District { Name = "Mahottari", Province = provinces[1] },
+                        new District { Name = "Sarlahi", Province = provinces[1] },
+                        new District { Name = "Rautahat", Province = provinces[1] },
+                        new District { Name = "Bara", Province = provinces[1] },
+                        new District { Name = "Parsa", Province = provinces[1] },
+                        new District { Name = "Dolakha", Province = provinces[2] },
+                        new District { Name = "Sindhupalchok", Province = provinces[2] },
+                        new District { Name = "Rasuwa", Province = provinces[2] },
+                        new District { Name = "Dhading", Province = provinces[2] },
+                        new District { Name = "Nuwakot", Province = provinces[2] },
+                        new District { Name = "Kathmandu", Province = provinces[2] },
+                        new District { Name = "Bhaktapur", Province = provinces[2] },
+                        new District { Name = "Lalitpur", Province = provinces[2] },
+                        new District { Name = "Kavrepalanchok", Province = provinces[2] },
+                        new District { Name = "Ramechhap", Province = provinces[2] },
+                        new District { Name = "Sindhuli", Province = provinces[2] },
+                        new District { Name = "Makwanpur", Province = provinces[2] },
+                        new District { Name = "Chitawan", Province = provinces[2] },
+                        new District { Name = "Gorkha", Province = provinces[3] },
+                        new District { Name = "Manang", Province = provinces[3] },
+                        new District { Name = "Myagdi", Province = provinces[3] },
+                        new District { Name = "Kaski", Province = provinces[3] },
+                        new District { Name = "Lamjung", Province = provinces[3] },
+                        new District { Name = "Tanahu", Province = provinces[3] },
+                        new District { Name = "Nawalparasi (Bardaghat Susta East)", Province = provinces[3] },
+                        new District { Name = "Syangja", Province = provinces[3] },
+                        new District { Name = "Parbat", Province = provinces[3] },
+                        new District { Name = "Baglung", Province = provinces[3] },
+                        new District { Name = "Rukum (East)", Province = provinces[4] },
+                        new District { Name = "Rolpa", Province = provinces[4] },
+                        new District { Name = "Pyuthan", Province = provinces[4] },
+                        new District { Name = "Gulmi", Province = provinces[4] },
+                        new District { Name = "Arghakhanchi", Province = provinces[4] },
+                        new District { Name = "Palpa", Province = provinces[4] },
+                        new District { Name = "Nawalparasi (Bardaghat Susta West)", Province = provinces[4] },
+                        new District { Name = "Rupandehi", Province = provinces[4] },
+                        new District { Name = "Kapilbastu", Province = provinces[4] },
+                        new District { Name = "Dang", Province = provinces[4] },
+                        new District { Name = "Banke", Province = provinces[4] },
+                        new District { Name = "Bardiya", Province = provinces[4] },
+                        new District { Name = "Dolpa", Province = provinces[4] },
+                        new District { Name = "Mugu", Province = provinces[4] },
+                        new District { Name = "Humla", Province = provinces[4] },
+                        new District { Name = "Jumla", Province = provinces[4] },
+                        new District { Name = "Kalikot", Province = provinces[4] },
+                        new District { Name = "Dailekh", Province = provinces[4] },
+                        new District { Name = "Jajarkot", Province = provinces[4] },
+                        new District { Name = "Rukum (West)", Province = provinces[4] },
+                        new District { Name = "Salyan", Province = provinces[4] },
+                        new District { Name = "Surkhet", Province = provinces[4] },
+                        new District { Name = "Bajura", Province = provinces[5] },
+                        new District { Name = "Bajhang", Province = provinces[5] },
+                        new District { Name = "Darchula", Province = provinces[5] },
+                        new District { Name = "Baitadi", Province = provinces[5] },
+                        new District { Name = "Dadeldhura", Province = provinces[5] },
+                        new District { Name = "Doti", Province = provinces[5] },
+                        new District { Name = "Achham", Province = provinces[5] },
+                        new District { Name = "Kailali", Province = provinces[5] },
+                        new District { Name = "Kanchanpur", Province = provinces[5] }
+
+                    ];
+                    await context.Set<District>().AddRangeAsync(list, cancellationToken);
+                }
+                await context.SaveChangesAsync();
             }
 
             List<Anusuchi> anusuchis = [

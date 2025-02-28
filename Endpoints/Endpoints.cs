@@ -37,6 +37,11 @@ public static class Endpoints
         //mapdanda form type
         endpoints.MapGet("api/mapdanda/formtype", [Authorize(Roles = "SuperAdmin")] async ([AsParameters] HospitalStandardQueryParams dto, IMapdandaService service) => TypedResults.Ok(await service.GetFormTypeForMapdanda(dto)));
 
+        //Facility address
+        endpoints.MapGet("api/province", async (IFacilityAddressService service) => TypedResults.Ok(await service.GetAllProvinces()));
+        endpoints.MapGet("api/district", async (IFacilityAddressService service) => TypedResults.Ok(await service.GetAllDistricts()));
+        endpoints.MapGet("api/district/province/{provinceId}", async (int provinceId, IFacilityAddressService service) => TypedResults.Ok(await service.GetDistrictsByProvince(provinceId)));
+        endpoints.MapGet("api/locallevel/district/{districtId}", async (int districtId, IFacilityAddressService service) => TypedResults.Ok(await service.GetLocalLevelsByDistrict(districtId)));
 
         //mapdanda file upload
         endpoints.MapGet("api/getmapdandafile/{filePath}", (string filePath, IFileUploadService service, IConfiguration config) =>
@@ -86,7 +91,6 @@ public static class Endpoints
         //user get
         endpoints.MapGet("api/users", [Authorize(Roles = "SuperAdmin")] async (IAuthService service) => TypedResults.Ok(await service.GetAllUsers())).RequireAuthorization();
 
-
         //user role services
         endpoints.MapGet("api/userrole", [Authorize(Roles = "SuperAdmin")] async (IUserRoleService service) => TypedResults.Ok(await service.GetAll())).RequireAuthorization();
         endpoints.MapPost("api/userrole", [Authorize(Roles = "SuperAdmin")] async (UserRoleDto dto, IUserRoleService service) => TypedResults.Ok(await service.Create(dto))).RequireAuthorization();
@@ -117,12 +121,13 @@ public static class Endpoints
         endpoints.MapGet("api/subsubparichhed/subparichhed/{subParichhedId}", async (int subParichhedId, IParichhedService service) => TypedResults.Ok(await service.GetSubSubParichhedsBySubParichhed(subParichhedId)));
         endpoints.MapGet("api/subsubparichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetSubSubParichhedById(id)));
 
-        //hospital standard1 services
+        //hospital standard services
         endpoints.MapPost("api/v2/hospitalstandard", async (HospitalStandardDto dto, IHospitalStandardService service, ClaimsPrincipal user) => TypedResults.Ok(await service.Create(dto, int.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization();
         endpoints.MapGet("api/v2/master/{submissionCode}", async (Guid submissionCode, IHospitalStandardService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetStandardEntries(submissionCode))).RequireAuthorization();
         endpoints.MapGet("api/v2/standardentry/{entryId}", async (int entryId, IHospitalStandardService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetHospitalEntryById(entryId))).RequireAuthorization();
         endpoints.MapGet("api/v2/standard/entry/{entryId}", async (int entryId, IHospitalStandardService service, ClaimsPrincipal user) => TypedResults.Ok(await service.AdminGetHospitalStandardForEntry(entryId)));
         endpoints.MapGet("api/standard/{submissionCode}", async (Guid submissionCode, [AsParameters] HospitalStandardQueryParams dto, IHospitalStandardService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetHospitalStandardForEntry(submissionCode, dto, int.Parse(user.FindFirstValue("HealthFacilityId") ?? "0"))));
+        endpoints.MapPost("api/hospitalstandard/approval", [Authorize(Roles = "SuperAdmin,localadmin,localadmin1")] async (List<StandardApprovalDto> dto, IHospitalStandardService service, ClaimsPrincipal user) => TypedResults.Ok(await service.UpdateStandardDecisionByAdmin(dto))).RequireAuthorization();
 
         endpoints.MapPost("api/v2/standard/status/approve/{entryId}", [Authorize(Roles = "SuperAdmin,localadmin,localadmin1")] async (Guid entryId, StandardRemarkDto dto, IMasterStandardEntryService service, ClaimsPrincipal user) => TypedResults.Ok(await service.ApproveStandardsWithRemark(entryId, dto, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization();
         endpoints.MapPost("api/v2/standard/status/reject/{entryId}", [Authorize(Roles = "SuperAdmin,localadmin,localadmin1")] async (Guid entryId, StandardRemarkDto dto, IMasterStandardEntryService service, ClaimsPrincipal user) => TypedResults.Ok(await service.RejectStandardsWithRemark(entryId, dto, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization();

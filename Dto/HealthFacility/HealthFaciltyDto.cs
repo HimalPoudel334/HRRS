@@ -15,8 +15,10 @@ public class HealthFacilityDto
 
     public string AvailableServices { get; set; }
 
+    public int DistrictId { get; set; }
     public string District { get; set; }
 
+    public int LocalLevelId { get; set; }
     public string LocalLevel { get; set; }
 
     public int WardNumber { get; set; }
