@@ -101,7 +101,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             EntryStatus = x.EntryStatus,
             HealthFacilityId = x.HealthFacilityId,
             SubmissionCode = x.SubmissionCode,
-            SubmissionType = x.SubmissionType
+            SubmissionType = x.SubmissionType,
+            HasNewSubmission = x.IsNewEntry
         }).ToListAsync();
 
 

@@ -66,7 +66,9 @@ namespace HRRS.Services.Implementation
                 IsRelocation = healthFacility.IsRelocation,
                 Others = healthFacility.Others,
                 ApplicationSubmittedAuthority = healthFacility.ApplicationSubmittedAuthority,
-                ApplicationSubmittedDate = healthFacility.ApplicationSubmittedDate
+                ApplicationSubmittedDate = healthFacility.ApplicationSubmittedDate,
+                HasNewSubmission = _context.MasterStandardEntries.Any(x => x.HealthFacilityId == healthFacility.Id && x.IsNewEntry)
+
             };
             return ResultWithDataDto<HealthFacilityDto>.Success(healthFacilityDto);
         }
@@ -89,56 +91,60 @@ namespace HRRS.Services.Implementation
 
             if (user.Role is not null) 
             { 
-                var res =  await _context.HealthFacilities
+                var facilityList =  await _context.HealthFacilities
                     .Include(x => x.FacilityType)
                     .Include(x => x.District)
                     .Include(x => x.LocalLevel)
                     .Where(x => x.BedCount == user.Role.BedCount)
-                    .Select(facility => new HealthFacilityDto() {
-                    Id = facility.Id,
-                    FacilityName = facility.FacilityName,
-                    FacilityType = facility.FacilityType.HOSP_CODE,
-                    FacilityTypeId = facility.FacilityTypeId,
-                    PanNumber = facility.PanNumber,
-                    BedCount = facility.BedCount,
-                    SpecialistCount = facility.SpecialistCount,
-                    AvailableServices = facility.AvailableServices,
-                    District = facility.District.Name,
-                    DistrictId = facility.DistrictId,
-                    LocalLevel = facility.LocalLevel.Name,
-                    LocalLevelId = facility.LocalLevelId,
-                    WardNumber = facility.WardNumber,
-                    Tole = facility.Tole,
-                    DateOfInspection = facility.DateOfInspection,
-                    FacilityEmail = facility.FacilityEmail,
-                    FacilityPhoneNumber = facility.FacilityPhoneNumber,
-                    FacilityHeadName = facility.FacilityHeadName,
-                    FacilityHeadPhone = facility.FacilityHeadPhone,
-                    FacilityHeadEmail = facility.FacilityHeadEmail,
-                    ExecutiveHeadName = facility.ExecutiveHeadName,
-                    ExecutiveHeadMobile = facility.ExecutiveHeadMobile,
-                    ExecutiveHeadEmail = facility.ExecutiveHeadEmail,
-                    PermissionReceivedDate = facility.PermissionReceivedDate,
-                    LastRenewedDate = facility.LastRenewedDate,
-                    ApporvingAuthority = facility.ApporvingAuthority,
-                    RenewingAuthority = facility.RenewingAuthority,
-                    ApprovalValidityTill = facility.ApprovalValidityTill,
-                    RenewalValidityTill = facility.RenewalValidityTill,
-                    UpgradeDate = facility.UpgradeDate,
-                    UpgradingAuthority = facility.UpgradingAuthority,
-                    IsLetterOfIntent = facility.IsLetterOfIntent,
-                    IsExecutionPermission = facility.IsExecutionPermission,
-                    IsRenewal = facility.IsRenewal,
-                    IsUpgrade = facility.IsUpgrade,
-                    IsServiceExtension = facility.IsServiceExtension,
-                    IsBranchExtension = facility.IsBranchExtension,
-                    IsRelocation = facility.IsRelocation,
-                    Others = facility.Others,
-                    ApplicationSubmittedAuthority = facility.ApplicationSubmittedAuthority,
-                    ApplicationSubmittedDate = facility.ApplicationSubmittedDate
-                })
-                .OrderByDescending(x => x.Id)
-                .ToListAsync();
+                    .OrderByDescending(x => x.Id)
+                    .ToListAsync();
+
+                    var res = facilityList.Select(facility => new HealthFacilityDto() 
+                    {
+                        Id = facility.Id,
+                        FacilityName = facility.FacilityName,
+                        FacilityType = facility.FacilityType.HOSP_CODE,
+                        FacilityTypeId = facility.FacilityTypeId,
+                        PanNumber = facility.PanNumber,
+                        BedCount = facility.BedCount,
+                        SpecialistCount = facility.SpecialistCount,
+                        AvailableServices = facility.AvailableServices,
+                        District = facility.District.Name,
+                        DistrictId = facility.DistrictId,
+                        LocalLevel = facility.LocalLevel.Name,
+                        LocalLevelId = facility.LocalLevelId,
+                        WardNumber = facility.WardNumber,
+                        Tole = facility.Tole,
+                        DateOfInspection = facility.DateOfInspection,
+                        FacilityEmail = facility.FacilityEmail,
+                        FacilityPhoneNumber = facility.FacilityPhoneNumber,
+                        FacilityHeadName = facility.FacilityHeadName,
+                        FacilityHeadPhone = facility.FacilityHeadPhone,
+                        FacilityHeadEmail = facility.FacilityHeadEmail,
+                        ExecutiveHeadName = facility.ExecutiveHeadName,
+                        ExecutiveHeadMobile = facility.ExecutiveHeadMobile,
+                        ExecutiveHeadEmail = facility.ExecutiveHeadEmail,
+                        PermissionReceivedDate = facility.PermissionReceivedDate,
+                        LastRenewedDate = facility.LastRenewedDate,
+                        ApporvingAuthority = facility.ApporvingAuthority,
+                        RenewingAuthority = facility.RenewingAuthority,
+                        ApprovalValidityTill = facility.ApprovalValidityTill,
+                        RenewalValidityTill = facility.RenewalValidityTill,
+                        UpgradeDate = facility.UpgradeDate,
+                        UpgradingAuthority = facility.UpgradingAuthority,
+                        IsLetterOfIntent = facility.IsLetterOfIntent,
+                        IsExecutionPermission = facility.IsExecutionPermission,
+                        IsRenewal = facility.IsRenewal,
+                        IsUpgrade = facility.IsUpgrade,
+                        IsServiceExtension = facility.IsServiceExtension,
+                        IsBranchExtension = facility.IsBranchExtension,
+                        IsRelocation = facility.IsRelocation,
+                        Others = facility.Others,
+                        ApplicationSubmittedAuthority = facility.ApplicationSubmittedAuthority,
+                        ApplicationSubmittedDate = facility.ApplicationSubmittedDate,
+                        HasNewSubmission = _context.MasterStandardEntries.Any(x => x.HealthFacilityId == facility.Id && x.IsNewEntry)
+                    }).ToList();
+
 
                 return ResultWithDataDto<List<HealthFacilityDto>>.Success(res);
             }
@@ -191,16 +197,23 @@ namespace HRRS.Services.Implementation
                     IsRelocation = facility.IsRelocation,
                     Others = facility.Others,
                     ApplicationSubmittedAuthority = facility.ApplicationSubmittedAuthority,
-                    ApplicationSubmittedDate = facility.ApplicationSubmittedDate
-
+                    ApplicationSubmittedDate = facility.ApplicationSubmittedDate,
+                    HasNewSubmission = _context.MasterStandardEntries.Any(x => x.HealthFacilityId == facility.Id && x.IsNewEntry)
                 };
                 return ResultWithDataDto<List<HealthFacilityDto>>.Success([dto]);
 
             }
 
 
-            var facilityDto = await _context.HealthFacilities.Include(x => x.District).Include(x => x.LocalLevel).Include(x => x.FacilityType).Select(facility => new HealthFacilityDto()
-                {
+            var list = await _context.HealthFacilities
+                .Include(x => x.District)
+                .Include(x => x.LocalLevel)
+                .Include(x => x.FacilityType)
+                .OrderByDescending(x => x.Id)
+                .ToListAsync();
+            
+            var facilityDtos = list.Select(facility => new HealthFacilityDto()
+            {
                 Id = facility.Id,
                 FacilityName = facility.FacilityName,
                 FacilityType = facility.FacilityType.HOSP_CODE,
@@ -241,16 +254,16 @@ namespace HRRS.Services.Implementation
                 IsRelocation = facility.IsRelocation,
                 Others = facility.Others,
                 ApplicationSubmittedAuthority = facility.ApplicationSubmittedAuthority,
-                ApplicationSubmittedDate = facility.ApplicationSubmittedDate
-            }).OrderByDescending(x => x.Id)
-            .ToListAsync();
+                ApplicationSubmittedDate = facility.ApplicationSubmittedDate,
+                HasNewSubmission = _context.MasterStandardEntries.Any(x => x.HealthFacilityId == facility.Id && x.IsNewEntry)
+            }).ToList();
 
-            if(facilityDto.Count == 0)
+            if(facilityDtos.Count == 0)
             {
-                return new ResultWithDataDto<List<HealthFacilityDto>>(true, facilityDto, "कुनै पनि स्वास्थ्य संस्था फेला परेन।");
+                return new ResultWithDataDto<List<HealthFacilityDto>>(true, facilityDtos, "कुनै पनि स्वास्थ्य संस्था फेला परेन।");
             }
 
-            return ResultWithDataDto<List<HealthFacilityDto>>.Success(facilityDto);
+            return ResultWithDataDto<List<HealthFacilityDto>>.Success(facilityDtos);
         }
 
         

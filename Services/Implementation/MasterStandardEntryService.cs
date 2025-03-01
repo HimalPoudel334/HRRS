@@ -98,6 +98,7 @@ namespace HRRS.Services.Implementation
             entry.Remarks = dto.Remarks;
             entry.UpdatedAt = DateTime.Now;
             entry.ApprovedBy = user;
+            entry.IsNewEntry = false;
 
             await _context.SaveChangesAsync();
 
@@ -123,6 +124,7 @@ namespace HRRS.Services.Implementation
             entry.Remarks = dto.Remarks;
             entry.UpdatedAt = DateTime.Now;
             entry.RejectedBy = user;
+            entry.IsNewEntry = false;
 
             await _context.SaveChangesAsync();
 

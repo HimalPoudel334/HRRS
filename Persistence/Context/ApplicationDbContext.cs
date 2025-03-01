@@ -29,7 +29,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Province> Provinces { get; set; }
     public DbSet<District> Districts { get; set; }
     public DbSet<LocalLevel> LocalLevels { get; set; }
-    public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
+    //public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
 
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
