@@ -12,6 +12,8 @@ namespace HRRS.Persistence.Entities
         public User? HandledBy { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public string? Remarks { get; set; }
+
     }
 
     public enum RequestStatus

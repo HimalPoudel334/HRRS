@@ -14,6 +14,7 @@ public class User
     public int? HealthFacilityId { get; set; }
     public int? RoleId { get; set; }
     public Role? Role { get; set; }
+    public bool IsFirstLogin { get; set; } = false;
 }
 
 

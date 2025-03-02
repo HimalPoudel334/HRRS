@@ -30,6 +30,10 @@ public class AuthService : IAuthService
         {
             return ResultWithDataDto<AuthResponseDto>.Failure("Invalid Username or Password");
         }
+
+        if (user.IsFirstLogin)
+            return ResultWithDataDto<AuthResponseDto>.Failure("Please change your password to continue");
+
         return GenerateAuthResponse(user);
     }
 
@@ -60,30 +64,30 @@ public class AuthService : IAuthService
         return GenerateAuthResponse(newUser);
     }
 
-    public async Task<ResultWithDataDto<AuthResponseDto>> RegisterHospitalAsync(RegisterHospitalDto dto)
+    public async Task<ResultWithDataDto<string>> RegisterHospitalAsync(RegisterHospitalDto dto)
     {
-        
+
         if (await _context.HealthFacilities.AnyAsync(x => x.PanNumber == dto.FacilityDto.PanNumber))
         {
-            return ResultWithDataDto<AuthResponseDto>.Failure("Health Facility already exists");
+            return ResultWithDataDto<string>.Failure("Health Facility already exists");
         }
 
         if (await _context.Users.AnyAsync(x => x.UserName == dto.Username))
         {
-            return ResultWithDataDto<AuthResponseDto>.Failure("Username already exists");
+            return ResultWithDataDto<string>.Failure("Username already exists");
         }
 
         var facilityType = await _context.HospitalType.FindAsync(dto.FacilityDto.FacilityTypeId);
-        if(facilityType is null)
-            return ResultWithDataDto<AuthResponseDto>.Failure("Facility type cannot be found");
+        if (facilityType is null)
+            return ResultWithDataDto<string>.Failure("Facility type cannot be found");
 
         var localLevel = await _context.LocalLevels.FindAsync(dto.FacilityDto.LocalLevelId);
         if (localLevel is null)
-            return ResultWithDataDto<AuthResponseDto>.Failure("Local level cannot be found");
+            return ResultWithDataDto<string>.Failure("Local level cannot be found");
 
         var district = await _context.Districts.FindAsync(dto.FacilityDto.DistrictId);
         if (district is null)
-            return ResultWithDataDto<AuthResponseDto>.Failure("District cannot be found");
+            return ResultWithDataDto<string>.Failure("District cannot be found");
 
         var healthFacility = new HealthFacility()
         {
@@ -126,18 +130,19 @@ public class AuthService : IAuthService
             ApplicationSubmittedDate = dto.FacilityDto.ApplicationSubmittedDate
         };
 
-        User newUser = new User
+        await _context.TempHealthFacilities.AddAsync(healthFacility);
+
+        var registrationRequest = new RegistrationRequest()
         {
-            UserName = dto.Username,
-            Password = GenerateHashedPassword(dto.Password),
-            HealthFacility = healthFacility
+            HealthFacility = healthFacility,
+            Status = RequestStatus.Pending,
+            CreatedAt = DateTime.Now
         };
 
-        await _context.HealthFacilities.AddAsync(healthFacility);
-        await _context.Users.AddAsync(newUser);
+        await _context.RegistrationRequests.AddAsync(registrationRequest);
         await _context.SaveChangesAsync();
-        return GenerateAuthResponse(newUser);
 
+        return ResultWithDataDto<string>.Success("Registration request submitted successfully");
     }
 
     private string GenerateHashedPassword(string password)
@@ -168,5 +173,26 @@ public class AuthService : IAuthService
         }).ToListAsync();
 
         return ResultWithDataDto<List<UserDto>>.Success(users);
+    }
+
+    public static string GenerateRandomPassword()
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var random = new Random();
+        return new string(Enumerable.Repeat(chars, 8)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
+    public async Task<ResultWithDataDto<string>> ChangePasswordAsync(ChangePasswordDto dto)
+    {
+        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
+        if (user == null || !BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.Password))
+        {
+            return ResultWithDataDto<string>.Failure("Invalid Username or Password");
+        }
+        user.Password = GenerateHashedPassword(dto.NewPassword);
+        user.IsFirstLogin = false;
+        await _context.SaveChangesAsync();
+        return ResultWithDataDto<string>.Success("Password changed successfully");
     }
 }

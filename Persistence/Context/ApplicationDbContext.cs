@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Mapdanda> Mapdandas { get; set; }
     public DbSet<HospitalStandard> HospitalStandards { get; set; }
     public DbSet<HealthFacility> HealthFacilities { get; set; }
+    public DbSet<HealthFacility> TempHealthFacilities { get; set; }
     public DbSet<Anusuchi> Anusuchis { get; set; }
     public DbSet<Parichhed> Parichheds { get; set; }
     public DbSet<SubParichhed> SubParichheds { get; set; }
@@ -29,9 +30,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<Province> Provinces { get; set; }
     public DbSet<District> Districts { get; set; }
     public DbSet<LocalLevel> LocalLevels { get; set; }
-    //public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
+    public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
 
-    
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         optionsBuilder.UseSeeding((context, _) =>
         {

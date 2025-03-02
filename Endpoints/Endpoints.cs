@@ -26,6 +26,8 @@ public static class Endpoints
 
         endpoints.MapPost("api/signin", async (LoginDto dto, IAuthService authService) => TypedResults.Ok(await authService.LoginUser(dto)));
         endpoints.MapPost("api/signup", [Authorize(Roles = "SuperAdmin")] async (RegisterDto dto, IAuthService authService) => TypedResults.Ok(await authService.RegisterAdminAsync(dto)));
+        endpoints.MapPost("api/changepassword", async (ChangePasswordDto dto, IAuthService authService, ClaimsPrincipal user) => TypedResults.Ok(await authService.ChangePasswordAsync(dto)));
+
 
         //mapdanda
         endpoints.MapGet("api/mapdanda", async ([AsParameters] HospitalStandardQueryParams dto, IMapdandaService service) => TypedResults.Ok(await service.GetAdminMapdandas(dto))).RequireAuthorization();
@@ -77,6 +79,11 @@ public static class Endpoints
             return TypedResults.Ok(await service.UploadFileAsync(dto));
         }).RequireAuthorization().DisableAntiforgery();
 
+        // health facility registration
+        endpoints.MapGet("api/registrationrequest", [Authorize(Roles = "SuperAdmin")] async (IRegistrationRequestService service) => TypedResults.Ok(await service.GetAllRegistrationRequestsAsync()));
+        endpoints.MapGet("api/registrationrequest/{id}", [Authorize(Roles = "SuperAdmin")] async (int id, IRegistrationRequestService service) => TypedResults.Ok(await service.GetRegistrationRequestByIdAsync(id)));
+        endpoints.MapPost("api/registrationrequest/{id}/approve", [Authorize(Roles = "SuperAdmin")] async (int id, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.ApproveRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"))));
+        endpoints.MapPost("api/registrationrequest/{id}/reject", [Authorize(Roles = "SuperAdmin")] async (int id, StandardRemarkDto dto, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.RejectRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"), dto)));
 
         //health facility
         endpoints.MapPost("api/healthfacility/register", async (RegisterHospitalDto dto, IAuthService service) => TypedResults.Ok(await service.RegisterHospitalAsync(dto)));
