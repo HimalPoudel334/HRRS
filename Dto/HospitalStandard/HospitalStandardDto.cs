@@ -48,6 +48,7 @@ public class HospitalEntryDto
 
 public class StandardGroupModel
 {
+    public string? SerialNumber { get; set; }
     public string? GroupName { get; set; }
     public List<MapdandaModel> GroupedMapdanda { get; set; }
 }

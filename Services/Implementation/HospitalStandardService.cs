@@ -169,10 +169,11 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 HasBedCount = m.FirstOrDefault() != null ? m.First().Mapdanda.IsAvailableDivided : false,
                 SubSubParixed = m.Key != null ? m.Key.Name : "",
                 List = m
-                    .GroupBy(m => m.Mapdanda.Group)
+                    .GroupBy(m => m.Mapdanda.SerialNumber)
                     .Select(group => new StandardGroupModel
                     {
-                        GroupName = group.Key,
+                        SerialNumber = group.Key,
+                        GroupName = group.First().Mapdanda.Group,
                         GroupedMapdanda = group.Select(item => new MapdandaModel
                         {
                             EntryId = item.Id,
@@ -294,10 +295,11 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                     HasBedCount = m.First().Mapdanda.IsAvailableDivided,
                     SubSubParixed = m.Key != null ? m.Key.Name : null,
                     List = m
-                        .GroupBy(m => m.Mapdanda.Group)
+                        .GroupBy(m => m.Mapdanda.SerialNumber)
                         .Select(m => new GroupedMapdandaByGroupName
                         {
-                            GroupName = m.Key,
+                            SerialNumber = m.Key,
+                            GroupName = m.First().Mapdanda.Group,
                             GroupedMapdanda = m.Select(m => new GroupedMapdanda
                             {
                                 Id = m.MapdandaId,
@@ -342,10 +344,11 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
                SubSubParixed = m.Key?.Name,
                List = [.. m
-               .GroupBy(m => m.Group)
+               .GroupBy(m => m.SerialNumber)
                .Select(m => new GroupedMapdandaByGroupName
                {
-                   GroupName = m.Key,
+                   SerialNumber = m.Key,
+                   GroupName = m.First().Group,
                    GroupedMapdanda = [.. m.Select(m => new GroupedMapdanda
                    {
                        Id = m.Id,

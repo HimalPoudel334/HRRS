@@ -20,7 +20,7 @@ namespace HRRS.Persistence.Entities
         public SubmissionType SubmissionType { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
-        public bool IsNewEntry { get; set; } = true;
+        public bool IsNewEntry { get; set; }
         public ICollection<HospitalStandardEntry> HospitalStandardEntries { get; set; } = [];
 
     }

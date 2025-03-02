@@ -33,6 +33,7 @@ namespace HRRS.Services.Implementation
                 HealthFacility = healthFacility,
                 SubmissionType = dto.Type,
                 BedCount = healthFacility.BedCount,
+                IsNewEntry = false
             };
 
             await _context.MasterStandardEntries.AddAsync(masterEntry);
@@ -156,6 +157,7 @@ namespace HRRS.Services.Implementation
 
             entry.EntryStatus = EntryStatus.Pending;
             entry.UpdatedAt = DateTime.Now;
+            entry.IsNewEntry = true;
 
             var entries = await _context.HospitalStandardEntrys.Where(x => x.MasterStandardEntry == entry).ToListAsync();
 

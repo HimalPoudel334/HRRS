@@ -51,7 +51,7 @@ public class AuthService : IAuthService
         {
             UserName = dto.Username,
             Password = GenerateHashedPassword(dto.Password),
-            UserType = "Admin",
+            UserType = "localadmin",
             Role = role,
         };
 

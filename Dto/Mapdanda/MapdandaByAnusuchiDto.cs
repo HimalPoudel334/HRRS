@@ -30,6 +30,7 @@ namespace HRRS.Dto.Mapdanda
 
     public class GroupedMapdandaByGroupName
     {
+        public string? SerialNumber { get; set; }
         public bool? HasBedCount { get; set; }
         public string? GroupName { get; set; }
         public List<GroupedMapdanda> GroupedMapdanda { get; set; } = [];
@@ -76,6 +77,7 @@ namespace HRRS.Dto.AdminMapdanda
 
         public bool? HasBedCount { get; set; }
         public string? GroupName { get; set; }
+        public string? SerialNumber { get; set; }
         public List<GroupedAdminMapdanda> GroupedMapdanda { get; set; }
 
     }

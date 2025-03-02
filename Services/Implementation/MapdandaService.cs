@@ -213,11 +213,12 @@ public class MapdandaService : IMapdandaService
                HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
                SubSubParixed = m.Key?.Name,
                List = m
-               .GroupBy(m => m.Group)
+               .GroupBy(m => m.SerialNumber)
                .Select(m => new GroupedMapdandaByGroupName
                {
                    FormType = m.FirstOrDefault()?.FormType ?? FormType.A1,
-                   GroupName = m.Key,
+                   SerialNumber = m.Key,
+                   GroupName = m.FirstOrDefault()?.Group,
                    GroupedMapdanda = m.Select(m => new GroupedAdminMapdanda
                    {
                        Id = m.Id,
