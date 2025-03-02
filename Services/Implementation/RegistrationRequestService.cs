@@ -4,6 +4,7 @@ using HRRS.Persistence.Context;
 using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Entities;
 
 namespace HRRS.Services.Implementation
 {
@@ -46,8 +47,19 @@ namespace HRRS.Services.Implementation
             request.HandledById = handledById;
             request.UpdatedAt = DateTime.Now;
 
-            var healthFacility = request.HealthFacility;
-            _context.Entry(healthFacility).State = EntityState.Detached;
+            var healthFacility = new HealthFacility
+            {
+                FacilityName = request.HealthFacility.FacilityName,
+                FacilityType = request.HealthFacility.FacilityType,
+                PanNumber = request.HealthFacility.PanNumber,
+                BedCount = request.HealthFacility.BedCount,
+                SpecialistCount = request.HealthFacility.SpecialistCount,
+                AvailableServices = request.HealthFacility.AvailableServices,
+                District = request.HealthFacility.District,
+                LocalLevel = request.HealthFacility.LocalLevel,
+                WardNumber = request.HealthFacility.WardNumber,
+                Tole = request.HealthFacility.Tole,
+            };
             await _context.HealthFacilities.AddAsync(healthFacility);
 
             var password = AuthService.GenerateRandomPassword();

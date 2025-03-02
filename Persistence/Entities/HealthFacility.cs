@@ -106,4 +106,32 @@ namespace Persistence.Entities
 
         public bool ACTIVE { get; set; }
     }
+
+    public class TempHealthFacility
+    {
+        public int Id { get; set; }
+        public string FacilityName { get; set; }
+
+        public int FacilityTypeId { get; set; }
+        public FacilityType FacilityType { get; set; }
+
+        public string PanNumber { get; set; }
+
+        public int BedCount { get; set; }
+
+        public int SpecialistCount { get; set; }
+
+        public string AvailableServices { get; set; }
+
+        public int DistrictId { get; set; }
+        public District District { get; set; }
+
+        public int LocalLevelId { get; set; }
+        public LocalLevel LocalLevel { get; set; }
+
+        public int WardNumber { get; set; }
+
+        public string Tole { get; set; }
+
+    }
 }

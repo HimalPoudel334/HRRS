@@ -89,7 +89,7 @@ public class AuthService : IAuthService
         if (district is null)
             return ResultWithDataDto<string>.Failure("District cannot be found");
 
-        var healthFacility = new HealthFacility()
+        var healthFacility = new TempHealthFacility()
         {
             FacilityName = dto.FacilityDto.FacilityName,
             FacilityType = facilityType,
@@ -101,33 +101,6 @@ public class AuthService : IAuthService
             LocalLevel = localLevel,
             WardNumber = dto.FacilityDto.WardNumber,
             Tole = dto.FacilityDto.Tole,
-            DateOfInspection = dto.FacilityDto.DateOfInspection,
-            FacilityEmail = dto.FacilityDto.FacilityEmail,
-            FacilityPhoneNumber = dto.FacilityDto.FacilityPhoneNumber,
-            FacilityHeadName = dto.FacilityDto.FacilityHeadName,
-            FacilityHeadPhone = dto.FacilityDto.FacilityHeadPhone,
-            FacilityHeadEmail = dto.FacilityDto.FacilityHeadEmail,
-            ExecutiveHeadName = dto.FacilityDto.ExecutiveHeadName,
-            ExecutiveHeadMobile = dto.FacilityDto.ExecutiveHeadMobile,
-            ExecutiveHeadEmail = dto.FacilityDto.ExecutiveHeadEmail,
-            PermissionReceivedDate = dto.FacilityDto.PermissionReceivedDate,
-            LastRenewedDate = dto.FacilityDto.LastRenewedDate,
-            ApporvingAuthority = dto.FacilityDto.ApporvingAuthority,
-            RenewingAuthority = dto.FacilityDto.RenewingAuthority,
-            ApprovalValidityTill = dto.FacilityDto.ApprovalValidityTill,
-            RenewalValidityTill = dto.FacilityDto.RenewalValidityTill,
-            UpgradeDate = dto.FacilityDto.UpgradeDate,
-            UpgradingAuthority = dto.FacilityDto.UpgradingAuthority,
-            IsLetterOfIntent = dto.FacilityDto.IsLetterOfIntent,
-            IsExecutionPermission = dto.FacilityDto.IsExecutionPermission,
-            IsRenewal = dto.FacilityDto.IsRenewal,
-            IsUpgrade = dto.FacilityDto.IsUpgrade,
-            IsServiceExtension = dto.FacilityDto.IsServiceExtension,
-            IsBranchExtension = dto.FacilityDto.IsBranchExtension,
-            IsRelocation = dto.FacilityDto.IsRelocation,
-            Others = dto.FacilityDto.Others,
-            ApplicationSubmittedAuthority = dto.FacilityDto.ApplicationSubmittedAuthority,
-            ApplicationSubmittedDate = dto.FacilityDto.ApplicationSubmittedDate
         };
 
         await _context.TempHealthFacilities.AddAsync(healthFacility);

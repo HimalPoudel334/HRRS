@@ -16,7 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Mapdanda> Mapdandas { get; set; }
     public DbSet<HospitalStandard> HospitalStandards { get; set; }
     public DbSet<HealthFacility> HealthFacilities { get; set; }
-    public DbSet<HealthFacility> TempHealthFacilities { get; set; }
+    public DbSet<TempHealthFacility> TempHealthFacilities { get; set; }
     public DbSet<Anusuchi> Anusuchis { get; set; }
     public DbSet<Parichhed> Parichheds { get; set; }
     public DbSet<SubParichhed> SubParichheds { get; set; }

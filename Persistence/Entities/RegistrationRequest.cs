@@ -6,7 +6,7 @@ namespace HRRS.Persistence.Entities
     {
         public int Id { get; set; }
         public int HealthFacilityId { get; set; }
-        public HealthFacility HealthFacility { get; set; }
+        public TempHealthFacility HealthFacility { get; set; }
         public RequestStatus Status { get; set; }
         public long? HandledById { get; set; }
         public User? HandledBy { get; set; }
