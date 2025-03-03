@@ -86,9 +86,8 @@ public static class Endpoints
         endpoints.MapPost("api/registrationrequest/{id}/reject", [Authorize(Roles = "SuperAdmin")] async (int id, StandardRemarkDto dto, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.RejectRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"), dto)));
 
         //health facility
-        endpoints.MapPost("api/healthfacility/register", async (RegisterHospitalDto dto, IAuthService service) => TypedResults.Ok(await service.RegisterHospitalAsync(dto)));
+        endpoints.MapPost("api/healthfacility/register", async (RegisterFacilityDto dto, IAuthService service) => TypedResults.Ok(await service.RegisterHospitalAsync(dto)));
         endpoints.MapGet("api/healthfacility", async (IHealthFacilityService service, HttpContext context) => TypedResults.Ok(await service.GetAll(context))).RequireAuthorization();
-        endpoints.MapPost("api/healthfacility", [Authorize(Roles = "SuperAdmin")] async (RegisterHospitalDto dto, IAuthService service) => TypedResults.Ok(await service.RegisterHospitalAsync(dto))).RequireAuthorization();
         endpoints.MapGet("api/healthfacility/{id}", async (int id, IHealthFacilityService service) => TypedResults.Ok(await service.GetById(id)));
 
         //health facility type

@@ -8,7 +8,7 @@ public interface IAuthService
 {
     Task<ResultWithDataDto<AuthResponseDto>> LoginUser(LoginDto dto);
     Task<ResultWithDataDto<AuthResponseDto>> RegisterAdminAsync(RegisterDto dto);
-    Task<ResultWithDataDto<string>> RegisterHospitalAsync(RegisterHospitalDto dto);
+    Task<ResultWithDataDto<string>> RegisterHospitalAsync(RegisterFacilityDto dto);
     Task<ResultWithDataDto<List<UserDto>>> GetAllUsers();
     Task<ResultWithDataDto<string>> ChangePasswordAsync(ChangePasswordDto dto);
 

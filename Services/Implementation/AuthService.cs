@@ -64,43 +64,40 @@ public class AuthService : IAuthService
         return GenerateAuthResponse(newUser);
     }
 
-    public async Task<ResultWithDataDto<string>> RegisterHospitalAsync(RegisterHospitalDto dto)
+    public async Task<ResultWithDataDto<string>> RegisterHospitalAsync(RegisterFacilityDto dto)
     {
 
-        if (await _context.HealthFacilities.AnyAsync(x => x.PanNumber == dto.FacilityDto.PanNumber))
+        if (await _context.HealthFacilities.AnyAsync(x => x.PanNumber == dto.PanNumber))
         {
             return ResultWithDataDto<string>.Failure("Health Facility already exists");
         }
 
-        if (await _context.Users.AnyAsync(x => x.UserName == dto.Username))
-        {
-            return ResultWithDataDto<string>.Failure("Username already exists");
-        }
+        
 
-        var facilityType = await _context.HospitalType.FindAsync(dto.FacilityDto.FacilityTypeId);
+        var facilityType = await _context.HospitalType.FindAsync(dto.FacilityTypeId);
         if (facilityType is null)
             return ResultWithDataDto<string>.Failure("Facility type cannot be found");
 
-        var localLevel = await _context.LocalLevels.FindAsync(dto.FacilityDto.LocalLevelId);
+        var localLevel = await _context.LocalLevels.FindAsync(dto.LocalLevelId);
         if (localLevel is null)
             return ResultWithDataDto<string>.Failure("Local level cannot be found");
 
-        var district = await _context.Districts.FindAsync(dto.FacilityDto.DistrictId);
+        var district = await _context.Districts.FindAsync(dto.DistrictId);
         if (district is null)
             return ResultWithDataDto<string>.Failure("District cannot be found");
 
         var healthFacility = new TempHealthFacility()
         {
-            FacilityName = dto.FacilityDto.FacilityName,
+            FacilityName = dto.FacilityName,
             FacilityType = facilityType,
-            PanNumber = dto.FacilityDto.PanNumber,
-            BedCount = dto.FacilityDto.BedCount,
-            SpecialistCount = dto.FacilityDto.SpecialistCount,
-            AvailableServices = dto.FacilityDto.AvailableServices,
+            PanNumber = dto.PanNumber,
+            BedCount = dto.BedCount,
+            SpecialistCount = dto.SpecialistCount,
+            AvailableServices = dto.AvailableServices,
             District = district,
             LocalLevel = localLevel,
-            WardNumber = dto.FacilityDto.WardNumber,
-            Tole = dto.FacilityDto.Tole,
+            WardNumber = dto.WardNumber,
+            Tole = dto.Tole,
         };
 
         await _context.TempHealthFacilities.AddAsync(healthFacility);

@@ -654,7 +654,60 @@ namespace HRRS.Migrations
                     b.HasIndex("PanNumber")
                         .IsUnique();
 
-                    b.ToTable("HealthFacility");
+                    b.ToTable("HealthFacilities");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.TempHealthFacility", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AvailableServices")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("BedCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DistrictId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FacilityName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FacilityTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LocalLevelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PanNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SpecialistCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WardNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("FacilityTypeId");
+
+                    b.HasIndex("LocalLevelId");
+
+                    b.ToTable("TempHealthFacilities");
                 });
 
             modelBuilder.Entity("SubMapdanda", b =>
@@ -792,7 +845,7 @@ namespace HRRS.Migrations
                         .WithMany()
                         .HasForeignKey("HandledById");
 
-                    b.HasOne("Persistence.Entities.HealthFacility", "HealthFacility")
+                    b.HasOne("Persistence.Entities.TempHealthFacility", "HealthFacility")
                         .WithMany()
                         .HasForeignKey("HealthFacilityId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -908,6 +961,33 @@ namespace HRRS.Migrations
                 });
 
             modelBuilder.Entity("Persistence.Entities.HealthFacility", b =>
+                {
+                    b.HasOne("HRRS.Persistence.Entities.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Persistence.Entities.FacilityType", "FacilityType")
+                        .WithMany()
+                        .HasForeignKey("FacilityTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRRS.Persistence.Entities.LocalLevel", "LocalLevel")
+                        .WithMany()
+                        .HasForeignKey("LocalLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("District");
+
+                    b.Navigation("FacilityType");
+
+                    b.Navigation("LocalLevel");
+                });
+
+            modelBuilder.Entity("Persistence.Entities.TempHealthFacility", b =>
                 {
                     b.HasOne("HRRS.Persistence.Entities.District", "District")
                         .WithMany()

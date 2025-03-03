@@ -1,5 +1,6 @@
 ﻿using HRRS.Dto;
 using HRRS.Dto.HealthStandard;
+using HRRS.Dto.RegistrationRequest;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
@@ -15,23 +16,86 @@ namespace HRRS.Services.Implementation
         public RegistrationRequestService(ApplicationDbContext context) => _context = context;
 
         
-        public async Task<ResultWithDataDto<List<RegistrationRequest?>>> GetAllRegistrationRequestsAsync()
+        public async Task<ResultWithDataDto<List<RegistrationRequestDto?>>> GetAllRegistrationRequestsAsync()
         {
             var requests =  await _context.RegistrationRequests
+                .Include(x => x.HandledBy)
                 .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.District)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.LocalLevel)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.FacilityType)
+                .Select(x => new RegistrationRequestDto
+                {
+                    Id = x.Id,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    HandledBy = x.HandledBy != null? x.HandledBy.UserName : null,
+                    HandledById = x.HandledById,
+                    HealthFacility = new RegisterFacilityDto
+                    {
+                        FacilityName = x.HealthFacility.FacilityName,
+                        FacilityType = x.HealthFacility.FacilityType.HOSP_TYPE,
+                        PanNumber = x.HealthFacility.PanNumber,
+                        BedCount = x.HealthFacility.BedCount,
+                        SpecialistCount = x.HealthFacility.SpecialistCount,
+                        AvailableServices = x.HealthFacility.AvailableServices,
+                        District = x.HealthFacility.District.Name,
+                        LocalLevel = x.HealthFacility.LocalLevel.Name,
+                        WardNumber = x.HealthFacility.WardNumber,
+                        Tole = x.HealthFacility.Tole,
+                    },
+                    Status = x.Status,
+                    Remarks = x.Remarks
+
+                })
                 .ToListAsync();
 
-            return ResultWithDataDto<List<RegistrationRequest?>>.Success(requests);
+
+
+            return ResultWithDataDto<List<RegistrationRequestDto?>>.Success(requests);
         }
 
-        public async Task<ResultWithDataDto<RegistrationRequest?>> GetRegistrationRequestByIdAsync(int id)
+        public async Task<ResultWithDataDto<RegistrationRequestDto?>> GetRegistrationRequestByIdAsync(int id)
         {
             var request = await _context.RegistrationRequests
+                .Include(x => x.HandledBy)
                 .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.District)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.LocalLevel)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.FacilityType)
+                .Select(x => new RegistrationRequestDto
+                {
+                    Id = x.Id,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt,
+                    HandledBy = x.HandledBy != null ? x.HandledBy.UserName : null,
+                    HandledById = x.HandledById,
+                    HealthFacility = new RegisterFacilityDto
+                    {
+                        FacilityName = x.HealthFacility.FacilityName,
+                        FacilityType = x.HealthFacility.FacilityType.HOSP_TYPE,
+                        PanNumber = x.HealthFacility.PanNumber,
+                        BedCount = x.HealthFacility.BedCount,
+                        SpecialistCount = x.HealthFacility.SpecialistCount,
+                        AvailableServices = x.HealthFacility.AvailableServices,
+                        District = x.HealthFacility.District.Name,
+                        LocalLevel = x.HealthFacility.LocalLevel.Name,
+                        WardNumber = x.HealthFacility.WardNumber,
+                        Tole = x.HealthFacility.Tole,
+                    },
+                    Status = x.Status,
+                    Remarks = x.Remarks
+
+                })
                 .FirstOrDefaultAsync(x => x.Id == id);
+
             return request == null
-                ? ResultWithDataDto<RegistrationRequest?>.Failure("Registration request not found")
-                : ResultWithDataDto<RegistrationRequest?>.Success(request);
+                ? ResultWithDataDto<RegistrationRequestDto?>.Failure("Registration request not found")
+                : ResultWithDataDto<RegistrationRequestDto?>.Success(request);
         }
 
         public async Task<ResultWithDataDto<string>> ApproveRegistrationRequestAsync(int id, long handledById)

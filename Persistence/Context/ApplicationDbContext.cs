@@ -102,7 +102,7 @@ public class ApplicationDbContext : DbContext
                 context.SaveChanges();
 
             }
-
+            /*
             var provincesList = context.Set<Province>().FirstOrDefault();
             if (provincesList is null)
             {
@@ -204,6 +204,7 @@ public class ApplicationDbContext : DbContext
                 }
                 context.SaveChanges();
             }
+            */
 
             List<Anusuchi> anusuchis = [
                     new() { DafaNo = "दफा ३ सँग सम्बन्धित", Name = "नयाँ स्वास्थ्य संस्थाको सेवा सञ्चालन पूर्वाधार स्वीकृतिको आशय पत्र (लेटर अफ इन्टेन्ट) प्रदान गर्नका लागि वस्तुगत मापदण्ड", SerialNo = "1" },
@@ -355,7 +356,7 @@ public class ApplicationDbContext : DbContext
 
             }
 
-            var provincesList = await context.Set<Province>().FirstOrDefaultAsync(cancellationToken);
+            /*var provincesList = await context.Set<Province>().FirstOrDefaultAsync(cancellationToken);
             if (provincesList is null)
             {
                 List<Province> provinces = [
@@ -456,6 +457,7 @@ public class ApplicationDbContext : DbContext
                 }
                 await context.SaveChangesAsync();
             }
+            */
 
             List<Anusuchi> anusuchis = [
                 new() { DafaNo = "दफा ३ सँग सम्बन्धित", Name = "नयाँ स्वास्थ्य संस्थाको सेवा सञ्चालन पूर्वाधार स्वीकृतिको आशय पत्र (लेटर अफ इन्टेन्ट) प्रदान गर्नका लागि वस्तुगत मापदण्ड", SerialNo = "1" },
