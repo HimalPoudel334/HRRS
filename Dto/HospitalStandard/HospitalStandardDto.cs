@@ -42,7 +42,7 @@ public class HospitalEntryDto
     public string? SubParichhed { get; set; }
     public string Anusuchi { get; set; }
     public string? Remarks { get; set; }
-    public SubmissionType SubmissionType { get; set; }
+    public string SubmissionType { get; set; }
 
 }
 

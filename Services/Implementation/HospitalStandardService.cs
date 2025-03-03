@@ -81,12 +81,12 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
     public async Task<ResultWithDataDto<List<MasterStandardEntryDto>>> AdminGetMasterStandardsEntry(int hospitalId)
     {
        
-        var res = await _dbContext.MasterStandardEntries.Where(x => x.HealthFacilityId  == hospitalId).Select(x => new MasterStandardEntryDto
+        var res = await _dbContext.MasterStandardEntries.Include(x => x.SubmissionType).Where(x => x.HealthFacilityId  == hospitalId).Select(x => new MasterStandardEntryDto
         {
             EntryStatus = x.EntryStatus,
             HealthFacilityId = x.HealthFacilityId,
             SubmissionCode = x.SubmissionCode,
-            SubmissionType = x.SubmissionType
+            SubmissionType = x.SubmissionType.Title
         }).ToListAsync();
 
 
@@ -96,12 +96,12 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
     public async Task<ResultWithDataDto<List<MasterStandardEntryDto>>> UserGetMasterStandardsEntry(int hospitalId)
     {
 
-        var res = await _dbContext.MasterStandardEntries.Where(x => x.HealthFacilityId == hospitalId).Select(x => new MasterStandardEntryDto
+        var res = await _dbContext.MasterStandardEntries.Include(x => x.SubmissionType).Where(x => x.HealthFacilityId == hospitalId).Select(x => new MasterStandardEntryDto
         {
             EntryStatus = x.EntryStatus,
             HealthFacilityId = x.HealthFacilityId,
             SubmissionCode = x.SubmissionCode,
-            SubmissionType = x.SubmissionType,
+            SubmissionType = x.SubmissionType.Title,
             HasNewSubmission = x.IsNewEntry
         }).ToListAsync();
 

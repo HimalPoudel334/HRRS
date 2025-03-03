@@ -33,6 +33,9 @@ namespace Persistence.Entities
         public int WardNumber { get; set; }
 
         public string Tole { get; set; }
+        public double? Longitude { get; set; }
+        public double? Latitude { get; set; }
+        public string? FilePath { get; set; }
 
         public string DateOfInspection { get; set; }
 
@@ -132,6 +135,9 @@ namespace Persistence.Entities
         public int WardNumber { get; set; }
 
         public string Tole { get; set; }
+        public double? Longitude { get; set; }
+        public double? Latitude { get; set; }
+        public string? FilePath { get; set; }
 
     }
 }

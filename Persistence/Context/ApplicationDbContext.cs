@@ -31,6 +31,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<District> Districts { get; set; }
     public DbSet<LocalLevel> LocalLevels { get; set; }
     public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
+    public DbSet<SubmissionType> SubmissionTypes { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
@@ -68,6 +69,22 @@ public class ApplicationDbContext : DbContext
                     UserType = "localadmin"
                 };
                 context.Set<User>().AddRange([local1, local2]);
+                context.SaveChanges();
+            }
+
+            var submissionTypes = context.Set<SubmissionType>().FirstOrDefault();
+            if(submissionTypes is null)
+            {
+                List<SubmissionType> list = [
+                    new SubmissionType { Title = "नयाँ स्वास्थ्य संस्थाको दर्ता" },
+                    new SubmissionType { Title = "नवीकरण" },
+                    new SubmissionType { Title = "स्तरोन्नति" },
+                    new SubmissionType { Title = "सेवा बिस्तार" },
+                    new SubmissionType { Title = "शाखा बिस्तार" },
+                    new SubmissionType { Title = "स्थानान्तरण" }
+                ];
+
+                context.Set<SubmissionType>().AddRange(list);
                 context.SaveChanges();
             }
 
@@ -322,6 +339,22 @@ public class ApplicationDbContext : DbContext
                 };
                await context.Set<User>().AddRangeAsync([local1, local2], cancellationToken);
                await context.SaveChangesAsync(cancellationToken);
+            }
+
+            var submissionTypes = await context.Set<SubmissionType>().FirstOrDefaultAsync(cancellationToken);
+            if (submissionTypes is null)
+            {
+                List<SubmissionType> list = [
+                    new SubmissionType { Title = "नयाँ स्वास्थ्य संस्थाको दर्ता" },
+                    new SubmissionType { Title = "नवीकरण" },
+                    new SubmissionType { Title = "स्तरोन्नति" },
+                    new SubmissionType { Title = "सेवा बिस्तार" },
+                    new SubmissionType { Title = "शाखा बिस्तार" },
+                    new SubmissionType { Title = "स्थानान्तरण" }
+                ];
+
+                await context.Set<SubmissionType>().AddRangeAsync(list, cancellationToken);
+                await context.SaveChangesAsync();
             }
 
             var roles = context.Set<Role>().FirstOrDefaultAsync(cancellationToken);

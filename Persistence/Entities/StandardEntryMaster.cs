@@ -17,6 +17,7 @@ namespace HRRS.Persistence.Entities
         public User? ApprovedBy { get; set; }
         public long? RejectedById { get; set; }
         public User? RejectedBy { get; set; }
+        public int SubmissionTypeId { get; set; }
         public SubmissionType SubmissionType { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
