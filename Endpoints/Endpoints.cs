@@ -84,10 +84,10 @@ public static class Endpoints
         endpoints.MapPost("api/userrole", [Authorize(Roles = "SuperAdmin")] async (UserRoleDto dto, IUserRoleService service) => TypedResults.Ok(await service.Create(dto))).RequireAuthorization();
 
         // anusuchi services
-        endpoints.MapPost("api/anusuchi", async (AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Create(dto)));
-        endpoints.MapPost("api/anusuchi/{anusuchiId}", async (int anusuchiId, AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Update(anusuchiId, dto)));
-        endpoints.MapGet("api/anusuchi", async (IAnusuchiService service) => TypedResults.Ok(await service.GetAll()));
-        endpoints.MapGet("api/anusuchi/{id}", async (int id, IAnusuchiService service) => TypedResults.Ok(await service.GetById(id)));
+        endpoints.MapPost("api/anusuchi", [Authorize(Roles = "SuperAdmin")] async (AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Create(dto))).RequireAuthorization();
+        endpoints.MapPost("api/anusuchi/{anusuchiId}", [Authorize(Roles = "SuperAdmin")] async (int anusuchiId, AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Update(anusuchiId, dto))).RequireAuthorization();
+        endpoints.MapGet("api/anusuchi", [Authorize(Roles = "SuperAdmin")] async (IAnusuchiService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetAll())).RequireAuthorization();
+        endpoints.MapGet("api/anusuchi/{id}", [Authorize(Roles = "SuperAdmin")] async (int id, IAnusuchiService service) => TypedResults.Ok(await service.GetById(id))).RequireAuthorization();
 
         // parichhed services
         endpoints.MapPost("api/parichhed", async (ParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.Create(dto)));

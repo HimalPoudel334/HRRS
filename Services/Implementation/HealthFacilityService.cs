@@ -79,6 +79,7 @@ namespace HRRS.Services.Implementation
                 HasNewSubmission = _context.MasterStandardEntries.Any(x => x.HealthFacilityId == healthFacility.Id && x.IsNewEntry)
 
             };
+
             return ResultWithDataDto<HealthFacilityDto>.Success(healthFacilityDto);
         }
 

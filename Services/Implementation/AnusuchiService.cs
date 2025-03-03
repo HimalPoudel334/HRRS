@@ -18,15 +18,12 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
         {
             return ResultDto.Failure("अनुसूचीमा नाम र क्रम सङ्ख्या हुनु पर्छ।");
         }
-        //if(await _dbContext.Anusuchis.AnyAsync(x => x.SerialNo == dto.SerialNo))
-        //{
-        //    return ResultDto.Failure("Serial Number already exists");
-        //}
+        
         Anusuchi anusuchi = new()
         {
             Name = dto.Name,
             DafaNo = dto.DafaNo,
-            SerialNo = dto.SerialNo //await _dbContext.Anusuchis.MaxAsync(x => x.SerialNo) + 1
+            SerialNo = dto.SerialNo 
         };
 
         await _dbContext.Anusuchis.AddAsync(anusuchi);
@@ -42,10 +39,6 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
             return ResultDto.Failure("अनुसूची फेला परेन।");
         }
         
-        //if (dto.SerialNo != anusuchi.SerialNo && await _dbContext.Anusuchis.AnyAsync(x => x.SerialNo == dto.SerialNo)) 
-        //{
-        //        return ResultDto.Failure("Serial Number already taken");
-        //}
         anusuchi.SerialNo = dto.SerialNo;
         anusuchi.Name = dto.Name;
         anusuchi.DafaNo = dto.DafaNo;
@@ -56,18 +49,14 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
 
     public async Task<ResultWithDataDto<List<AnusuchiDto>>> GetAll()
     {
-        var anusuchis = await _dbContext.Anusuchis.Include(x => x.Parichheds).Select(x => new AnusuchiDto()
+        var anusuchis = await _dbContext.Anusuchis.Select(x => new AnusuchiDto()
         {
             Id = x.Id,
             Name = x.Name,
             DafaNo = x.DafaNo,
-            SerialNo = x.SerialNo,
-            Parichheds = x.Parichheds.Select(p => new ParichhedDto()
-            {
-                Id = p.Id,
-                Name = p.Name
-            }).ToList()
+            SerialNo = x.SerialNo
         }).ToListAsync();
+
         return ResultWithDataDto<List<AnusuchiDto>>.Success(anusuchis);
     }
 
