@@ -25,13 +25,16 @@ namespace HRRS.Services.Implementation
                 return new ResultWithDataDto<string>(false, null, "Health facility not found");
             }
 
+            var submissionType = await _context.SubmissionTypes.FindAsync(dto.Type);
+            if (submissionType is null) return new ResultWithDataDto<string>(false, null, "Submission type not found");
+
             var masterEntry = new MasterStandardEntry
             {
                 SubmissionCode = Guid.NewGuid(),
                 CreatedAt = DateTime.Now,
                 EntryStatus = EntryStatus.Draft,
                 HealthFacility = healthFacility,
-                SubmissionType = dto.Type,
+                SubmissionType = submissionType,
                 BedCount = healthFacility.BedCount,
                 IsNewEntry = false
             };
@@ -170,6 +173,12 @@ namespace HRRS.Services.Implementation
         public async Task<ResultWithDataDto<MasterStandardEntry>> GetMasterEntryById(Guid submissionCode)
         {
             return ResultWithDataDto<MasterStandardEntry>.Success(await _context.MasterStandardEntries.FindAsync(submissionCode));
+        }
+
+        public async Task<ResultWithDataDto<List<SubmissionType>>> GetAllSubmissionTypes()
+        {
+            var submissionTypes = await _context.SubmissionTypes.ToListAsync();
+            return ResultWithDataDto<List<SubmissionType>>.Success(submissionTypes);
         }
     }
 }

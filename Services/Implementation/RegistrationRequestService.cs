@@ -19,7 +19,7 @@ namespace HRRS.Services.Implementation
         
         public async Task<ResultWithDataDto<List<RegistrationRequestDto?>>> GetAllRegistrationRequestsAsync()
         {
-            var requests = await _context.RegistrationRequests.Include(x => x.HandledBy).Include(x => x.HealthFacility).Where(x => x.Status == RequestStatus.Pending).Select(x => new RegistrationRequestDto
+            var requests = await _context.RegistrationRequests.Include(x => x.HandledBy).Include(x => x.HealthFacility).Select(x => new RegistrationRequestDto
             {
                 Id = x.Id,
                 CreatedAt = x.CreatedAt,
@@ -27,7 +27,8 @@ namespace HRRS.Services.Implementation
                 HandledBy = x.HandledBy != null ? x.HandledBy.UserName : null,
                 HandledById = x.HandledById,
                 FacilityId = x.HealthFacility.Id,
-                FacilityName = x.HealthFacility.FacilityName
+                FacilityName = x.HealthFacility.FacilityName,
+                Status = x.Status
             }).ToListAsync();
 
 
@@ -85,16 +86,34 @@ namespace HRRS.Services.Implementation
 
         public async Task<ResultWithDataDto<string>> ApproveRegistrationRequestAsync(int id, long handledById, LoginDto dto)
         {
+            if(await _context.Users.AnyAsync(x => x.UserName == dto.Username))
+                return ResultWithDataDto<string>.Failure("Username already exists");
+
             var user = await _context.Users.FindAsync(handledById);
             if (user == null) 
                 return ResultWithDataDto<string>.Failure("User not found");
 
             var request = await _context.RegistrationRequests
+                .Include(x => x.HandledBy)
                 .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.District)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.LocalLevel)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.FacilityType)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.Province)
+                .Where(x => x.Status == RequestStatus.Pending)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if (request == null)
                 return ResultWithDataDto<string>.Failure("Registration request not found");
+
+            if (await _context.HealthFacilities.AnyAsync(x => x.PanNumber == request.HealthFacility.PanNumber))
+                return ResultWithDataDto<string>.Failure("Health Facility already exists");
+
+            if (await _context.HealthFacilities.AnyAsync(x => x.FacilityEmail != null && x.FacilityEmail.Equals(request.HealthFacility.Email))) return ResultWithDataDto<string>.Failure("Email already exists");
+            if (await _context.HealthFacilities.AnyAsync(x => x.FacilityPhoneNumber != null && x.FacilityPhoneNumber.Equals(request.HealthFacility.PhoneNumber))) return ResultWithDataDto<string>.Failure("Phone number already exists");
 
             request.Status = RequestStatus.Approved;
             request.HandledBy = user;
@@ -116,6 +135,10 @@ namespace HRRS.Services.Implementation
                 Latitude = request.HealthFacility.Latitude,
                 FilePath = request.HealthFacility.FilePath,
                 Province = request.HealthFacility.Province,
+                FacilityPhoneNumber = request.HealthFacility.PhoneNumber,
+                FacilityEmail = request.HealthFacility.Email,
+                FacilityHeadPhone = request.HealthFacility.MobileNumber
+
             };
             await _context.HealthFacilities.AddAsync(healthFacility);
 
@@ -140,6 +163,7 @@ namespace HRRS.Services.Implementation
         {
             var request = await _context.RegistrationRequests
                 .Include(x => x.HealthFacility)
+                .Where(x => x.Status == RequestStatus.Pending)
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (request == null)
                 return ResultWithDataDto<string>.Failure("Registration request not found");

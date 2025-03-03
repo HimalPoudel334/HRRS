@@ -9,6 +9,7 @@ public class HealthFacilityDto
     public int BedCount { get; set; }
     public int SpecialistCount { get; set; }
     public string AvailableServices { get; set; }
+    public string Province { get; set; }
     public int DistrictId { get; set; }
     public string District { get; set; }
     public int LocalLevelId { get; set; }
@@ -18,7 +19,7 @@ public class HealthFacilityDto
     public double? Longitude { get; set; }
     public double? Latitude { get; set; }
     public string? FilePath { get; set; }
-    public string DateOfInspection { get; set; }
+    public string? DateOfInspection { get; set; }
     public string? FacilityEmail { get; set; }
     public string? FacilityPhoneNumber { get; set; }
     public string? FacilityHeadName { get; set; }

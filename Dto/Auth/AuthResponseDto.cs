@@ -2,4 +2,6 @@
 
 namespace HRRS.Dto.Auth;
 
-public record AuthResponseDto(LoggedInUser User, string Token);
+public record AuthResponseDto(LoggedInUser User, string Token, bool RequiresPasswordChange = false, string? RedirectUrl = null);
+
+

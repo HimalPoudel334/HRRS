@@ -40,7 +40,7 @@ namespace Persistence.Entities
         public double? Latitude { get; set; }
         public string? FilePath { get; set; }
 
-        public string DateOfInspection { get; set; }
+        public string? DateOfInspection { get; set; }
 
         public string? FacilityEmail { get; set; }
 

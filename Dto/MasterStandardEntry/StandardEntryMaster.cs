@@ -17,6 +17,6 @@ namespace HRRS.Dto.MasterStandardEntry
 
     public class SubmissionTypeDto 
     {
-        public SubmissionType Type { get; set; }
+        public int Type { get; set; }
     }
 }

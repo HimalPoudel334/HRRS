@@ -34,8 +34,14 @@ public class AuthService : IAuthService
         }
 
         if (user.IsFirstLogin)
-            return ResultWithDataDto<AuthResponseDto>.Failure("Please change your password to continue");
-
+        {
+            return new ResultWithDataDto<AuthResponseDto>(true, new AuthResponseDto(
+                null,
+                Token: "", // No token yet since they must change their password
+                RequiresPasswordChange: true,
+                RedirectUrl: "/change-password"
+            ), "Please change your password to continue");
+        }
         return GenerateAuthResponse(user);
     }
 
@@ -69,9 +75,6 @@ public class AuthService : IAuthService
     public async Task<ResultWithDataDto<string>> RegisterHospitalAsync(RegisterFacilityDto dto)
     {
 
-        if (await _context.HealthFacilities.AnyAsync(x => x.PanNumber == dto.PanNumber))
-            return ResultWithDataDto<string>.Failure("Health Facility already exists");
-
         var facilityType = await _context.HospitalType.FindAsync(dto.FacilityTypeId);
         if (facilityType is null)
             return ResultWithDataDto<string>.Failure("Facility type cannot be found");
@@ -87,10 +90,6 @@ public class AuthService : IAuthService
         var district = await _context.Districts.FindAsync(dto.DistrictId);
         if (district is null)
             return ResultWithDataDto<string>.Failure("District cannot be found");
-
-        if (await _context.TempHealthFacilities.AnyAsync(x => x.Email != null && x.Email.Equals(dto.Email))) return ResultWithDataDto<string>.Failure("Email already exists");
-        if (await _context.TempHealthFacilities.AnyAsync(x => x.PhoneNumber != null && x.PhoneNumber.Equals(dto.PhoneNumber))) return ResultWithDataDto<string>.Failure("Phone number already exists");
-        if (await _context.TempHealthFacilities.AnyAsync(x => x.MobileNumber != null && x.MobileNumber.Equals(dto.MobileNumber))) return ResultWithDataDto<string>.Failure("Mobile number already exists");
 
         var healthFacility = new TempHealthFacility()
         {
@@ -173,10 +172,15 @@ public class AuthService : IAuthService
 
     public async Task<ResultWithDataDto<string>> ChangePasswordAsync(ChangePasswordDto dto)
     {
+        if(dto.NewPassword != dto.ConfirmPassword) return ResultWithDataDto<string>.Failure("Passwords do not match");
         var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
         if (user == null || !BCrypt.Net.BCrypt.Verify(dto.OldPassword, user.Password))
         {
             return ResultWithDataDto<string>.Failure("Invalid Username or Password");
+        }
+        if(BCrypt.Net.BCrypt.Verify(dto.NewPassword, user.Password))
+        {
+            return ResultWithDataDto<string>.Failure("New password cannot be the same as the old password");
         }
         user.Password = GenerateHashedPassword(dto.NewPassword);
         user.IsFirstLogin = false;

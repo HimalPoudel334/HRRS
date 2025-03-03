@@ -24,7 +24,7 @@ namespace HRRS.MIddlewares
             {
                 Status = StatusCodes.Status500InternalServerError,
                 Title = "Server error",
-                Detail = exception.Message
+                Detail = $"{exception.Message} {exception.InnerException}"
             };
 
             httpContext.Response.StatusCode = problemDetails.Status.Value;

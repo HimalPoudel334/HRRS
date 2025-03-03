@@ -4,6 +4,7 @@ using HRRS.Dto;
 using HRRS.Persistence.Context;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Entities;
 
 
 namespace HRRS.Services.Implementation
@@ -19,11 +20,15 @@ namespace HRRS.Services.Implementation
 
         public async Task<ResultWithDataDto<HealthFacilityDto>> GetById(int id)
         {
-            var healthFacility = await _context.HealthFacilities.Include(x => x.FacilityType).Include(x => x.District).Include(x => x.LocalLevel).FirstOrDefaultAsync(x => x.Id == id);
-            if(healthFacility == null)
-            {
-                return ResultWithDataDto<HealthFacilityDto>.Failure("स्वास्थ्य संस्था फेला परेन।");
-            }
+            var healthFacility = await _context.HealthFacilities
+                .Include(x => x.FacilityType)
+                .Include(x => x.Province)
+                .Include(x => x.District)
+                .Include(x => x.LocalLevel)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            
+            if(healthFacility == null) return ResultWithDataDto<HealthFacilityDto>.Failure("स्वास्थ्य संस्था फेला परेन।");
+
             var healthFacilityDto = new HealthFacilityDto
             {
                 Id = id,
@@ -36,10 +41,14 @@ namespace HRRS.Services.Implementation
                 AvailableServices = healthFacility.AvailableServices,
                 District = healthFacility.District.Name,
                 DistrictId = healthFacility.DistrictId,
+                Province = healthFacility.Province.Name,
                 LocalLevel = healthFacility.LocalLevel.Name,
                 LocalLevelId = healthFacility.LocalLevelId,
                 WardNumber = healthFacility.WardNumber,
                 Tole = healthFacility.Tole,
+                Latitude = healthFacility.Latitude,
+                Longitude = healthFacility.Longitude,
+                FilePath = healthFacility.FilePath,
                 DateOfInspection = healthFacility.DateOfInspection,
                 FacilityEmail = healthFacility.FacilityEmail,
                 FacilityPhoneNumber = healthFacility.FacilityPhoneNumber,
@@ -93,6 +102,7 @@ namespace HRRS.Services.Implementation
             { 
                 var facilityList =  await _context.HealthFacilities
                     .Include(x => x.FacilityType)
+                    .Include(x => x.Province)
                     .Include(x => x.District)
                     .Include(x => x.LocalLevel)
                     .Where(x => x.BedCount == user.Role.BedCount)
@@ -109,12 +119,16 @@ namespace HRRS.Services.Implementation
                         BedCount = facility.BedCount,
                         SpecialistCount = facility.SpecialistCount,
                         AvailableServices = facility.AvailableServices,
+                        Province = facility.Province.Name,
                         District = facility.District.Name,
                         DistrictId = facility.DistrictId,
                         LocalLevel = facility.LocalLevel.Name,
                         LocalLevelId = facility.LocalLevelId,
                         WardNumber = facility.WardNumber,
                         Tole = facility.Tole,
+                        Latitude = facility.Latitude,
+                        Longitude = facility.Longitude,
+                        FilePath = facility.FilePath,
                         DateOfInspection = facility.DateOfInspection,
                         FacilityEmail = facility.FacilityEmail,
                         FacilityPhoneNumber = facility.FacilityPhoneNumber,
@@ -151,10 +165,18 @@ namespace HRRS.Services.Implementation
 
             if (role == "Hospital")
             {
-                var facility = await _context.HealthFacilities.Include(x => x.District).Include(x => x.LocalLevel).Include(x => x.FacilityType).Where(x=> x.Id == user.HealthFacilityId).SingleOrDefaultAsync();
+                var facility = await _context.HealthFacilities
+                    .Include(x => x.Province)
+                    .Include(x => x.District)
+                    .Include(x => x.LocalLevel)
+                    .Include(x => x.FacilityType)
+                    .Where(x=> x.Id == user.HealthFacilityId)
+                    .SingleOrDefaultAsync();
+
                 if (facility == null) {
                     return new ResultWithDataDto<List<HealthFacilityDto>>(true, null, "स्वास्थ्य संस्था फेला परेन।");
                 }
+
                 var dto = new HealthFacilityDto()
                 {
                     Id = facility.Id,
@@ -165,12 +187,16 @@ namespace HRRS.Services.Implementation
                     BedCount = facility.BedCount,
                     SpecialistCount = facility.SpecialistCount,
                     AvailableServices = facility.AvailableServices,
+                    Province = facility.Province.Name,
                     District = facility.District.Name,
                     DistrictId = facility.DistrictId,
                     LocalLevel = facility.LocalLevel.Name,
                     LocalLevelId = facility.LocalLevelId,
                     WardNumber = facility.WardNumber,
                     Tole = facility.Tole,
+                    Latitude = facility.Latitude,
+                    Longitude = facility.Longitude,
+                    FilePath = facility.FilePath,
                     DateOfInspection = facility.DateOfInspection,
                     FacilityEmail = facility.FacilityEmail,
                     FacilityPhoneNumber = facility.FacilityPhoneNumber,
@@ -206,6 +232,7 @@ namespace HRRS.Services.Implementation
 
 
             var list = await _context.HealthFacilities
+                .Include(x => x.Province)
                 .Include(x => x.District)
                 .Include(x => x.LocalLevel)
                 .Include(x => x.FacilityType)
@@ -223,11 +250,15 @@ namespace HRRS.Services.Implementation
                 SpecialistCount = facility.SpecialistCount,
                 AvailableServices = facility.AvailableServices,
                 District = facility.District.Name,
+                Province = facility.Province.Name,
                 DistrictId = facility.DistrictId,
                 LocalLevel = facility.LocalLevel.Name,
                 LocalLevelId = facility.LocalLevelId,
                 WardNumber = facility.WardNumber,
                 Tole = facility.Tole,
+                Latitude = facility.Latitude,
+                Longitude = facility.Longitude,
+                FilePath = facility.FilePath,
                 DateOfInspection = facility.DateOfInspection,
                 FacilityEmail = facility.FacilityEmail,
                 FacilityPhoneNumber = facility.FacilityPhoneNumber,
