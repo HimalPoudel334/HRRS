@@ -28,45 +28,17 @@ public static class Endpoints
         endpoints.MapPost("api/signup", [Authorize(Roles = "SuperAdmin")] async (RegisterDto dto, IAuthService authService) => TypedResults.Ok(await authService.RegisterAdminAsync(dto)));
         endpoints.MapPost("api/changepassword", async (ChangePasswordDto dto, IAuthService authService, ClaimsPrincipal user) => TypedResults.Ok(await authService.ChangePasswordAsync(dto)));
 
-
         //mapdanda
         endpoints.MapGet("api/mapdanda", async ([AsParameters] HospitalStandardQueryParams dto, IMapdandaService service) => TypedResults.Ok(await service.GetAdminMapdandas(dto))).RequireAuthorization();
         endpoints.MapPost("api/mapdanda/", [Authorize(Roles = "SuperAdmin")] async (MapdandaDto dto, IMapdandaService mapdandaService) => TypedResults.Ok(await mapdandaService.Add(dto))).RequireAuthorization();
         endpoints.MapPost("api/mapdanda/{mapdandaId}/update", [Authorize(Roles = "SuperAdmin")] async (int mapdandaId, MapdandaDto dto, IMapdandaService mapdandaService) => TypedResults.Ok(await mapdandaService.UpdateMapdanda(mapdandaId, dto))).RequireAuthorization();
         endpoints.MapPost("api/Mapdanda/{mapdandaId}/toggle-status", [Authorize(Roles = "SuperAdmin")] async (int mapdandaId, IMapdandaService service) => TypedResults.Ok(await service.ToggleStatus(mapdandaId))).RequireAuthorization() ;
         endpoints.MapGet("api/mapdanda-group", async ([FromQuery] string? searchKey, IMapdandaService service) => TypedResults.Ok(await service.GetMapdandaGroups(searchKey)));
-
         //mapdanda form type
         endpoints.MapGet("api/mapdanda/formtype", [Authorize(Roles = "SuperAdmin")] async ([AsParameters] HospitalStandardQueryParams dto, IMapdandaService service) => TypedResults.Ok(await service.GetFormTypeForMapdanda(dto)));
-
-        //Facility address
-        endpoints.MapGet("api/province", async (IFacilityAddressService service) => TypedResults.Ok(await service.GetAllProvinces()));
-        endpoints.MapGet("api/district", async (IFacilityAddressService service) => TypedResults.Ok(await service.GetAllDistricts()));
-        endpoints.MapGet("api/district/province/{provinceId}", async (int provinceId, IFacilityAddressService service) => TypedResults.Ok(await service.GetDistrictsByProvince(provinceId)));
-        endpoints.MapGet("api/locallevel/district/{districtId}", async (int districtId, IFacilityAddressService service) => TypedResults.Ok(await service.GetLocalLevelsByDistrict(districtId)));
-
+        //mapdanda file get
+        MapFileEndpoint(endpoints, "api/getmapdandafile/{filePath}", "MapdandaUpload");
         //mapdanda file upload
-        endpoints.MapGet("api/getmapdandafile/{filePath}", (string filePath, IFileUploadService service, IConfiguration config) =>
-        {
-            if (string.IsNullOrEmpty(filePath))
-            {
-                return Results.BadRequest(new ResultDto(false, "Filename is required"));
-            }
-
-            var path = config["FileUploadPath"] ?? Path.Combine("Media", "Mapdanda");
-            var fullPath = Path.Combine(path, filePath);
-
-            if (!File.Exists(fullPath))
-            {
-                Results.NotFound(new ResultDto(false, "File not found."));
-            }
-
-            var contentType = service.GetContentType(fullPath);
-            var fileBytes = File.ReadAllBytes(fullPath);
-
-            return Results.File(fileBytes, contentType);
-
-        });
         endpoints.MapPost("api/mapdandaupload", async ([FromQuery] int mapdandaId, IFormFile file, IFileUploadService service, ClaimsPrincipal user) =>
         {
             var userId = int.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
@@ -79,16 +51,26 @@ public static class Endpoints
             return TypedResults.Ok(await service.UploadFileAsync(dto));
         }).RequireAuthorization().DisableAntiforgery();
 
+
+        //Facility address
+        endpoints.MapGet("api/province", async (IFacilityAddressService service) => TypedResults.Ok(await service.GetAllProvinces()));
+        endpoints.MapGet("api/district", async (IFacilityAddressService service) => TypedResults.Ok(await service.GetAllDistricts()));
+        endpoints.MapGet("api/district/province/{provinceId}", async (int provinceId, IFacilityAddressService service) => TypedResults.Ok(await service.GetDistrictsByProvince(provinceId)));
+        endpoints.MapGet("api/locallevel/district/{districtId}", async (int districtId, IFacilityAddressService service) => TypedResults.Ok(await service.GetLocalLevelsByDistrict(districtId)));
+
+        
         // health facility registration
         endpoints.MapGet("api/registrationrequest", [Authorize(Roles = "SuperAdmin")] async (IRegistrationRequestService service) => TypedResults.Ok(await service.GetAllRegistrationRequestsAsync()));
         endpoints.MapGet("api/registrationrequest/{id}", [Authorize(Roles = "SuperAdmin")] async (int id, IRegistrationRequestService service) => TypedResults.Ok(await service.GetRegistrationRequestByIdAsync(id)));
         endpoints.MapPost("api/registrationrequest/{id}/approve", [Authorize(Roles = "SuperAdmin")] async (int id, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.ApproveRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"))));
         endpoints.MapPost("api/registrationrequest/{id}/reject", [Authorize(Roles = "SuperAdmin")] async (int id, StandardRemarkDto dto, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.RejectRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"), dto)));
-
+        
         //health facility
         endpoints.MapPost("api/healthfacility/register", async (RegisterFacilityDto dto, IAuthService service) => TypedResults.Ok(await service.RegisterHospitalAsync(dto)));
         endpoints.MapGet("api/healthfacility", async (IHealthFacilityService service, HttpContext context) => TypedResults.Ok(await service.GetAll(context))).RequireAuthorization();
         endpoints.MapGet("api/healthfacility/{id}", async (int id, IHealthFacilityService service) => TypedResults.Ok(await service.GetById(id)));
+        // healthfacility file
+        MapFileEndpoint(endpoints, "api/getmapdandafile/{filePath}", "MapdandaUpload");
 
         //health facility type
         endpoints.MapGet("api/facilitytypes", async (IFacilityTypeService service) => TypedResults.Ok(await service.GetAll()));
@@ -150,6 +132,31 @@ public static class Endpoints
 
         return endpoints;
     }
+
+    private static void MapFileEndpoint(IEndpointRouteBuilder endpoints, string route, string configKey)
+    {
+        endpoints.MapGet(route, (string filePath, IFileUploadService service, IConfiguration config) =>
+        {
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return Results.BadRequest(new ResultDto(false, "Filename is required"));
+            }
+
+            var basePath = config[$"FileUploadPaths:{configKey}"] ?? Path.Combine("Media", configKey);
+            var fullPath = Path.Combine(basePath, filePath);
+
+            if (!File.Exists(fullPath))
+            {
+                return Results.NotFound(new ResultDto(false, "File not found."));
+            }
+
+            var contentType = service.GetContentType(fullPath);
+            var fileBytes = File.ReadAllBytes(fullPath);
+
+            return Results.File(fileBytes, contentType);
+        });
+    }
+
 }
 
 

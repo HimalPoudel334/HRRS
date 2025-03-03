@@ -26,6 +26,8 @@ namespace HRRS.Services.Implementation
                 .ThenInclude(x => x.LocalLevel)
                 .Include(x => x.HealthFacility)
                 .ThenInclude(x => x.FacilityType)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.Province)
                 .Select(x => new RegistrationRequestDto
                 {
                     Id = x.Id,
@@ -45,6 +47,10 @@ namespace HRRS.Services.Implementation
                         LocalLevel = x.HealthFacility.LocalLevel.Name,
                         WardNumber = x.HealthFacility.WardNumber,
                         Tole = x.HealthFacility.Tole,
+                        Longitude = x.HealthFacility.Longitude,
+                        Latitude = x.HealthFacility.Latitude,
+                        FilePath = x.HealthFacility.FilePath,
+                        Province = x.HealthFacility.Province.Name
                     },
                     Status = x.Status,
                     Remarks = x.Remarks
@@ -67,6 +73,8 @@ namespace HRRS.Services.Implementation
                 .ThenInclude(x => x.LocalLevel)
                 .Include(x => x.HealthFacility)
                 .ThenInclude(x => x.FacilityType)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.Province)
                 .Select(x => new RegistrationRequestDto
                 {
                     Id = x.Id,
@@ -86,6 +94,10 @@ namespace HRRS.Services.Implementation
                         LocalLevel = x.HealthFacility.LocalLevel.Name,
                         WardNumber = x.HealthFacility.WardNumber,
                         Tole = x.HealthFacility.Tole,
+                        Longitude = x.HealthFacility.Longitude,
+                        Latitude = x.HealthFacility.Latitude,
+                        FilePath = x.HealthFacility.FilePath,
+                        Province = x.HealthFacility.Province.Name
                     },
                     Status = x.Status,
                     Remarks = x.Remarks
@@ -123,6 +135,10 @@ namespace HRRS.Services.Implementation
                 LocalLevel = request.HealthFacility.LocalLevel,
                 WardNumber = request.HealthFacility.WardNumber,
                 Tole = request.HealthFacility.Tole,
+                Longitude = request.HealthFacility.Longitude,
+                Latitude = request.HealthFacility.Latitude,
+                FilePath = request.HealthFacility.FilePath,
+                Province = request.HealthFacility.Province,
             };
             await _context.HealthFacilities.AddAsync(healthFacility);
 

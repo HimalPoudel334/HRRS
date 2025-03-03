@@ -16,11 +16,13 @@ public class AuthService : IAuthService
 
     private readonly ApplicationDbContext _context;
     private readonly TokenService _tokenService;
+    private readonly IFileUploadService _fileService;
 
-    public AuthService(ApplicationDbContext context, TokenService tokenService)
+    public AuthService(ApplicationDbContext context, TokenService tokenService, IFileUploadService fileService)
     {
         _context = context;
         _tokenService = tokenService;
+        _fileService = fileService;
     }
 
     public async Task<ResultWithDataDto<AuthResponseDto>> LoginUser(LoginDto dto)
@@ -72,11 +74,13 @@ public class AuthService : IAuthService
             return ResultWithDataDto<string>.Failure("Health Facility already exists");
         }
 
-        
-
         var facilityType = await _context.HospitalType.FindAsync(dto.FacilityTypeId);
         if (facilityType is null)
             return ResultWithDataDto<string>.Failure("Facility type cannot be found");
+
+        var province = await _context.Provinces.FindAsync(dto.ProvinceId);
+        if (province is null)
+            return ResultWithDataDto<string>.Failure("Province cannot be found");
 
         var localLevel = await _context.LocalLevels.FindAsync(dto.LocalLevelId);
         if (localLevel is null)
@@ -85,6 +89,10 @@ public class AuthService : IAuthService
         var district = await _context.Districts.FindAsync(dto.DistrictId);
         if (district is null)
             return ResultWithDataDto<string>.Failure("District cannot be found");
+
+        if (await _context.TempHealthFacilities.AnyAsync(x => x.Email.Equals(dto.Email))) return ResultWithDataDto<string>.Failure("Email already exists");
+        if (await _context.TempHealthFacilities.AnyAsync(x => x.PhoneNumber.Equals(dto.PhoneNumber))) return ResultWithDataDto<string>.Failure("Phone number already exists");
+        if (await _context.TempHealthFacilities.AnyAsync(x => x.MobileNumber.Equals(dto.MobileNumber))) return ResultWithDataDto<string>.Failure("Mobile number already exists");
 
         var healthFacility = new TempHealthFacility()
         {
@@ -98,8 +106,20 @@ public class AuthService : IAuthService
             LocalLevel = localLevel,
             WardNumber = dto.WardNumber,
             Tole = dto.Tole,
+            Province = province,
+            Longitude = dto.Longitude,
+            Latitude = dto.Latitude,
+            PhoneNumber = dto.PhoneNumber,
+            MobileNumber = dto.MobileNumber,
+            Email = dto.Email,
         };
 
+        if (dto.Photo is not null)
+        {
+            var fileName = await _fileService.UploadFacilityFileAsync(dto.Photo);
+            healthFacility.FilePath = fileName;
+
+        }
         await _context.TempHealthFacilities.AddAsync(healthFacility);
 
         var registrationRequest = new RegistrationRequest()

@@ -11,17 +11,25 @@ namespace HRRS.Services.Implementation;
 
 public class FileUploadService : IFileUploadService
 {
-    private readonly string _fileUploadPath;
+    private readonly string _mapdandaUploadPath;
+    private readonly string _facilityUploadPath;
     private readonly ApplicationDbContext _context;
 
     public FileUploadService(IConfiguration configuration, IWebHostEnvironment env, ApplicationDbContext context)
     {
         var appRoot = env.ContentRootPath;
-        _fileUploadPath = Path.Combine(appRoot, configuration["FileUploadPath"] ?? Path.Combine("Media", "Mapdanda"));
+        _mapdandaUploadPath = Path.Combine(appRoot, configuration["FileUploadPaths:MapdandaUpload"] ?? Path.Combine("Media", "Mapdanda"));
         
-        if (!Directory.Exists(_fileUploadPath))
+        if (!Directory.Exists(_mapdandaUploadPath))
         {
-            Directory.CreateDirectory(_fileUploadPath);
+            Directory.CreateDirectory(_mapdandaUploadPath);
+        }
+
+        _facilityUploadPath = Path.Combine(appRoot, configuration["FacilityUpload:HealthFacility"] ?? Path.Combine("Media", "HealthFacility"));
+
+        if (!Directory.Exists(_facilityUploadPath))
+        {
+            Directory.CreateDirectory(_facilityUploadPath);
         }
 
         _context = context;
@@ -41,7 +49,7 @@ public class FileUploadService : IFileUploadService
         //}
 
         var uniqueFileName = $"H{Guid.NewGuid()}-M{dto.MapdandaId}{Path.GetExtension(dto.File.FileName)}";
-        var filePath = Path.Combine(_fileUploadPath, uniqueFileName);
+        var filePath = Path.Combine(_mapdandaUploadPath, uniqueFileName);
 
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
@@ -49,6 +57,25 @@ public class FileUploadService : IFileUploadService
         }
 
         return ResultWithDataDto<string>.Success(uniqueFileName);
+    }
+
+    public async Task<string> UploadFacilityFileAsync(IFormFile file)
+    {
+        if (file.Length == 0)
+        {
+            return "File is empty";
+        }
+
+        var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+        var filePath = Path.Combine(_mapdandaUploadPath, uniqueFileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        return uniqueFileName;
+
     }
 
     // Helper function to get MIME type (you can use a more comprehensive library if needed).
