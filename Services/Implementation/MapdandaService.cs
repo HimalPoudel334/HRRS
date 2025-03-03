@@ -87,7 +87,6 @@ public class MapdandaService : IMapdandaService
                 }
                 
                 mapdanda.SubParichhed = subParichhed;
-
                 if (dto.SubSubParichhedId.HasValue)
                 {
                     var subSubParichhed = await _dbContext.SubSubParichheds.FindAsync(dto.SubSubParichhedId);

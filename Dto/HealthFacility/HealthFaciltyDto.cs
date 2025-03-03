@@ -54,7 +54,7 @@ public class RegisterFacilityDto
     public int? Id { get; set; }
     public string FacilityName { get; set; }
     public int FacilityTypeId { get; set; }
-    public string FacilityType { get; set; }
+    public string? FacilityType { get; set; }
     public string PanNumber { get; set; }
     public int BedCount { get; set; }
     public int SpecialistCount { get; set; }
@@ -72,9 +72,9 @@ public class RegisterFacilityDto
     public double? Latitude { get; set; }
     public IFormFile? Photo { get; set; }
     public string? FilePath { get; set; }
-    public string PhoneNumber { get; set; }
-    public string MobileNumber { get; set; }
-    public string Email { get; set; }
+    public string? PhoneNumber { get; set; }
+    public string? MobileNumber { get; set; }
+    public string? Email { get; set; }
 }
 
 public class FacilityTypeDto

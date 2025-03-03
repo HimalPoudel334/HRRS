@@ -18,52 +18,22 @@ namespace HRRS.Services.Implementation
         
         public async Task<ResultWithDataDto<List<RegistrationRequestDto?>>> GetAllRegistrationRequestsAsync()
         {
-            var requests =  await _context.RegistrationRequests
-                .Include(x => x.HandledBy)
-                .Include(x => x.HealthFacility)
-                .ThenInclude(x => x.District)
-                .Include(x => x.HealthFacility)
-                .ThenInclude(x => x.LocalLevel)
-                .Include(x => x.HealthFacility)
-                .ThenInclude(x => x.FacilityType)
-                .Include(x => x.HealthFacility)
-                .ThenInclude(x => x.Province)
-                .Select(x => new RegistrationRequestDto
-                {
-                    Id = x.Id,
-                    CreatedAt = x.CreatedAt,
-                    UpdatedAt = x.UpdatedAt,
-                    HandledBy = x.HandledBy != null? x.HandledBy.UserName : null,
-                    HandledById = x.HandledById,
-                    HealthFacility = new RegisterFacilityDto
-                    {
-                        FacilityName = x.HealthFacility.FacilityName,
-                        FacilityType = x.HealthFacility.FacilityType.HOSP_TYPE,
-                        PanNumber = x.HealthFacility.PanNumber,
-                        BedCount = x.HealthFacility.BedCount,
-                        SpecialistCount = x.HealthFacility.SpecialistCount,
-                        AvailableServices = x.HealthFacility.AvailableServices,
-                        District = x.HealthFacility.District.Name,
-                        LocalLevel = x.HealthFacility.LocalLevel.Name,
-                        WardNumber = x.HealthFacility.WardNumber,
-                        Tole = x.HealthFacility.Tole,
-                        Longitude = x.HealthFacility.Longitude,
-                        Latitude = x.HealthFacility.Latitude,
-                        FilePath = x.HealthFacility.FilePath,
-                        Province = x.HealthFacility.Province.Name
-                    },
-                    Status = x.Status,
-                    Remarks = x.Remarks
-
-                })
-                .ToListAsync();
-
+            var requests = await _context.RegistrationRequests.Include(x => x.HandledBy).Include(x => x.HealthFacility).Where(x => x.Status == RequestStatus.Pending).Select(x => new RegistrationRequestDto
+            {
+                Id = x.Id,
+                CreatedAt = x.CreatedAt,
+                UpdatedAt = x.UpdatedAt,
+                HandledBy = x.HandledBy != null ? x.HandledBy.UserName : null,
+                HandledById = x.HandledById,
+                FacilityId = x.HealthFacility.Id,
+                FacilityName = x.HealthFacility.FacilityName
+            }).ToListAsync();
 
 
             return ResultWithDataDto<List<RegistrationRequestDto?>>.Success(requests);
         }
 
-        public async Task<ResultWithDataDto<RegistrationRequestDto?>> GetRegistrationRequestByIdAsync(int id)
+        public async Task<ResultWithDataDto<RegistrationRequestWithFacilityDto?>> GetRegistrationRequestByIdAsync(int id)
         {
             var request = await _context.RegistrationRequests
                 .Include(x => x.HandledBy)
@@ -75,7 +45,7 @@ namespace HRRS.Services.Implementation
                 .ThenInclude(x => x.FacilityType)
                 .Include(x => x.HealthFacility)
                 .ThenInclude(x => x.Province)
-                .Select(x => new RegistrationRequestDto
+                .Select(x => new RegistrationRequestWithFacilityDto
                 {
                     Id = x.Id,
                     CreatedAt = x.CreatedAt,
@@ -106,12 +76,16 @@ namespace HRRS.Services.Implementation
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             return request == null
-                ? ResultWithDataDto<RegistrationRequestDto?>.Failure("Registration request not found")
-                : ResultWithDataDto<RegistrationRequestDto?>.Success(request);
+                ? ResultWithDataDto<RegistrationRequestWithFacilityDto?>.Failure("Registration request not found")
+                : ResultWithDataDto<RegistrationRequestWithFacilityDto?>.Success(request);
         }
 
         public async Task<ResultWithDataDto<string>> ApproveRegistrationRequestAsync(int id, long handledById)
         {
+            var user = await _context.Users.FindAsync(handledById);
+            if (user == null) 
+                return ResultWithDataDto<string>.Failure("User not found");
+
             var request = await _context.RegistrationRequests
                 .Include(x => x.HealthFacility)
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -120,7 +94,7 @@ namespace HRRS.Services.Implementation
                 return ResultWithDataDto<string>.Failure("Registration request not found");
 
             request.Status = RequestStatus.Approved;
-            request.HandledById = handledById;
+            request.HandledBy = user;
             request.UpdatedAt = DateTime.Now;
 
             var healthFacility = new HealthFacility

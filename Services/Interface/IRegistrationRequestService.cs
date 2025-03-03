@@ -8,7 +8,7 @@ namespace HRRS.Services.Interface
     public interface IRegistrationRequestService
     {
         Task<ResultWithDataDto<List<RegistrationRequestDto?>>> GetAllRegistrationRequestsAsync();
-        Task<ResultWithDataDto<RegistrationRequestDto?>> GetRegistrationRequestByIdAsync(int id);
+        Task<ResultWithDataDto<RegistrationRequestWithFacilityDto?>> GetRegistrationRequestByIdAsync(int id);
         Task<ResultWithDataDto<string>> ApproveRegistrationRequestAsync(int id, long handledById);
         Task<ResultWithDataDto<string>> RejectRegistrationRequestAsync(int id, long handledById, StandardRemarkDto dto);
     }

@@ -11,9 +11,17 @@ namespace HRRS.Persistence.Entities
         public BedCount BedCount { get; set; }
         public int SubmissionTypeId { get; set; }
         public SubmissionType SubmissionType { get; set; }
-        public int MapdandaTableId { get; set; }
-        public MapdandaTable MapdandaTable { get; set; }
         public int RoleId { get; set; }
         public Role Role { get; set; }
+        public ICollection<MapdandaTable> MapdandaTables { get; set; } = [];
+    }
+
+    public class AnusuchiMapdandaTableMapping
+    {
+        public int AnusuchiMappingId { get; set; }
+        public AnusuchiMapping AnusuchiMapping { get; set; }
+
+        public int MapdandaTableId { get; set; }
+        public MapdandaTable MapdandaTable { get; set; }
     }
 }

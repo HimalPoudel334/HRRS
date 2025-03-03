@@ -70,9 +70,7 @@ public class AuthService : IAuthService
     {
 
         if (await _context.HealthFacilities.AnyAsync(x => x.PanNumber == dto.PanNumber))
-        {
             return ResultWithDataDto<string>.Failure("Health Facility already exists");
-        }
 
         var facilityType = await _context.HospitalType.FindAsync(dto.FacilityTypeId);
         if (facilityType is null)
@@ -90,9 +88,9 @@ public class AuthService : IAuthService
         if (district is null)
             return ResultWithDataDto<string>.Failure("District cannot be found");
 
-        if (await _context.TempHealthFacilities.AnyAsync(x => x.Email.Equals(dto.Email))) return ResultWithDataDto<string>.Failure("Email already exists");
-        if (await _context.TempHealthFacilities.AnyAsync(x => x.PhoneNumber.Equals(dto.PhoneNumber))) return ResultWithDataDto<string>.Failure("Phone number already exists");
-        if (await _context.TempHealthFacilities.AnyAsync(x => x.MobileNumber.Equals(dto.MobileNumber))) return ResultWithDataDto<string>.Failure("Mobile number already exists");
+        if (await _context.TempHealthFacilities.AnyAsync(x => x.Email != null && x.Email.Equals(dto.Email))) return ResultWithDataDto<string>.Failure("Email already exists");
+        if (await _context.TempHealthFacilities.AnyAsync(x => x.PhoneNumber != null && x.PhoneNumber.Equals(dto.PhoneNumber))) return ResultWithDataDto<string>.Failure("Phone number already exists");
+        if (await _context.TempHealthFacilities.AnyAsync(x => x.MobileNumber != null && x.MobileNumber.Equals(dto.MobileNumber))) return ResultWithDataDto<string>.Failure("Mobile number already exists");
 
         var healthFacility = new TempHealthFacility()
         {
