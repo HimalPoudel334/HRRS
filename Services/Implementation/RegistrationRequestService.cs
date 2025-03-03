@@ -1,4 +1,5 @@
 ﻿using HRRS.Dto;
+using HRRS.Dto.Auth;
 using HRRS.Dto.HealthStandard;
 using HRRS.Dto.RegistrationRequest;
 using HRRS.Persistence.Context;
@@ -67,7 +68,9 @@ namespace HRRS.Services.Implementation
                         Longitude = x.HealthFacility.Longitude,
                         Latitude = x.HealthFacility.Latitude,
                         FilePath = x.HealthFacility.FilePath,
-                        Province = x.HealthFacility.Province.Name
+                        Province = x.HealthFacility.Province.Name,
+                        MobileNumber = x.HealthFacility.MobileNumber,
+                        PhoneNumber = x.HealthFacility.PhoneNumber
                     },
                     Status = x.Status,
                     Remarks = x.Remarks
@@ -80,7 +83,7 @@ namespace HRRS.Services.Implementation
                 : ResultWithDataDto<RegistrationRequestWithFacilityDto?>.Success(request);
         }
 
-        public async Task<ResultWithDataDto<string>> ApproveRegistrationRequestAsync(int id, long handledById)
+        public async Task<ResultWithDataDto<string>> ApproveRegistrationRequestAsync(int id, long handledById, LoginDto dto)
         {
             var user = await _context.Users.FindAsync(handledById);
             if (user == null) 
@@ -116,11 +119,10 @@ namespace HRRS.Services.Implementation
             };
             await _context.HealthFacilities.AddAsync(healthFacility);
 
-            var password = AuthService.GenerateRandomPassword();
             var newUser = new User
             {
-                UserName = request.HealthFacility.PanNumber,
-                Password = password,
+                UserName = dto.Username,
+                Password = AuthService.GenerateHashedPassword(dto.Password),
                 HealthFacility = healthFacility,
                 IsFirstLogin = true
             };
@@ -131,7 +133,7 @@ namespace HRRS.Services.Implementation
             //TODO: 
             //create a service that sends mail to the health facility with the username and password
 
-            return ResultWithDataDto<string>.Success($"Registration request approved successfully.\n The username is {newUser.UserName} and password is {password}");
+            return ResultWithDataDto<string>.Success($"Registration request approved successfully.\n The username is {newUser.UserName} and password is {dto.Password}");
         }
 
         public async Task<ResultWithDataDto<string>> RejectRegistrationRequestAsync(int id, long handledById, StandardRemarkDto dto)

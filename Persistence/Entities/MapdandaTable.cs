@@ -14,6 +14,6 @@
         public string? Description { get; set; }
         public string? Note { get; set; }
         public FormType FormType { get; set; }
-        public ICollection<AnusuchiMapping> anusuchiMappings { get; set; } = [];
+        public ICollection<AnusuchiMapping> AnusuchiMappings { get; set; } = [];
     }
 }

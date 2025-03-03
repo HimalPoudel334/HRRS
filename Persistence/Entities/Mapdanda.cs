@@ -42,6 +42,7 @@ public class Mapdanda
     public int? SubSubParichhedId { get; set; }
     public SubSubParichhed? SubSubParichhed { get; set; }
     public FormType FormType { get; set; }
+    public int TableNumber { get; set; }
 
     public ICollection<SubMapdanda> SubMapdandas { get; set; }
 

@@ -133,7 +133,7 @@ public class AuthService : IAuthService
         return ResultWithDataDto<string>.Success("Registration request submitted successfully");
     }
 
-    private string GenerateHashedPassword(string password)
+    public static string GenerateHashedPassword(string password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password, 12);
     }

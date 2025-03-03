@@ -62,7 +62,7 @@ public static class Endpoints
         // health facility registration
         endpoints.MapGet("api/registrationrequest", [Authorize(Roles = "SuperAdmin")] async (IRegistrationRequestService service) => TypedResults.Ok(await service.GetAllRegistrationRequestsAsync()));
         endpoints.MapGet("api/registrationrequest/{id}", [Authorize(Roles = "SuperAdmin")] async (int id, IRegistrationRequestService service) => TypedResults.Ok(await service.GetRegistrationRequestByIdAsync(id)));
-        endpoints.MapPost("api/registrationrequest/{id}/approve", [Authorize(Roles = "SuperAdmin")] async (int id, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.ApproveRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"))));
+        endpoints.MapPost("api/registrationrequest/{id}/approve", [Authorize(Roles = "SuperAdmin")] async (int id, LoginDto dto, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.ApproveRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"), dto)));
         endpoints.MapPost("api/registrationrequest/{id}/reject", [Authorize(Roles = "SuperAdmin")] async (int id, StandardRemarkDto dto, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.RejectRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"), dto)));
         
         //health facility
