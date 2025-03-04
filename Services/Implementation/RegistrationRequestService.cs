@@ -13,13 +13,28 @@ namespace HRRS.Services.Implementation
     public class RegistrationRequestService : IRegistrationRequestService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFileUploadService _fileService;
 
-        public RegistrationRequestService(ApplicationDbContext context) => _context = context;
-
-        
-        public async Task<ResultWithDataDto<List<RegistrationRequestDto?>>> GetAllRegistrationRequestsAsync()
+        public RegistrationRequestService(ApplicationDbContext context, IFileUploadService service)
         {
-            var requests = await _context.RegistrationRequests.Include(x => x.HandledBy).Include(x => x.HealthFacility).Select(x => new RegistrationRequestDto
+            _context = context;
+            _fileService = service;
+        }
+
+        public async Task<ResultWithDataDto<List<RegistrationRequestDto?>>> GetAllRegistrationRequestsAsync(long userId)
+        {
+            var requestQuery = _context.RegistrationRequests
+                .Include(x => x.HandledBy)
+                .Include(x => x.HealthFacility)
+                .AsQueryable();
+
+            var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId);
+            if(user!.Role is not null && user!.Role.Title != Role.SuperAdmin)
+            {
+                requestQuery = requestQuery.Where(x => x.HealthFacility.BedCount == user.Role.BedCount);
+            }
+
+            var requests = await requestQuery.Select(x => new RegistrationRequestDto
             {
                 Id = x.Id,
                 CreatedAt = x.CreatedAt,
@@ -30,7 +45,6 @@ namespace HRRS.Services.Implementation
                 FacilityName = x.HealthFacility.FacilityName,
                 Status = x.Status
             }).ToListAsync();
-
 
             return ResultWithDataDto<List<RegistrationRequestDto?>>.Success(requests);
         }
@@ -68,7 +82,7 @@ namespace HRRS.Services.Implementation
                         Tole = x.HealthFacility.Tole,
                         Longitude = x.HealthFacility.Longitude,
                         Latitude = x.HealthFacility.Latitude,
-                        FilePath = x.HealthFacility.FilePath,
+                        FilePath = _fileService.GetHealthFacilityFilePath(x.HealthFacility.FilePath),
                         Province = x.HealthFacility.Province.Name,
                         MobileNumber = x.HealthFacility.MobileNumber,
                         PhoneNumber = x.HealthFacility.PhoneNumber

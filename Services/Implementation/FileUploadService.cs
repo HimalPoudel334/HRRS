@@ -13,26 +13,25 @@ public class FileUploadService : IFileUploadService
 {
     private readonly string _mapdandaUploadPath;
     private readonly string _facilityUploadPath;
-    private readonly ApplicationDbContext _context;
+    private readonly IConfiguration configuration;
 
-    public FileUploadService(IConfiguration configuration, IWebHostEnvironment env, ApplicationDbContext context)
+    public FileUploadService(IConfiguration configuration, IWebHostEnvironment env)
     {
-        var appRoot = env.ContentRootPath;
-        _mapdandaUploadPath = Path.Combine(appRoot, configuration["FileUploadPaths:MapdandaUpload"] ?? Path.Combine("Media", "Mapdanda"));
+        _mapdandaUploadPath = Path.Combine(env.ContentRootPath, configuration["FileUploadPaths:MapdandaUpload"] ?? Path.Combine("Media", "Mapdanda"));
         
         if (!Directory.Exists(_mapdandaUploadPath))
         {
             Directory.CreateDirectory(_mapdandaUploadPath);
         }
 
-        _facilityUploadPath = Path.Combine(appRoot, configuration["FacilityUpload:HealthFacility"] ?? Path.Combine("Media", "HealthFacility"));
+        _facilityUploadPath = Path.Combine(env.WebRootPath, configuration["FacilityUpload:FacilityFacility"] ?? Path.Combine("Images", "HealthFacility"));
 
         if (!Directory.Exists(_facilityUploadPath))
         {
             Directory.CreateDirectory(_facilityUploadPath);
         }
 
-        _context = context;
+        this.configuration = configuration;
     }
 
     public async Task<ResultWithDataDto<string>> UploadFileAsync(FileDto dto)
@@ -67,7 +66,7 @@ public class FileUploadService : IFileUploadService
         }
 
         var uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
-        var filePath = Path.Combine(_mapdandaUploadPath, uniqueFileName);
+        var filePath = Path.Combine(_facilityUploadPath, uniqueFileName);
 
         using (var stream = new FileStream(filePath, FileMode.Create))
         {
@@ -88,5 +87,10 @@ public class FileUploadService : IFileUploadService
         }
         return contentType;
 
+    }
+
+    public string GetHealthFacilityFilePath(string? fileName)
+    {
+        return Path.Combine(configuration["FacilityUpload:FacilityFacility"] ?? Path.Combine("Images", "HealthFacility"), fileName);
     }
 }

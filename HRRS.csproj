@@ -29,6 +29,7 @@
     <Folder Include="Dto\HealthFacility\" />
     <Folder Include="Dto\Anusuchi\" />
     <Folder Include="Persistence\EntityMappings\" />
+    <Folder Include="wwwroot\Images\HealthFacility\" />
   </ItemGroup>
 
 </Project>

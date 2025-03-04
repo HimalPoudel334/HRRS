@@ -287,18 +287,15 @@ public class ApplicationDbContext : DbContext
                     new()  { SerialNumber = "7", Name = "अघिल्लो आ.व. सम्मको स्वास्थ्य संस्थाको कर चुक्ता प्रमाणपत्र (नयाँको हकमा आवश्यक नपर्ने)", Anusuchi = anusuchis[2] },
                     new()  { SerialNumber = "8", Name = "स्वास्थ्य संस्थाको नागरिक बडापत्र (सेवा, प्रक्रिया, सुविधा र शुल्क सहितको विवरण) वेबसाइट र सबैले देख्‍ने ठाउँमा प्रदर्शनमा राखेको", Anusuchi = anusuchis[2] },
                     new()  { SerialNumber = "9", Name = "प्रदेश वातावरण संरक्षण ऐन २०७७ बमोजिम संक्षिप्त वातावरणीय परीक्षण (BES) वा प्रारम्भिक वातावरणीय परीक्षण (IEE) वा वातावरणीय प्रभाव मूल्याङ्कन (EIA) को स्वीकृति पत्र", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "10", Name = "सरकारले तोकिएको ढाँचामा (HMIS /AHMIS अनुसार) मासिक रुपमा प्रतिवेदन प्रविष्ट गर्ने/बुझाउने गरेको", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "11", Name = "(नयाँको हकमा आवश्यक नपर्ने)", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "12", Name = "स्वास्थ्य संस्था भवनको निर्माण सम्पन्‍न प्रमाणपत्र", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "13", Name = "(आशयपत्रको हकमा आवश्यक नपर्ने)", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "14", Name = "गत आ.व. को वार्षिक लेखा परीक्षण प्रतिवेदन (नयाँको हकमा आवश्यक नपर्ने)", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "15", Name = "स्वास्थ्य संस्थाको कार्य योजना (Business Plan)", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "16", Name = "स्वास्थ्य संस्थाको आफ्नै वेवसाइट (अद्यावधिक गरिएको) भएको", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "17", Name = "सम्बन्धित स्थानीय तहको सिफारिस पत्र", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "18", Name = "सम्बन्धित जनस्वास्थ्य कार्यालयको सिफारिस पत्र", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "19", Name = "बेवारिसे, अति गरिब, विपन्‍न, अपाङ्गता भएका विपन्‍न र असहाय बिरामीका लागि कूल शय्याको १०% शय्या छुट्याई उपलब्ध सेवा, औषधी तथा उपचार खर्च व्यहोर्ने गरेको प्रमाण/निस्सा", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "20", Name = "(नयाँको हकमा आवश्यक नपर्ने)", Anusuchi = anusuchis[2] },
-                    new()  { SerialNumber = "21", Name = "स्वास्थ्य संस्था वा अस्पतालको कूल सञ्‍चालक समितिको सदस्य मध्ये कम्तिमा दुई तिहाई सदस्य नेपाली नागरिक भएको", Anusuchi = anusuchis[2] }
+                    new()  { SerialNumber = "10", Name = "सरकारले तोकिएको ढाँचामा (HMIS /AHMIS अनुसार) मासिक रुपमा प्रतिवेदन प्रविष्ट गर्ने/बुझाउने गरेको (नयाँको हकमा आवश्यक नपर्ने)", Anusuchi = anusuchis[2] },
+                    new()  { SerialNumber = "11", Name = "स्वास्थ्य संस्था भवनको निर्माण सम्पन्‍न प्रमाणपत्र (आशयपत्रको हकमा आवश्यक नपर्ने)", Anusuchi = anusuchis[2] },
+                    new()  { SerialNumber = "12", Name = "गत आ.व. को वार्षिक लेखा परीक्षण प्रतिवेदन (नयाँको हकमा आवश्यक नपर्ने)", Anusuchi = anusuchis[2] },
+                    new()  { SerialNumber = "13", Name = "स्वास्थ्य संस्थाको कार्य योजना (Business Plan)", Anusuchi = anusuchis[2] },
+                    new()  { SerialNumber = "14", Name = "स्वास्थ्य संस्थाको आफ्नै वेवसाइट (अद्यावधिक गरिएको) भएको", Anusuchi = anusuchis[2] },
+                    new()  { SerialNumber = "15", Name = "सम्बन्धित स्थानीय तहको सिफारिस पत्र", Anusuchi = anusuchis[2] },
+                    new()  { SerialNumber = "16", Name = "सम्बन्धित जनस्वास्थ्य कार्यालयको सिफारिस पत्र", Anusuchi = anusuchis[2] },
+                    new()  { SerialNumber = "17", Name = "बेवारिसे, अति गरिब, विपन्‍न, अपाङ्गता भएका विपन्‍न र असहाय बिरामीका लागि कूल शय्याको १०% शय्या छुट्याई उपलब्ध सेवा, औषधी तथा उपचार खर्च व्यहोर्ने गरेको प्रमाण/निस्सा (नयाँको हकमा आवश्यक नपर्ने)", Anusuchi = anusuchis[2] },
+                    new()  { SerialNumber = "18", Name = "स्वास्थ्य संस्था वा अस्पतालको कूल सञ्‍चालक समितिको सदस्य मध्ये कम्तिमा दुई तिहाई सदस्य नेपाली नागरिक भएको", Anusuchi = anusuchis[2] }
 
                 ];
                 context.Set<Mapdanda>().AddRange(mapdandas);

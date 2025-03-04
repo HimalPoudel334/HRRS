@@ -112,11 +112,8 @@ public class AuthService : IAuthService
         };
 
         if (dto.Photo is not null)
-        {
-            var fileName = await _fileService.UploadFacilityFileAsync(dto.Photo);
-            healthFacility.FilePath = fileName;
+            healthFacility.FilePath = await _fileService.UploadFacilityFileAsync(dto.Photo);
 
-        }
         await _context.TempHealthFacilities.AddAsync(healthFacility);
 
         var registrationRequest = new RegistrationRequest()

@@ -60,13 +60,13 @@ public static class Endpoints
 
         
         // health facility registration
-        endpoints.MapGet("api/registrationrequest", [Authorize(Roles = "SuperAdmin")] async (IRegistrationRequestService service) => TypedResults.Ok(await service.GetAllRegistrationRequestsAsync()));
-        endpoints.MapGet("api/registrationrequest/{id}", [Authorize(Roles = "SuperAdmin")] async (int id, IRegistrationRequestService service) => TypedResults.Ok(await service.GetRegistrationRequestByIdAsync(id)));
-        endpoints.MapPost("api/registrationrequest/{id}/approve", [Authorize(Roles = "SuperAdmin")] async (int id, LoginDto dto, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.ApproveRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"), dto))).RequireAuthorization();
-        endpoints.MapPost("api/registrationrequest/{id}/reject", [Authorize(Roles = "SuperAdmin")] async (int id, StandardRemarkDto dto, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.RejectRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"), dto))).RequireAuthorization();
+        endpoints.MapGet("api/registrationrequest", async (IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetAllRegistrationRequestsAsync(long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization();
+        endpoints.MapGet("api/registrationrequest/{id}", async (int id, IRegistrationRequestService service) => TypedResults.Ok(await service.GetRegistrationRequestByIdAsync(id)));
+        endpoints.MapPost("api/registrationrequest/{id}/approve", async (int id, LoginDto dto, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.ApproveRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"), dto))).RequireAuthorization();
+        endpoints.MapPost("api/registrationrequest/{id}/reject", async (int id, StandardRemarkDto dto, IRegistrationRequestService service, ClaimsPrincipal user) => TypedResults.Ok(await service.RejectRegistrationRequestAsync(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"), dto))).RequireAuthorization();
         
         //health facility
-        endpoints.MapPost("api/healthfacility/register", async (RegisterFacilityDto dto, IAuthService service) => TypedResults.Ok(await service.RegisterHospitalAsync(dto)));
+        endpoints.MapPost("api/healthfacility/register", async ([FromForm] RegisterFacilityDto dto, IAuthService service) => TypedResults.Ok(await service.RegisterHospitalAsync(dto))).DisableAntiforgery();
         endpoints.MapGet("api/healthfacility", async (IHealthFacilityService service, HttpContext context) => TypedResults.Ok(await service.GetAll(context))).RequireAuthorization();
         endpoints.MapGet("api/healthfacility/{id}", async (int id, IHealthFacilityService service) => TypedResults.Ok(await service.GetById(id)));
         // healthfacility file
@@ -86,7 +86,7 @@ public static class Endpoints
         // anusuchi services
         endpoints.MapPost("api/anusuchi", [Authorize(Roles = "SuperAdmin")] async (AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Create(dto))).RequireAuthorization();
         endpoints.MapPost("api/anusuchi/{anusuchiId}", [Authorize(Roles = "SuperAdmin")] async (int anusuchiId, AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Update(anusuchiId, dto))).RequireAuthorization();
-        endpoints.MapGet("api/anusuchi", [Authorize(Roles = "SuperAdmin")] async (IAnusuchiService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetAll())).RequireAuthorization();
+        endpoints.MapGet("api/anusuchi", async (IAnusuchiService service) => TypedResults.Ok(await service.GetAll())).RequireAuthorization();
         endpoints.MapGet("api/anusuchi/{id}", [Authorize(Roles = "SuperAdmin")] async (int id, IAnusuchiService service) => TypedResults.Ok(await service.GetById(id))).RequireAuthorization();
 
         // parichhed services
