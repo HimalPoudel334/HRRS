@@ -46,7 +46,10 @@ public class ApplicationDbContext : DbContext
                 {
                     UserName = "Administrator",
                     Password = BCrypt.Net.BCrypt.HashPassword("12345", 12),
-                    UserType = "SuperAdmin"
+                    UserType = "SuperAdmin",
+                    DistrictId = 4,
+                    ProvinceId = 1,
+                    FacilityTypeId = 1,
                 };
                 context.Set<User>().Add(newUser);
                 context.SaveChanges();
@@ -59,14 +62,20 @@ public class ApplicationDbContext : DbContext
                 {
                     UserName = "LocalAdmin",
                     Password = BCrypt.Net.BCrypt.HashPassword("12345", 12),
-                    UserType = "localadmin"
+                    UserType = "localadmin",
+                    DistrictId = 4,
+                    ProvinceId = 1,
+                    FacilityTypeId = 1,
                 };
 
                 var local2 = new User()
                 {
                     UserName = "LocalAdmin1",
                     Password = BCrypt.Net.BCrypt.HashPassword("12345", 12),
-                    UserType = "localadmin"
+                    UserType = "localadmin",
+                    DistrictId = 4,
+                    ProvinceId = 1,
+                    FacilityTypeId = 1,
                 };
                 context.Set<User>().AddRange([local1, local2]);
                 context.SaveChanges();

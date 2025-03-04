@@ -59,12 +59,36 @@ public class AuthService : IAuthService
             return ResultWithDataDto<AuthResponseDto>.Failure("Cannot find user role");
         }
 
+        var province = await _context.Provinces.FindAsync(dto.ProvinceId);
+        if (province is null)
+            return ResultWithDataDto<AuthResponseDto>.Failure("Province cannot be found");
+
+        var district = await _context.Districts.FindAsync(dto.DistrictId);
+        if (district is null)
+            return ResultWithDataDto<AuthResponseDto>.Failure("District cannot be found");
+
+        var facilityType = await _context.HospitalType.FindAsync(dto.FacilityTypeId);
+        if (facilityType is null)
+            return ResultWithDataDto<AuthResponseDto>.Failure("Facility type cannot be found");
+
         User newUser = new User
         {
             UserName = dto.Username,
             Password = GenerateHashedPassword(dto.Password),
             UserType = "localadmin",
             Role = role,
+            District = district,
+            Province = province,
+            FacilityType = facilityType,
+            Post = dto.Post,
+            FullName = dto.FullName,
+            MobileNumber = dto.MobileNumber,
+            FacilityMobileNumber = dto.FacilityMobileNumber,
+            TelephoneNumber = dto.TelephoneNumber,
+            FacilityEmail = dto.FacilityEmail,
+            PersonalEmail = dto.PersonalEmail,
+            Remarks = dto.Remarks,
+            IsFirstLogin = true
         };
 
         await _context.Users.AddAsync(newUser);
@@ -146,15 +170,35 @@ public class AuthService : IAuthService
 
     public async Task<ResultWithDataDto<List<UserDto>>> GetAllUsers()
     {
-        var users = await _context.Users.Include(x => x.Role).Select(x => new UserDto
-        {
-            UserId = x.UserId,
-            Username = x.UserName,
-            UserType = x.UserType,
-            RoleId = x.RoleId,
-            Role = x.Role != null? x.Role.Title : "",
-            BedCount = x.Role != null ? x.Role.BedCount : 0
-        }).ToListAsync();
+        var users = await _context.Users
+            .Include(x => x.District)
+            .Include(x => x.Province)
+            .Include(x => x.FacilityType)
+            .Include(x => x.Role)
+            .Select(x => new UserDto
+            {
+                UserId = x.UserId,
+                Username = x.UserName,
+                UserType = x.UserType,
+                RoleId = x.RoleId,
+                Role = x.Role != null? x.Role.Title : "",
+                BedCount = x.Role != null ? x.Role.BedCount : null,
+                FacilityType = x.FacilityType.HOSP_TYPE,
+                DistrictId = x.DistrictId,
+                District = x.District.Name,
+                ProvinceId = x.ProvinceId,
+                Province = x.Province.Name,
+                Post = x.Post,
+                FullName = x.FullName,
+                MobileNumber = x.MobileNumber,
+                FacilityMobileNumber = x.FacilityMobileNumber,
+                TelephoneNumber = x.TelephoneNumber,
+                FacilityEmail = x.FacilityEmail,
+                PersonalEmail = x.PersonalEmail,
+                Remarks = x.Remarks
+
+
+            }).ToListAsync();
 
         return ResultWithDataDto<List<UserDto>>.Success(users);
     }
