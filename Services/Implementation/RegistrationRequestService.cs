@@ -45,7 +45,8 @@ namespace HRRS.Services.Implementation
                 HandledById = x.HandledById,
                 FacilityId = x.HealthFacility.Id,
                 FacilityName = x.HealthFacility.FacilityName,
-                Status = x.Status
+                Status = x.Status,
+                BedCount = x.HealthFacility.BedCount
             }).ToListAsync();
 
             return ResultWithDataDto<List<RegistrationRequestDto?>>.Success(requests);
