@@ -9,5 +9,5 @@ public interface IFileUploadService
     Task<ResultWithDataDto<string>> UploadFileAsync(FileDto file);
     Task<string> UploadFacilityFileAsync(IFormFile file);
     string GetContentType(string filename);
-    string GetHealthFacilityFilePath(string? fileName);
+    string GetHealthFacilityFilePath(string fileName);
 }

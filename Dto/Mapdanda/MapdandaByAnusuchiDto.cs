@@ -52,7 +52,7 @@ namespace HRRS.Dto.Mapdanda
         public bool? IsAvailable { get; set; }
         public string? FilePath { get; set; }
         public string? Remarks { get; set; }
-        public bool IsApproved { get; set; }
+        public bool? IsApproved { get; set; }
 
     }
 

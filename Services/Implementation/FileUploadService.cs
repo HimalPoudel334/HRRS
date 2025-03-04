@@ -89,7 +89,7 @@ public class FileUploadService : IFileUploadService
 
     }
 
-    public string GetHealthFacilityFilePath(string? fileName)
+    public string GetHealthFacilityFilePath(string fileName)
     {
         return Path.Combine(configuration["FacilityUpload:FacilityFacility"] ?? Path.Combine("Images", "HealthFacility"), fileName);
     }

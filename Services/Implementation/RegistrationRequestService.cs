@@ -34,7 +34,9 @@ namespace HRRS.Services.Implementation
                 requestQuery = requestQuery.Where(x => x.HealthFacility.BedCount == user.Role.BedCount);
             }
 
-            var requests = await requestQuery.Select(x => new RegistrationRequestDto
+            var requests = await requestQuery
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new RegistrationRequestDto
             {
                 Id = x.Id,
                 CreatedAt = x.CreatedAt,
@@ -82,7 +84,7 @@ namespace HRRS.Services.Implementation
                         Tole = x.HealthFacility.Tole,
                         Longitude = x.HealthFacility.Longitude,
                         Latitude = x.HealthFacility.Latitude,
-                        FilePath = _fileService.GetHealthFacilityFilePath(x.HealthFacility.FilePath),
+                        FilePath = x.HealthFacility.FilePath != null ? _fileService.GetHealthFacilityFilePath(x.HealthFacility.FilePath) : null,
                         Province = x.HealthFacility.Province.Name,
                         MobileNumber = x.HealthFacility.MobileNumber,
                         PhoneNumber = x.HealthFacility.PhoneNumber
