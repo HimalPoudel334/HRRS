@@ -126,12 +126,6 @@ namespace HRRS.Services.Implementation
             if (request == null)
                 return ResultWithDataDto<string>.Failure("Registration request not found");
 
-            if (await _context.HealthFacilities.AnyAsync(x => x.PanNumber == request.HealthFacility.PanNumber))
-                return ResultWithDataDto<string>.Failure("Health Facility already exists");
-
-            if (await _context.HealthFacilities.AnyAsync(x => x.FacilityEmail != null && x.FacilityEmail.Equals(request.HealthFacility.Email))) return ResultWithDataDto<string>.Failure("Email already exists");
-            if (await _context.HealthFacilities.AnyAsync(x => x.FacilityPhoneNumber != null && x.FacilityPhoneNumber.Equals(request.HealthFacility.PhoneNumber))) return ResultWithDataDto<string>.Failure("Phone number already exists");
-
             request.Status = RequestStatus.Approved;
             request.HandledBy = user;
             request.UpdatedAt = DateTime.Now;
@@ -164,7 +158,17 @@ namespace HRRS.Services.Implementation
                 UserName = dto.Username,
                 Password = AuthService.GenerateHashedPassword(dto.Password),
                 HealthFacility = healthFacility,
-                IsFirstLogin = true
+                IsFirstLogin = true,
+                Post = "",
+                FullName = "",
+                MobileNumber = request.HealthFacility.MobileNumber,
+                DistrictId = request.HealthFacility.DistrictId,
+                ProvinceId = request.HealthFacility.ProvinceId,
+                FacilityTypeId = request.HealthFacility.FacilityTypeId,
+                FacilityEmail = request.HealthFacility.Email,
+                PersonalEmail = "",
+                TelephoneNumber = request.HealthFacility.PhoneNumber,
+
             };
 
             await _context.Users.AddAsync(newUser);

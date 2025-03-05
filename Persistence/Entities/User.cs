@@ -22,7 +22,7 @@ public class User
     public District District { get; set; }
     public int FacilityTypeId { get; set; }
     public FacilityType FacilityType { get; set; }
-    public string Post { get; set; }
+    public string? Post { get; set; }
     public string? FullName { get; set; }
     public string? MobileNumber { get; set; }
     public string? FacilityMobileNumber { get; set; }

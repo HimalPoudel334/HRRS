@@ -47,6 +47,83 @@ namespace HRRS.Migrations
                     b.ToTable("Anusuchis");
                 });
 
+            modelBuilder.Entity("HRRS.Persistence.Entities.AnusuchiMapdandaTableMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AnusuchiId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AnusuchiMappingId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParichhedId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnusuchiId");
+
+                    b.HasIndex("AnusuchiMappingId");
+
+                    b.HasIndex("ParichhedId");
+
+                    b.ToTable("AnusuchiMapdandaTableMappings");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.AnusuchiMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BedCountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FacilityTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubmissionTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BedCountId");
+
+                    b.HasIndex("FacilityTypeId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("SubmissionTypeId");
+
+                    b.ToTable("AnusuchiMappings");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.BedCount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BedCount");
+                });
+
             modelBuilder.Entity("HRRS.Persistence.Entities.District", b =>
                 {
                     b.Property<int>("Id")
@@ -890,6 +967,66 @@ namespace HRRS.Migrations
                     b.HasIndex("SubParichhedId");
 
                     b.ToTable("SubSubParichheds");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.AnusuchiMapdandaTableMapping", b =>
+                {
+                    b.HasOne("Anusuchi", "Anusuchi")
+                        .WithMany()
+                        .HasForeignKey("AnusuchiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRRS.Persistence.Entities.AnusuchiMapping", "AnusuchiMapping")
+                        .WithMany()
+                        .HasForeignKey("AnusuchiMappingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Parichhed", "Parichhed")
+                        .WithMany()
+                        .HasForeignKey("ParichhedId");
+
+                    b.Navigation("Anusuchi");
+
+                    b.Navigation("AnusuchiMapping");
+
+                    b.Navigation("Parichhed");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.AnusuchiMapping", b =>
+                {
+                    b.HasOne("HRRS.Persistence.Entities.BedCount", "BedCount")
+                        .WithMany()
+                        .HasForeignKey("BedCountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Persistence.Entities.FacilityType", "FacilityType")
+                        .WithMany()
+                        .HasForeignKey("FacilityTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRRS.Persistence.Entities.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRRS.Persistence.Entities.SubmissionType", "SubmissionType")
+                        .WithMany()
+                        .HasForeignKey("SubmissionTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BedCount");
+
+                    b.Navigation("FacilityType");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("SubmissionType");
                 });
 
             modelBuilder.Entity("HRRS.Persistence.Entities.District", b =>

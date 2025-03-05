@@ -59,6 +59,74 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
 
         return ResultWithDataDto<List<AnusuchiDto>>.Success(anusuchis);
     }
+    public async Task<ResultWithDataDto<List<AnusuchiDto>>> GetAllUserAnusuchi(long userId, Guid? submissionCode)
+    {
+        var user = await _dbContext.Users.FindAsync(userId);
+        if (user == null)
+            return ResultWithDataDto<List<AnusuchiDto>>.Failure("User not found");
+
+        if (user.UserType != "Hospital" || submissionCode == null)
+        {
+            var anusuchis = await _dbContext.Anusuchis
+                .Select(x => new AnusuchiDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    DafaNo = x.DafaNo,
+                    SerialNo = x.SerialNo
+                })
+                .ToListAsync();
+            return ResultWithDataDto<List<AnusuchiDto>>.Success(anusuchis);
+        }
+
+        var standardEntries = await _dbContext.HospitalStandardEntrys
+            .Where(x => x.MasterStandardEntry.SubmissionCode == submissionCode)
+            .ToListAsync();
+
+        if (standardEntries.Count == 0)
+        {
+            var anusuchis = await _dbContext.Anusuchis
+                .Where(x => new[] { "17", "१७", "3", "३" }.Contains(x.SerialNo))
+                .Select(x => new AnusuchiDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    DafaNo = x.DafaNo,
+                    SerialNo = x.SerialNo
+                })
+                .ToListAsync();
+            return ResultWithDataDto<List<AnusuchiDto>>.Success(anusuchis);
+        }
+
+        var healthFacility = await _dbContext.HealthFacilities.FindAsync(user.HealthFacilityId);
+        if (healthFacility == null)
+            return ResultWithDataDto<List<AnusuchiDto>>.Failure("Health Facility not found");
+
+        var masterEntry = await _dbContext.MasterStandardEntries.FindAsync(submissionCode);
+        if (masterEntry == null)
+            return ResultWithDataDto<List<AnusuchiDto>>.Failure("Master Entry not found");
+
+        var anusuchiMapping = await _dbContext.AnusuchiMappings
+            .FirstOrDefaultAsync(x => x.SubmissionTypeId == masterEntry.SubmissionTypeId
+                && x.FacilityTypeId == healthFacility.FacilityTypeId);
+        if (anusuchiMapping == null)
+            return ResultWithDataDto<List<AnusuchiDto>>.Failure("Anusuchi Mapping not found");
+
+        var anusuchisMapped = await _dbContext.AnusuchiMapdandaTableMappings
+            .Include(x => x.Anusuchi)
+            .Where(x => x.AnusuchiMapping == anusuchiMapping)
+            .Select(x => new AnusuchiDto
+            {
+                Id = x.Anusuchi.Id,
+                Name = x.Anusuchi.Name,
+                DafaNo = x.Anusuchi.DafaNo,
+                SerialNo = x.Anusuchi.SerialNo
+            })
+            .ToListAsync();
+
+        return ResultWithDataDto<List<AnusuchiDto>>.Success(anusuchisMapped);
+    
+    }
 
     public async Task<ResultWithDataDto<AnusuchiDto>> GetById(int id)
     {

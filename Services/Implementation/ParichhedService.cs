@@ -1,8 +1,10 @@
 ﻿
 using HRRS.Dto;
 using HRRS.Dto.AdminMapdanda;
+using HRRS.Dto.Anusuchi;
 using HRRS.Dto.Parichhed;
 using HRRS.Persistence.Context;
+using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,12 +28,6 @@ public class ParichhedService : IParichhedService
         {
             return ResultWithDataDto<ParichhedDto>.Failure("अनुसूची फेला परेन।");
         }
-
-        //if (await _context.Parichheds.AnyAsync(x => x.SerialNo == dto.SerialNo)) 
-        //{
-        //    return ResultWithDataDto<ParichhedDto>.Failure("Serial number already taken");
-
-        //}
 
         var parichhed = new Parichhed()
         {
@@ -79,23 +75,60 @@ public class ParichhedService : IParichhedService
 
     }
 
-    public async Task<ResultWithDataDto<List<ParichhedDto>>> GetAllParichhed(int? anusuchiId)
+    public async Task<ResultWithDataDto<List<ParichhedDto>>> GetAllParichhed(ParichhedQueryParams dto, long userId)
     {
-        var parichheds = _context.Parichheds.Select(x => new ParichhedDto()
+        var user = await _context.Users.FindAsync(userId);
+        if (user == null)
+            return ResultWithDataDto<List<ParichhedDto>>.Failure("User not found");
+
+        var parichhedQuery = _context.Parichheds.Select(x => new ParichhedDto
         {
             Id = x.Id,
             AnusuchiId = x.AnusuchiId,
             Name = x.Name,
-            SerialNo = x.SerialNo,
+            SerialNo = x.SerialNo
         });
 
-        if (anusuchiId is not null)
-            parichheds = parichheds.Where(x => x.AnusuchiId == anusuchiId);
+        if (user.UserType != "Hospital" || dto.SubmissionCode == null)
+        {
+            if (dto.AnusuchiId.HasValue)
+                parichhedQuery = parichhedQuery.Where(x => x.AnusuchiId == dto.AnusuchiId);
 
-        var res = await parichheds.ToListAsync();
+            return ResultWithDataDto<List<ParichhedDto>>.Success(await parichhedQuery.ToListAsync());
+        }
 
-        return ResultWithDataDto<List<ParichhedDto>>.Success(res);
+        var healthFacility = await _context.HealthFacilities.FindAsync(user.HealthFacilityId);
+        if (healthFacility == null)
+            return ResultWithDataDto<List<ParichhedDto>>.Failure("Health Facility not found");
+
+        var masterEntry = await _context.MasterStandardEntries.FindAsync(dto.SubmissionCode);
+        if (masterEntry == null)
+            return ResultWithDataDto<List<ParichhedDto>>.Failure("Master Entry not found");
+
+        var anusuchiMapping = await _context.AnusuchiMappings
+            .FirstOrDefaultAsync(x => x.SubmissionTypeId == masterEntry.SubmissionTypeId
+                && x.FacilityTypeId == healthFacility.FacilityTypeId);
+
+        if (anusuchiMapping == null)
+            return ResultWithDataDto<List<ParichhedDto>>.Failure("Anusuchi Mapping not found");
+
+        var mapdandaMapping = await _context.AnusuchiMapdandaTableMappings
+            .Include(x => x.Parichhed)
+            .FirstOrDefaultAsync(x => x.AnusuchiMapping == anusuchiMapping
+                && x.Anusuchi.Id == dto.AnusuchiId);
+
+        if (mapdandaMapping == null)
+            return ResultWithDataDto<List<ParichhedDto>>.Failure("Anusuchi Mapdanda Table Mapping not found");
+
+        if (mapdandaMapping.Parichhed == null)
+            parichhedQuery = parichhedQuery.Where(x => x.AnusuchiId == dto.AnusuchiId);
+        else
+            parichhedQuery = parichhedQuery.Where(x => x.AnusuchiId == dto.AnusuchiId
+                && x.Id == mapdandaMapping.Parichhed.Id);
+
+        return ResultWithDataDto<List<ParichhedDto>>.Success(await parichhedQuery.ToListAsync());
     }
+
 
     public async Task<ResultWithDataDto<ParichhedDto>> GetParichhedById(int id)
     {

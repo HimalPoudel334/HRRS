@@ -8,6 +8,7 @@ using HRRS.Dto.Mapdanda;
 using HRRS.Dto.MasterStandardEntry;
 using HRRS.Dto.Parichhed;
 using HRRS.Dto.User;
+using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -86,13 +87,13 @@ public static class Endpoints
         // anusuchi services
         endpoints.MapPost("api/anusuchi", [Authorize(Roles = "SuperAdmin")] async (AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Create(dto))).RequireAuthorization();
         endpoints.MapPost("api/anusuchi/{anusuchiId}", [Authorize(Roles = "SuperAdmin")] async (int anusuchiId, AnusuchiDto dto, IAnusuchiService service) => TypedResults.Ok(await service.Update(anusuchiId, dto))).RequireAuthorization();
-        endpoints.MapGet("api/anusuchi", async (IAnusuchiService service) => TypedResults.Ok(await service.GetAll())).RequireAuthorization();
+        endpoints.MapGet("api/anusuchi", async ([FromQuery] Guid? submissionCode, IAnusuchiService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetAllUserAnusuchi(long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier)?.Trim() ?? "0"), submissionCode))).RequireAuthorization();
         endpoints.MapGet("api/anusuchi/{id}", async (int id, IAnusuchiService service) => TypedResults.Ok(await service.GetById(id))).RequireAuthorization();
 
         // parichhed services
         endpoints.MapPost("api/parichhed", async (ParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.Create(dto)));
         endpoints.MapPost("api/parichhed/{parichhedId}/update", async (int parichhedId, ParichhedDto dto, IParichhedService service) => TypedResults.Ok(await service.Update(parichhedId, dto)));
-        endpoints.MapGet("api/parichhed", async ([FromQuery] int? anusuchiId, IParichhedService service) => TypedResults.Ok(await service.GetAllParichhed(anusuchiId)));
+        endpoints.MapGet("api/parichhed", async ([AsParameters] ParichhedQueryParams dto, IParichhedService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetAllParichhed(dto, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier)?.Trim() ?? "0"))));
         endpoints.MapGet("api/parichhed/{id}", async (int id, IParichhedService service) => TypedResults.Ok(await service.GetParichhedById(id)));
 
         //sub parichhed services

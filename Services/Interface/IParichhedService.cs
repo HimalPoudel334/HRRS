@@ -9,7 +9,7 @@ public interface IParichhedService
 {
     Task<ResultWithDataDto<ParichhedDto>> Create(ParichhedDto dto);
     Task<ResultDto> Update(int parichhedId, ParichhedDto dto);
-    Task<ResultWithDataDto<List<ParichhedDto>>> GetAllParichhed(int? anusuchiId);
+    Task<ResultWithDataDto<List<ParichhedDto>>> GetAllParichhed(ParichhedQueryParams dto, long userId);
     Task<ResultWithDataDto<ParichhedDto>> GetParichhedById(int id);
     Task<ResultWithDataDto<List<ParichhedDto>>> GetParichhedByAnusuchi(int id);
     Task<ResultWithDataDto<SubParichhedDto>> CreateSubParichhed(SubParichhedDto dto);

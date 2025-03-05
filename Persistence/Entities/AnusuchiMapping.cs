@@ -17,6 +17,7 @@ namespace HRRS.Persistence.Entities
 
     public class AnusuchiMapdandaTableMapping
     {
+        public int Id { get; set; }
         public int AnusuchiMappingId { get; set; }
         public AnusuchiMapping AnusuchiMapping { get; set; }
 

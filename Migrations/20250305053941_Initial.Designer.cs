@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRRS.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250303052927_AddProvinceInFacility")]
-    partial class AddProvinceInFacility
+    [Migration("20250305053941_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,6 +48,83 @@ namespace HRRS.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Anusuchis");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.AnusuchiMapdandaTableMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AnusuchiId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("AnusuchiMappingId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ParichhedId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnusuchiId");
+
+                    b.HasIndex("AnusuchiMappingId");
+
+                    b.HasIndex("ParichhedId");
+
+                    b.ToTable("AnusuchiMapdandaTableMappings");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.AnusuchiMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BedCountId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FacilityTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubmissionTypeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BedCountId");
+
+                    b.HasIndex("FacilityTypeId");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("SubmissionTypeId");
+
+                    b.ToTable("AnusuchiMappings");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.BedCount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BedCount");
                 });
 
             modelBuilder.Entity("HRRS.Persistence.Entities.District", b =>
@@ -274,18 +351,52 @@ namespace HRRS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("UserId"));
 
+                    b.Property<int>("DistrictId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FacilityEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FacilityMobileNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FacilityTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("HealthFacilityId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsFirstLogin")
                         .HasColumnType("bit");
 
+                    b.Property<string>("MobileNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PersonalEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Post")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProvinceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("RoleId")
                         .HasColumnType("int");
+
+                    b.Property<string>("TelephoneNumber")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -297,7 +408,13 @@ namespace HRRS.Migrations
 
                     b.HasKey("UserId");
 
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("FacilityTypeId");
+
                     b.HasIndex("HealthFacilityId");
+
+                    b.HasIndex("ProvinceId");
 
                     b.HasIndex("RoleId");
 
@@ -324,7 +441,7 @@ namespace HRRS.Migrations
                     b.Property<int>("HealthFacilityId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsApproved")
+                    b.Property<bool?>("IsApproved")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("IsAvailable")
@@ -466,6 +583,9 @@ namespace HRRS.Migrations
                     b.Property<int?>("SubSubParichhedId")
                         .HasColumnType("int");
 
+                    b.Property<int>("TableNumber")
+                        .HasColumnType("int");
+
                     b.Property<string>("Value100")
                         .HasColumnType("nvarchar(max)");
 
@@ -569,7 +689,6 @@ namespace HRRS.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("DateOfInspection")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DistrictId")
@@ -712,7 +831,6 @@ namespace HRRS.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FacilityName")
@@ -735,7 +853,6 @@ namespace HRRS.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("MobileNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PanNumber")
@@ -743,7 +860,6 @@ namespace HRRS.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProvinceId")
@@ -856,6 +972,66 @@ namespace HRRS.Migrations
                     b.ToTable("SubSubParichheds");
                 });
 
+            modelBuilder.Entity("HRRS.Persistence.Entities.AnusuchiMapdandaTableMapping", b =>
+                {
+                    b.HasOne("Anusuchi", "Anusuchi")
+                        .WithMany()
+                        .HasForeignKey("AnusuchiId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRRS.Persistence.Entities.AnusuchiMapping", "AnusuchiMapping")
+                        .WithMany()
+                        .HasForeignKey("AnusuchiMappingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Parichhed", "Parichhed")
+                        .WithMany()
+                        .HasForeignKey("ParichhedId");
+
+                    b.Navigation("Anusuchi");
+
+                    b.Navigation("AnusuchiMapping");
+
+                    b.Navigation("Parichhed");
+                });
+
+            modelBuilder.Entity("HRRS.Persistence.Entities.AnusuchiMapping", b =>
+                {
+                    b.HasOne("HRRS.Persistence.Entities.BedCount", "BedCount")
+                        .WithMany()
+                        .HasForeignKey("BedCountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Persistence.Entities.FacilityType", "FacilityType")
+                        .WithMany()
+                        .HasForeignKey("FacilityTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRRS.Persistence.Entities.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRRS.Persistence.Entities.SubmissionType", "SubmissionType")
+                        .WithMany()
+                        .HasForeignKey("SubmissionTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BedCount");
+
+                    b.Navigation("FacilityType");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("SubmissionType");
+                });
+
             modelBuilder.Entity("HRRS.Persistence.Entities.District", b =>
                 {
                     b.HasOne("HRRS.Persistence.Entities.Province", "Province")
@@ -947,15 +1123,39 @@ namespace HRRS.Migrations
 
             modelBuilder.Entity("HRRS.Persistence.Entities.User", b =>
                 {
+                    b.HasOne("HRRS.Persistence.Entities.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Persistence.Entities.FacilityType", "FacilityType")
+                        .WithMany()
+                        .HasForeignKey("FacilityTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Persistence.Entities.HealthFacility", "HealthFacility")
                         .WithMany()
                         .HasForeignKey("HealthFacilityId");
+
+                    b.HasOne("HRRS.Persistence.Entities.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("HRRS.Persistence.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId");
 
+                    b.Navigation("District");
+
+                    b.Navigation("FacilityType");
+
                     b.Navigation("HealthFacility");
+
+                    b.Navigation("Province");
 
                     b.Navigation("Role");
                 });

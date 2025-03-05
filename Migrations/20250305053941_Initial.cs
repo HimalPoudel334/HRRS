@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HRRS.Migrations
 {
     /// <inheritdoc />
-    public partial class InitalCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -24,6 +24,19 @@ namespace HRRS.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Anusuchis", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BedCount",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Count = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BedCount", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -52,6 +65,19 @@ namespace HRRS.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Provinces", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubmissionTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubmissionTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -110,6 +136,46 @@ namespace HRRS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AnusuchiMappings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FacilityTypeId = table.Column<int>(type: "int", nullable: false),
+                    BedCountId = table.Column<int>(type: "int", nullable: false),
+                    SubmissionTypeId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnusuchiMappings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMappings_BedCount_BedCountId",
+                        column: x => x.BedCountId,
+                        principalTable: "BedCount",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMappings_HospitalType_FacilityTypeId",
+                        column: x => x.FacilityTypeId,
+                        principalTable: "HospitalType",
+                        principalColumn: "SN",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMappings_SubmissionTypes_SubmissionTypeId",
+                        column: x => x.SubmissionTypeId,
+                        principalTable: "SubmissionTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMappings_UserRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "UserRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SubParichheds",
                 columns: table => new
                 {
@@ -151,6 +217,38 @@ namespace HRRS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AnusuchiMapdandaTableMappings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AnusuchiMappingId = table.Column<int>(type: "int", nullable: false),
+                    AnusuchiId = table.Column<int>(type: "int", nullable: false),
+                    ParichhedId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnusuchiMapdandaTableMappings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMapdandaTableMappings_AnusuchiMappings_AnusuchiMappingId",
+                        column: x => x.AnusuchiMappingId,
+                        principalTable: "AnusuchiMappings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMapdandaTableMappings_Anusuchis_AnusuchiId",
+                        column: x => x.AnusuchiId,
+                        principalTable: "Anusuchis",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMapdandaTableMappings_Parichheds_ParichhedId",
+                        column: x => x.ParichhedId,
+                        principalTable: "Parichheds",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SubSubParichheds",
                 columns: table => new
                 {
@@ -183,11 +281,15 @@ namespace HRRS.Migrations
                     BedCount = table.Column<int>(type: "int", nullable: false),
                     SpecialistCount = table.Column<int>(type: "int", nullable: false),
                     AvailableServices = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProvinceId = table.Column<int>(type: "int", nullable: false),
                     DistrictId = table.Column<int>(type: "int", nullable: false),
                     LocalLevelId = table.Column<int>(type: "int", nullable: false),
                     WardNumber = table.Column<int>(type: "int", nullable: false),
                     Tole = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DateOfInspection = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Longitude = table.Column<double>(type: "float", nullable: true),
+                    Latitude = table.Column<double>(type: "float", nullable: true),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DateOfInspection = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FacilityEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FacilityPhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FacilityHeadName = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -235,7 +337,13 @@ namespace HRRS.Migrations
                         column: x => x.LocalLevelId,
                         principalTable: "LocalLevels",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_HealthFacilities_Provinces_ProvinceId",
+                        column: x => x.ProvinceId,
+                        principalTable: "Provinces",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -253,7 +361,14 @@ namespace HRRS.Migrations
                     DistrictId = table.Column<int>(type: "int", nullable: false),
                     LocalLevelId = table.Column<int>(type: "int", nullable: false),
                     WardNumber = table.Column<int>(type: "int", nullable: false),
-                    Tole = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Tole = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Longitude = table.Column<double>(type: "float", nullable: true),
+                    Latitude = table.Column<double>(type: "float", nullable: true),
+                    FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProvinceId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -275,7 +390,13 @@ namespace HRRS.Migrations
                         column: x => x.LocalLevelId,
                         principalTable: "LocalLevels",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TempHealthFacilities_Provinces_ProvinceId",
+                        column: x => x.ProvinceId,
+                        principalTable: "Provinces",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -312,7 +433,8 @@ namespace HRRS.Migrations
                     ParichhedId = table.Column<int>(type: "int", nullable: true),
                     SubParichhedId = table.Column<int>(type: "int", nullable: true),
                     SubSubParichhedId = table.Column<int>(type: "int", nullable: true),
-                    FormType = table.Column<int>(type: "int", nullable: false)
+                    FormType = table.Column<int>(type: "int", nullable: false),
+                    TableNumber = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -351,16 +473,45 @@ namespace HRRS.Migrations
                     UserType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HealthFacilityId = table.Column<int>(type: "int", nullable: true),
                     RoleId = table.Column<int>(type: "int", nullable: true),
-                    IsFirstLogin = table.Column<bool>(type: "bit", nullable: false)
+                    IsFirstLogin = table.Column<bool>(type: "bit", nullable: false),
+                    ProvinceId = table.Column<int>(type: "int", nullable: false),
+                    DistrictId = table.Column<int>(type: "int", nullable: false),
+                    FacilityTypeId = table.Column<int>(type: "int", nullable: false),
+                    Post = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FacilityMobileNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TelephoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FacilityEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PersonalEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.UserId);
                     table.ForeignKey(
+                        name: "FK_Users_Districts_DistrictId",
+                        column: x => x.DistrictId,
+                        principalTable: "Districts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Users_HealthFacilities_HealthFacilityId",
                         column: x => x.HealthFacilityId,
                         principalTable: "HealthFacilities",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Users_HospitalType_FacilityTypeId",
+                        column: x => x.FacilityTypeId,
+                        principalTable: "HospitalType",
+                        principalColumn: "SN",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Users_Provinces_ProvinceId",
+                        column: x => x.ProvinceId,
+                        principalTable: "Provinces",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Users_UserRoles_RoleId",
                         column: x => x.RoleId,
@@ -402,7 +553,7 @@ namespace HRRS.Migrations
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ApprovedById = table.Column<long>(type: "bigint", nullable: true),
                     RejectedById = table.Column<long>(type: "bigint", nullable: true),
-                    SubmissionType = table.Column<int>(type: "int", nullable: false),
+                    SubmissionTypeId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsNewEntry = table.Column<bool>(type: "bit", nullable: false)
@@ -414,6 +565,12 @@ namespace HRRS.Migrations
                         name: "FK_MasterStandardEntries_HealthFacilities_HealthFacilityId",
                         column: x => x.HealthFacilityId,
                         principalTable: "HealthFacilities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MasterStandardEntries_SubmissionTypes_SubmissionTypeId",
+                        column: x => x.SubmissionTypeId,
+                        principalTable: "SubmissionTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -517,7 +674,7 @@ namespace HRRS.Migrations
                     HealthFacilityId = table.Column<int>(type: "int", nullable: false),
                     MapdandaId = table.Column<int>(type: "int", nullable: false),
                     IsAvailable = table.Column<bool>(type: "bit", nullable: true),
-                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: true),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FiscalYear = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -542,6 +699,41 @@ namespace HRRS.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnusuchiMapdandaTableMappings_AnusuchiId",
+                table: "AnusuchiMapdandaTableMappings",
+                column: "AnusuchiId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnusuchiMapdandaTableMappings_AnusuchiMappingId",
+                table: "AnusuchiMapdandaTableMappings",
+                column: "AnusuchiMappingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnusuchiMapdandaTableMappings_ParichhedId",
+                table: "AnusuchiMapdandaTableMappings",
+                column: "ParichhedId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnusuchiMappings_BedCountId",
+                table: "AnusuchiMappings",
+                column: "BedCountId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnusuchiMappings_FacilityTypeId",
+                table: "AnusuchiMappings",
+                column: "FacilityTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnusuchiMappings_RoleId",
+                table: "AnusuchiMappings",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnusuchiMappings_SubmissionTypeId",
+                table: "AnusuchiMappings",
+                column: "SubmissionTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Approvals_CreatedById",
@@ -578,6 +770,11 @@ namespace HRRS.Migrations
                 table: "HealthFacilities",
                 column: "PanNumber",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HealthFacilities_ProvinceId",
+                table: "HealthFacilities",
+                column: "ProvinceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_HospitalStandardEntrys_MasterStandardEntrySubmissionCode",
@@ -635,6 +832,11 @@ namespace HRRS.Migrations
                 column: "RejectedById");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MasterStandardEntries_SubmissionTypeId",
+                table: "MasterStandardEntries",
+                column: "SubmissionTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Parichheds_AnusuchiId",
                 table: "Parichheds",
                 column: "AnusuchiId");
@@ -680,9 +882,29 @@ namespace HRRS.Migrations
                 column: "LocalLevelId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TempHealthFacilities_ProvinceId",
+                table: "TempHealthFacilities",
+                column: "ProvinceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_DistrictId",
+                table: "Users",
+                column: "DistrictId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_FacilityTypeId",
+                table: "Users",
+                column: "FacilityTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_HealthFacilityId",
                 table: "Users",
                 column: "HealthFacilityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_ProvinceId",
+                table: "Users",
+                column: "ProvinceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",
@@ -693,6 +915,9 @@ namespace HRRS.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AnusuchiMapdandaTableMappings");
+
             migrationBuilder.DropTable(
                 name: "Approvals");
 
@@ -706,6 +931,9 @@ namespace HRRS.Migrations
                 name: "SubMapdandas");
 
             migrationBuilder.DropTable(
+                name: "AnusuchiMappings");
+
+            migrationBuilder.DropTable(
                 name: "HospitalStandardEntrys");
 
             migrationBuilder.DropTable(
@@ -715,10 +943,16 @@ namespace HRRS.Migrations
                 name: "Mapdandas");
 
             migrationBuilder.DropTable(
+                name: "BedCount");
+
+            migrationBuilder.DropTable(
                 name: "MasterStandardEntries");
 
             migrationBuilder.DropTable(
                 name: "SubSubParichheds");
+
+            migrationBuilder.DropTable(
+                name: "SubmissionTypes");
 
             migrationBuilder.DropTable(
                 name: "Users");

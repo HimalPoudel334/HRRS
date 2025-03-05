@@ -8,6 +8,7 @@ using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Persistence.Entities;
+using Azure.Core;
 
 namespace HRRS.Services.Implementation;
 
@@ -114,6 +115,13 @@ public class AuthService : IAuthService
         var district = await _context.Districts.FindAsync(dto.DistrictId);
         if (district is null)
             return ResultWithDataDto<string>.Failure("District cannot be found");
+
+        if (await _context.HealthFacilities.AnyAsync(x => x.PanNumber == dto.PanNumber))
+            return ResultWithDataDto<string>.Failure("Health Facility already exists");
+
+        if (await _context.HealthFacilities.AnyAsync(x => x.FacilityEmail != null && x.FacilityEmail.Equals(dto.Email))) return ResultWithDataDto<string>.Failure("Email already exists");
+        if (await _context.HealthFacilities.AnyAsync(x => x.FacilityPhoneNumber != null && x.FacilityPhoneNumber.Equals(dto.PhoneNumber))) return ResultWithDataDto<string>.Failure("Phone number already exists");
+
 
         var healthFacility = new TempHealthFacility()
         {

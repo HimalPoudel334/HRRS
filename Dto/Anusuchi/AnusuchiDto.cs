@@ -9,6 +9,10 @@ public class AnusuchiDto
     public string SerialNo { get; set; }
     public string Name { get; set; }
     public string DafaNo { get; set; }
-    public ICollection<ParichhedDto> Parichheds { get; set; } = [];
-    public ICollection<MapdandaDto> Mapdandas { get; set; } = [];
+}
+
+public class AnusuchiQueryParams
+{
+    public int? Id { get; set; }
+    public Guid? SubmissionCode { get; set; }
 }

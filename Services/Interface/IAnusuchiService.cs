@@ -10,4 +10,5 @@ public interface IAnusuchiService
     Task<ResultDto> Update(int anusuchiId, AnusuchiDto dto);
     Task<ResultWithDataDto<List<AnusuchiDto>>> GetAll();
     Task<ResultWithDataDto<AnusuchiDto>> GetById(int id);
+    Task<ResultWithDataDto<List<AnusuchiDto>>> GetAllUserAnusuchi(long userId, Guid? submissionCode);
 }
