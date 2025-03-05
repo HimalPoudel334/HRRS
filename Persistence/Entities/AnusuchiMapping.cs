@@ -13,7 +13,6 @@ namespace HRRS.Persistence.Entities
         public SubmissionType SubmissionType { get; set; }
         public int RoleId { get; set; }
         public Role Role { get; set; }
-        public ICollection<MapdandaTable> MapdandaTables { get; set; } = [];
     }
 
     public class AnusuchiMapdandaTableMapping
@@ -21,7 +20,10 @@ namespace HRRS.Persistence.Entities
         public int AnusuchiMappingId { get; set; }
         public AnusuchiMapping AnusuchiMapping { get; set; }
 
-        public int MapdandaTableId { get; set; }
-        public MapdandaTable MapdandaTable { get; set; }
+        public int AnusuchiId { get; set; }
+        public Anusuchi Anusuchi { get; set; }
+
+        public int? ParichhedId { get; set; }
+        public Parichhed? Parichhed { get; set; }
     }
 }

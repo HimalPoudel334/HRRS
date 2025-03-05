@@ -32,6 +32,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<LocalLevel> LocalLevels { get; set; }
     public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
     public DbSet<SubmissionType> SubmissionTypes { get; set; }
+    public DbSet<AnusuchiMapping> AnusuchiMappings { get; set; }
+    public DbSet<AnusuchiMapdandaTableMapping> AnusuchiMapdandaTableMappings { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
