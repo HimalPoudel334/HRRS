@@ -2,7 +2,6 @@
 using HRRS.Dto.AdminMapdanda;
 using HRRS.Dto.HealthStandard;
 using HRRS.Persistence.Context;
-using HRRS.Persistence.Repositories.Interfaces;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 

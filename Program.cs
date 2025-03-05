@@ -1,8 +1,6 @@
 using HRRS.Endpoints;
 using HRRS.MIddlewares;
 using HRRS.Persistence.Context;
-using HRRS.Persistence.Repositories.Implementations;
-using HRRS.Persistence.Repositories.Interfaces;
 using HRRS.Services;
 using HRRS.Services.Implementation;
 using HRRS.Services.Interface;
@@ -44,9 +42,6 @@ builder.Services.AddScoped<IAnusuchiService, AnusuchiService>();
 builder.Services.AddScoped<IParichhedService, ParichhedService>();
 builder.Services.AddScoped<IMasterStandardEntryService, MasterStandardEntryService>();
 
-builder.Services.AddScoped<IMapdandaRepository, MapdandaRepository>();
-builder.Services.AddScoped<IHospitalStandardRespository, HospitalStandardRepository>();
-builder.Services.AddScoped<IHealthFacilityRepositoroy, HealthFacilityRepository>();
 builder.Services.AddScoped<IFacilityTypeService, FacilityTypeService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<IFacilityAddressService, FacilityAddressService>();
@@ -59,7 +54,7 @@ builder.Services.AddProblemDetails();
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
 
 builder.Services.AddOpenApi();
 

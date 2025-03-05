@@ -203,6 +203,42 @@ public class AuthService : IAuthService
         return ResultWithDataDto<List<UserDto>>.Success(users);
     }
 
+    public async Task<ResultWithDataDto<UserDto>> GetById(long userId)
+    {
+        var user = await _context.Users
+            .Include(x => x.District)
+            .Include(x => x.Province)
+            .Include(x => x.FacilityType)
+            .Include(x => x.Role)
+            .Select(x => new UserDto
+            {
+                UserId = x.UserId,
+                Username = x.UserName,
+                UserType = x.UserType,
+                RoleId = x.RoleId,
+                Role = x.Role != null ? x.Role.Title : "",
+                BedCount = x.Role != null ? x.Role.BedCount : null,
+                FacilityType = x.FacilityType.HOSP_TYPE,
+                DistrictId = x.DistrictId,
+                District = x.District.Name,
+                ProvinceId = x.ProvinceId,
+                Province = x.Province.Name,
+                Post = x.Post,
+                FullName = x.FullName,
+                MobileNumber = x.MobileNumber,
+                FacilityMobileNumber = x.FacilityMobileNumber,
+                TelephoneNumber = x.TelephoneNumber,
+                FacilityEmail = x.FacilityEmail,
+                PersonalEmail = x.PersonalEmail,
+                Remarks = x.Remarks
+
+
+            })
+            .FirstOrDefaultAsync(x => x.UserId == userId);
+
+        return ResultWithDataDto<UserDto>.Success(user);
+    }
+
     public static string GenerateRandomPassword()
     {
         const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -225,6 +261,31 @@ public class AuthService : IAuthService
         }
         user.Password = GenerateHashedPassword(dto.NewPassword);
         user.IsFirstLogin = false;
+        await _context.SaveChangesAsync();
+        return ResultWithDataDto<string>.Success("Password changed successfully");
+    }
+
+    public async Task<ResultWithDataDto<string>> ResetAdminPasswordAsync(long userId, long adminId, ResetPasswordDto dto)
+    {
+        if (dto.Password != dto.ConfirmPassword) return ResultWithDataDto<string>.Failure("Passwords do not match");
+        var adminUser = await _context.Users.FindAsync(adminId);
+        if (adminUser is null)
+            return ResultWithDataDto<string>.Failure("Something went wrong");
+
+        if(adminUser.UserType != "SuperAdmin")
+            return ResultWithDataDto<string>.Failure("You do not have permission to reset password");
+
+        var user = await _context.Users.FindAsync(userId);
+        if (user is null)
+            return ResultWithDataDto<string>.Failure("User not found");
+
+        if(user.UserType == "Hospital")
+            return ResultWithDataDto<string>.Failure("Cannot reset password for this user");
+
+
+        user.Password = GenerateHashedPassword(dto.Password);
+        user.IsFirstLogin = false;
+
         await _context.SaveChangesAsync();
         return ResultWithDataDto<string>.Success("Password changed successfully");
     }

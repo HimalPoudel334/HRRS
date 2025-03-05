@@ -8,13 +8,10 @@ using HRRS.Dto.Mapdanda;
 using HRRS.Dto.MasterStandardEntry;
 using HRRS.Dto.Parichhed;
 using HRRS.Dto.User;
-using HRRS.Persistence.Context;
-using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HRRS.Endpoints;
 
@@ -27,6 +24,7 @@ public static class Endpoints
         endpoints.MapPost("api/signin", async (LoginDto dto, IAuthService authService) => TypedResults.Ok(await authService.LoginUser(dto)));
         endpoints.MapPost("api/signup", [Authorize(Roles = "SuperAdmin")] async (RegisterDto dto, IAuthService authService) => TypedResults.Ok(await authService.RegisterAdminAsync(dto)));
         endpoints.MapPost("api/changepassword", async (ChangePasswordDto dto, IAuthService authService, ClaimsPrincipal user) => TypedResults.Ok(await authService.ChangePasswordAsync(dto)));
+        endpoints.MapPost("api/resetpassword/{userId}", [Authorize(Roles = "SuperAdmin")] async (long userId, ResetPasswordDto dto, IAuthService authService, ClaimsPrincipal user) => TypedResults.Ok(await authService.ResetAdminPasswordAsync(userId, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"), dto)));
 
         //mapdanda
         endpoints.MapGet("api/mapdanda", async ([AsParameters] HospitalStandardQueryParams dto, IMapdandaService service) => TypedResults.Ok(await service.GetAdminMapdandas(dto))).RequireAuthorization();
@@ -78,6 +76,8 @@ public static class Endpoints
 
         //user get
         endpoints.MapGet("api/users", [Authorize(Roles = "SuperAdmin")] async (IAuthService service) => TypedResults.Ok(await service.GetAllUsers())).RequireAuthorization();
+        endpoints.MapGet("api/users/{userId}", [Authorize(Roles = "SuperAdmin")] async (long userId, IAuthService service) => TypedResults.Ok(await service.GetById(userId))).RequireAuthorization();
+
 
         //user role services
         endpoints.MapGet("api/userrole", [Authorize(Roles = "SuperAdmin")] async (IUserRoleService service) => TypedResults.Ok(await service.GetAll())).RequireAuthorization();
