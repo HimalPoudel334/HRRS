@@ -21,9 +21,7 @@ namespace HRRS.Services.Implementation
         {
             var healthFacility = await _context.HealthFacilities.FindAsync(healthFacilityId);
             if (healthFacility is null)
-            {
                 return new ResultWithDataDto<string>(false, null, "Health facility not found");
-            }
 
             var submissionType = await _context.SubmissionTypes.FindAsync(dto.Type);
             if (submissionType is null) return new ResultWithDataDto<string>(false, null, "Submission type not found");
@@ -50,9 +48,7 @@ namespace HRRS.Services.Implementation
                 .Where(m => m.HealthFacilityId == healthFacilityId).Where(x => x.EntryStatus != EntryStatus.Draft).OrderByDescending(x => x.CreatedAt).ToListAsync();
 
             if (masterEntry is null)
-            {
                 return new ResultWithDataDto<List<MasterStandardEntry>>(false, null, "Master standard entry not found");
-            }
 
             return ResultWithDataDto<List<MasterStandardEntry>>.Success(masterEntry);
         }
@@ -63,9 +59,7 @@ namespace HRRS.Services.Implementation
                 .Where(m => m.HealthFacilityId == healthFacilityId).OrderByDescending(x => x.CreatedAt).ToListAsync();
 
             if (masterEntry is null)
-            {
                 return new ResultWithDataDto<List<MasterStandardEntry>>(false, null, "Master standard entry not found");
-            }
 
             return ResultWithDataDto<List<MasterStandardEntry>>.Success(masterEntry);
         }
@@ -74,9 +68,7 @@ namespace HRRS.Services.Implementation
         {
             var entry = await _context.MasterStandardEntries.FindAsync(submissionCode);
             if (entry is null)
-            {
                 return ResultDto.Failure("Cannot find submission entry");
-            }
 
             entry.EntryStatus = EntryStatus.Pending;
             entry.UpdatedAt = DateTime.Now;
@@ -141,22 +133,16 @@ namespace HRRS.Services.Implementation
         {
 
             var entry = await _context.MasterStandardEntries.FindAsync(entryId);
-
             if (entry == null)
-            {
                 return ResultDto.Failure("Cannot find entry");
-            }
+            
             var healthFacility = await _context.HealthFacilities.FirstOrDefaultAsync(x => x.Id == facilityId);
             if (healthFacility is null)
-            {
                 return ResultDto.Failure("You are not allowed to preform this action");
-            }
+            
             var isAlreadyPending = await _context.MasterStandardEntries.Where(x => x.HealthFacilityId == healthFacility!.Id).AnyAsync(x => x.EntryStatus == EntryStatus.Pending);
             if (isAlreadyPending)
-            {
                 return ResultDto.Failure("You have alread a pending submission");
-            }
-
 
             entry.EntryStatus = EntryStatus.Pending;
             entry.UpdatedAt = DateTime.Now;
@@ -190,10 +176,7 @@ namespace HRRS.Services.Implementation
                 .Where(x => x.IsNewEntry);
 
             if (user.Role != null && user.Role.Title != Role.SuperAdmin)
-            {
-                var bedCount = user.Role.BedCount;
-                masterEntryQuery = masterEntryQuery.Where(x => x.HealthFacility.BedCount == bedCount);
-            }
+                masterEntryQuery = masterEntryQuery.Where(x => x.HealthFacility.BedCount == user.Role.BedCount);
 
             var masterEntries = await masterEntryQuery
                 .Select(x => new MasterStandardEntryDto
@@ -204,6 +187,7 @@ namespace HRRS.Services.Implementation
                     Remarks = x.Remarks,
                     SubmissionType = x.SubmissionType.Title,
                     SubmissionCode = x.SubmissionCode,
+                    SubmittedOn = x.UpdatedAt
                 }).ToListAsync();
 
             return ResultWithDataDto<List<MasterStandardEntryDto>>.Success(masterEntries);
@@ -218,10 +202,7 @@ namespace HRRS.Services.Implementation
                 .Where(x => x.IsNewEntry);
 
             if (user.Role != null && user.Role.Title != Role.SuperAdmin)
-            {
-                var bedCount = user.Role.BedCount;
-                masterEntryQuery = masterEntryQuery.Where(x => x.HealthFacility.BedCount == bedCount);
-            }
+                masterEntryQuery = masterEntryQuery.Where(x => x.HealthFacility.BedCount == user.Role.BedCount);
 
             var count = await masterEntryQuery.CountAsync();
             return ResultWithDataDto<int>.Success(count);

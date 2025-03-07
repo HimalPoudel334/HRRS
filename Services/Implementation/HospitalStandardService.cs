@@ -19,22 +19,15 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
     {
         var user = await _dbContext.Users.FindAsync((long) id); 
         if(user == null)
-        {
             return ResultDto.Failure("User not found");
-        }
 
         var healthFacility = await _dbContext.HealthFacilities.FindAsync(user.HealthFacilityId);
-
         if (healthFacility == null)
-        {
             ResultDto.Failure("Health Facility not found");
-        }
 
         var masterEntry = await _dbContext.MasterStandardEntries.FindAsync(dto.SubmissionCode);
         if (masterEntry == null)
-        {
             return ResultDto.Failure("Registrations type unknown for health facility");
-        }
 
         if(masterEntry.EntryStatus != EntryStatus.Draft)
             return ResultDto.Failure("You cannot add or update standards after submission!");
@@ -117,9 +110,9 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             {
                 Id = x.Id,
                 Remarks = x.Remarks,
-                Anusuchi = x.HospitalStandards.First().Mapdanda.Anusuchi.Name,
-                Parichhed = x.HospitalStandards.First().Mapdanda.Parichhed != null ? x.HospitalStandards.First().Mapdanda.Parichhed!.Name : "",
-                SubParichhed = x.HospitalStandards.First().Mapdanda.SubParichhed != null ? x.HospitalStandards.First().Mapdanda.SubParichhed!.Name : ""
+                Anusuchi = x.HospitalStandards.First().Mapdanda.Anusuchi.SerialNo,
+                Parichhed = x.HospitalStandards.First().Mapdanda.Parichhed != null ? x.HospitalStandards.First().Mapdanda.Parichhed!.SerialNo : "",
+                SubParichhed = x.HospitalStandards.First().Mapdanda.SubParichhed != null ? x.HospitalStandards.First().Mapdanda.SubParichhed!.SerialNo : ""
             }).ToListAsync();
 
         return new ResultWithDataDto<List<HospitalEntryDto>>(true, res, null);
@@ -137,9 +130,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
     {
         var entry = await _dbContext.HospitalStandardEntrys.FirstOrDefaultAsync(x => x.Id == entryId);
         if(entry is null)
-        {
             return ResultWithDataDto<HospitalEntryDto>.Failure("Entry not found");
-        }
+        
         var dto = new HospitalEntryDto
         {
             Id = entry.Id,
@@ -200,14 +192,10 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
     {
         var masterEntry = await _dbContext.MasterStandardEntries.FirstOrDefaultAsync(x => x.SubmissionCode == dto.SubmissionCode && x.HealthFacilityId == id);
         if (masterEntry is null)
-        {
             return ResultDto.Failure("Entry not found for hospital");
-        }
 
         if (masterEntry.EntryStatus != EntryStatus.Draft)
-        {
             return ResultDto.Failure("You have already submitted. You cannot edit now!");
-        }
 
         bool success = await Up(dto);
 

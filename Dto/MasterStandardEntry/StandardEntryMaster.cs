@@ -14,6 +14,7 @@ namespace HRRS.Dto.MasterStandardEntry
         public string SubmissionType { get; set; }
         public ApprovalStatus? Decision { get; set; }
         public bool HasNewSubmission { get; set; }
+        public DateTime? SubmittedOn { get; set; }
     }
 
     public class SubmissionTypeDto 
