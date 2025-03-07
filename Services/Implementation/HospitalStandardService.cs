@@ -21,7 +21,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             return ResultDto.Failure("User not found");
 
         var healthFacility = await _dbContext.HealthFacilities.FindAsync(user.HealthFacilityId);
-
         if (healthFacility == null)
             ResultDto.Failure("Health Facility not found");
 
@@ -117,7 +116,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             {
                 Id = x.Id,
                 Remarks = x.Remarks,
-                Anusuchi = x.HospitalStandards.First().Mapdanda.MapdandaTable.Anusuchi.Name,
+                Anusuchi = x.HospitalStandards.First().Mapdanda.MapdandaTable.Anusuchi.SerialNo,
                 Parichhed = x.HospitalStandards.First().Mapdanda.MapdandaTable.Parichhed != null ? x.HospitalStandards.First().Mapdanda.MapdandaTable.Parichhed!.SerialNo : "",
                 SubParichhed = x.HospitalStandards.First().Mapdanda.MapdandaTable.SubParichhed != null ? x.HospitalStandards.First().Mapdanda.MapdandaTable.SubParichhed!.SerialNo : ""
             }).ToListAsync();
@@ -239,6 +238,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 standard.UpdatedAt = DateTime.Now;
             }
         }
+
+        mas.StandardEntry.MasterStandardEntry.IsNewEntry = false;
 
         await _dbContext.SaveChangesAsync();
         return ResultDto.Success();

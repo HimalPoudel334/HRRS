@@ -8,11 +8,13 @@ namespace HRRS.Dto.MasterStandardEntry
     {
         public Guid SubmissionCode { get; set; }
         public int HealthFacilityId { get; set; }
+        public string? HealthFacility { get; set; }
         public EntryStatus EntryStatus { get; set; }
         public string? Remarks { get; set; }
         public string SubmissionType { get; set; }
         public ApprovalStatus? Decision { get; set; }
         public bool HasNewSubmission { get; set; }
+        public DateTime? SubmittedOn { get; set; }
     }
 
     public class SubmissionTypeDto 

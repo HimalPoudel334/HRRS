@@ -30,9 +30,7 @@ namespace HRRS.Services.Implementation
 
             var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId);
             if(user!.Role is not null && user!.Role.Title != Role.SuperAdmin)
-            {
                 requestQuery = requestQuery.Where(x => x.HealthFacility.BedCount == user.Role.BedCount);
-            }
 
             var requests = await requestQuery
                 .OrderByDescending(x => x.CreatedAt)
@@ -46,7 +44,8 @@ namespace HRRS.Services.Implementation
                 FacilityId = x.HealthFacility.Id,
                 FacilityName = x.HealthFacility.FacilityName,
                 Status = x.Status,
-                BedCount = x.HealthFacility.BedCount
+                BedCount = x.HealthFacility.BedCount,
+                Remarks = x.Remarks
             }).ToListAsync();
 
             return ResultWithDataDto<List<RegistrationRequestDto?>>.Success(requests);
@@ -71,6 +70,7 @@ namespace HRRS.Services.Implementation
                     UpdatedAt = x.UpdatedAt,
                     HandledBy = x.HandledBy != null ? x.HandledBy.UserName : null,
                     HandledById = x.HandledById,
+                    Remarks = x.Remarks,
                     HealthFacility = new RegisterFacilityDto
                     {
                         FacilityName = x.HealthFacility.FacilityName,
@@ -91,7 +91,6 @@ namespace HRRS.Services.Implementation
                         PhoneNumber = x.HealthFacility.PhoneNumber
                     },
                     Status = x.Status,
-                    Remarks = x.Remarks
 
                 })
                 .FirstOrDefaultAsync(x => x.Id == id);

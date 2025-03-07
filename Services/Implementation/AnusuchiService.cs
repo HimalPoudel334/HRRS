@@ -110,7 +110,7 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
             .FirstOrDefaultAsync(x => x.SubmissionTypeId == masterEntry.SubmissionTypeId
                 && x.FacilityTypeId == healthFacility.FacilityTypeId);
         if (anusuchiMapping == null)
-            return ResultWithDataDto<List<AnusuchiDto>>.Failure("Anusuchi Mapping not found");
+            return ResultWithDataDto<List<AnusuchiDto>>.Failure("अनुसूची फेला परेन।");
 
         var anusuchisMapped = await _dbContext.AnusuchiMapdandaTableMappings
             .Include(x => x.Anusuchi)
