@@ -12,10 +12,7 @@ namespace HRRS.Services.Implementation
     {
         private readonly ApplicationDbContext _context;
 
-        public MasterStandardEntryService(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        public MasterStandardEntryService(ApplicationDbContext context) => _context = context;
 
         public async Task<ResultWithDataDto<string>> Create(SubmissionTypeDto dto, int healthFacilityId)
         {
@@ -42,26 +39,55 @@ namespace HRRS.Services.Implementation
 
             return ResultWithDataDto<string>.Success(masterEntry.SubmissionCode.ToString());
         }
-        public async Task<ResultWithDataDto<List<MasterStandardEntry>>> GetByHospitalId(int healthFacilityId)
+
+        public async Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetByHospitalId(int healthFacilityId)
         {
-            var masterEntry = await _context.MasterStandardEntries
-                .Where(m => m.HealthFacilityId == healthFacilityId).Where(x => x.EntryStatus != EntryStatus.Draft).OrderByDescending(x => x.CreatedAt).ToListAsync();
+            var masterEntry = await _context
+                .MasterStandardEntries
+                .Where(m => m.HealthFacilityId == healthFacilityId)
+                .Where(x => x.EntryStatus != EntryStatus.Draft)
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new MasterStandardEntryDto
+                {
+                    HealthFacility = x.HealthFacility.FacilityName,
+                    HealthFacilityId = x.HealthFacilityId,
+                    EntryStatus = x.EntryStatus,
+                    Remarks = x.Remarks,
+                    SubmissionType = x.SubmissionType.Title,
+                    SubmissionCode = x.SubmissionCode,
+                    SubmittedOn = x.UpdatedAt
+                })
+                .ToListAsync();
 
             if (masterEntry is null)
-                return new ResultWithDataDto<List<MasterStandardEntry>>(false, null, "Master standard entry not found");
+                return new ResultWithDataDto<List<MasterStandardEntryDto>>(false, null, "Master standard entry not found");
 
-            return ResultWithDataDto<List<MasterStandardEntry>>.Success(masterEntry);
+            return ResultWithDataDto<List<MasterStandardEntryDto>>.Success(masterEntry);
         }
 
-        public async Task<ResultWithDataDto<List<MasterStandardEntry>>> GetByUserHospitalId(int healthFacilityId)
+        public async Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetByUserHospitalId(int healthFacilityId)
         {
-            var masterEntry = await _context.MasterStandardEntries
-                .Where(m => m.HealthFacilityId == healthFacilityId).OrderByDescending(x => x.CreatedAt).ToListAsync();
+            var masterEntry = await _context
+                .MasterStandardEntries
+                .Include(x => x.SubmissionType)
+                .Where(m => m.HealthFacilityId == healthFacilityId)
+                .OrderByDescending(x => x.CreatedAt)
+                .Select(x => new MasterStandardEntryDto
+                {
+                    HealthFacility = x.HealthFacility.FacilityName,
+                    HealthFacilityId = x.HealthFacilityId,
+                    EntryStatus = x.EntryStatus,
+                    Remarks = x.Remarks,
+                    SubmissionType = x.SubmissionType.Title,
+                    SubmissionCode = x.SubmissionCode,
+                    SubmittedOn = x.UpdatedAt
+                })
+                .ToListAsync();
 
             if (masterEntry is null)
-                return new ResultWithDataDto<List<MasterStandardEntry>>(false, null, "Master standard entry not found");
+                return new ResultWithDataDto<List<MasterStandardEntryDto>>(false, null, "Master standard entry not found");
 
-            return ResultWithDataDto<List<MasterStandardEntry>>.Success(masterEntry);
+            return ResultWithDataDto<List<MasterStandardEntryDto>>.Success(masterEntry);
         }
 
         public async Task<ResultDto> UserFinalSubmission(Guid submissionCode)
@@ -156,9 +182,24 @@ namespace HRRS.Services.Implementation
 
         }
 
-        public async Task<ResultWithDataDto<MasterStandardEntry>> GetMasterEntryById(Guid submissionCode)
+        public async Task<ResultWithDataDto<MasterStandardEntryDto>> GetMasterEntryById(Guid submissionCode)
         {
-            return ResultWithDataDto<MasterStandardEntry>.Success(await _context.MasterStandardEntries.FindAsync(submissionCode));
+            var entryDto = await _context
+                .MasterStandardEntries.
+                Include(x => x.SubmissionType)
+                .Select(x => new MasterStandardEntryDto
+                {
+                    HealthFacility = x.HealthFacility.FacilityName,
+                    HealthFacilityId = x.HealthFacilityId,
+                    EntryStatus = x.EntryStatus,
+                    Remarks = x.Remarks,
+                    SubmissionType = x.SubmissionType.Title,
+                    SubmissionCode = x.SubmissionCode,
+                    SubmittedOn = x.UpdatedAt
+                })
+                .FirstOrDefaultAsync(x => x.SubmissionCode == submissionCode);
+
+            return ResultWithDataDto<MasterStandardEntryDto>.Success(entryDto);
         }
 
         public async Task<ResultWithDataDto<List<SubmissionType>>> GetAllSubmissionTypes()
