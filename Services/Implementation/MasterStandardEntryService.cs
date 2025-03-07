@@ -180,5 +180,54 @@ namespace HRRS.Services.Implementation
             var submissionTypes = await _context.SubmissionTypes.ToListAsync();
             return ResultWithDataDto<List<SubmissionType>>.Success(submissionTypes);
         }
+
+        public async Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetAllNewSubmission(long userId)
+        {
+            var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId);
+            if (user == null || user.UserType == "Hospital") return ResultWithDataDto<List<MasterStandardEntryDto>>.Failure("User not found");
+
+            var masterEntryQuery = _context.MasterStandardEntries
+                .Where(x => x.IsNewEntry);
+
+            if (user.Role != null && user.Role.Title != Role.SuperAdmin)
+            {
+                var bedCount = user.Role.BedCount;
+                masterEntryQuery = masterEntryQuery.Where(x => x.HealthFacility.BedCount == bedCount);
+            }
+
+            var masterEntries = await masterEntryQuery
+                .Select(x => new MasterStandardEntryDto
+                {
+                    HealthFacility = x.HealthFacility.FacilityName,
+                    HealthFacilityId = x.HealthFacilityId,
+                    EntryStatus = x.EntryStatus,
+                    Remarks = x.Remarks,
+                    SubmissionType = x.SubmissionType.Title,
+                    SubmissionCode = x.SubmissionCode,
+                }).ToListAsync();
+
+            return ResultWithDataDto<List<MasterStandardEntryDto>>.Success(masterEntries);
+        }
+
+        public async Task<ResultWithDataDto<int>> GetNewSubmissionCount(long userId)
+        {
+            var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId);
+            if (user == null || user.UserType == "Hospital") return ResultWithDataDto<int>.Failure("User not found");
+
+            var masterEntryQuery = _context.MasterStandardEntries
+                .Where(x => x.IsNewEntry);
+
+            if (user.Role != null && user.Role.Title != Role.SuperAdmin)
+            {
+                var bedCount = user.Role.BedCount;
+                masterEntryQuery = masterEntryQuery.Where(x => x.HealthFacility.BedCount == bedCount);
+            }
+
+            var count = await masterEntryQuery.CountAsync();
+            return ResultWithDataDto<int>.Success(count);
+        }
+
+
+
     }
 }

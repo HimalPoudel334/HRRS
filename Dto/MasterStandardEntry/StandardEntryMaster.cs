@@ -8,6 +8,7 @@ namespace HRRS.Dto.MasterStandardEntry
     {
         public Guid SubmissionCode { get; set; }
         public int HealthFacilityId { get; set; }
+        public string? HealthFacility { get; set; }
         public EntryStatus EntryStatus { get; set; }
         public string? Remarks { get; set; }
         public string SubmissionType { get; set; }

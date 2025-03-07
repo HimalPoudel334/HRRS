@@ -131,8 +131,15 @@ public static class Endpoints
 
         //submission type
         endpoints.MapGet("api/submissiontype", async (IMasterStandardEntryService service) => TypedResults.Ok(await service.GetAllSubmissionTypes())).RequireAuthorization();
+
+        // all new submissions
+        endpoints.MapGet("api/submission/new", async (IMasterStandardEntryService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetAllNewSubmission(long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier)?.Trim() ?? "0")))).RequireAuthorization();
         
-        
+        //new submission count
+        endpoints.MapGet("api/submission/count", async (IMasterStandardEntryService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetNewSubmissionCount(long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier)?.Trim() ?? "0")))).RequireAuthorization();
+
+
+
         return endpoints;
 
     }

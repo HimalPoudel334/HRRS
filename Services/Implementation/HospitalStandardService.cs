@@ -242,6 +242,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             }
         }
 
+        mas.StandardEntry.MasterStandardEntry.IsNewEntry = false;
+
         await _dbContext.SaveChangesAsync();
         return ResultDto.Success();
     }
