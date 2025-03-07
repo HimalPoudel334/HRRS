@@ -4,12 +4,11 @@ using HRRS.Persistence.Entities;
 
 public class Mapdanda
 {
-
     public int  Id { get; set; }
+    public int OrderNo { get; set; }
     public string SerialNumber { get; set; }
     public string Name { get; set; }
     public string? Parimaad { get; set; }
-    public string? Group { get; set; }
     public bool IsAvailableDivided { get; set; }
     public bool Is25Active { get; set; }
     public bool Is50Active { get; set; }
@@ -30,19 +29,13 @@ public class Mapdanda
     public string? Col8 { get; set; }
     public string? Col9 { get; set; }
     public bool Status { get; set; } = true;
-    public int AnusuchiId { get; set; }
-    public Anusuchi Anusuchi { get; set; }
-
-    public int? ParichhedId { get; set; }
-    public Parichhed? Parichhed { get; set; }
-
-    public int? SubParichhedId { get; set; }
-    public SubParichhed? SubParichhed { get; set; }
-
-    public int? SubSubParichhedId { get; set; }
-    public SubSubParichhed? SubSubParichhed { get; set; }
     public FormType FormType { get; set; }
-    public int TableNumber { get; set; }
+    public int MapdandaTableId { get; set; }
+    public MapdandaTable MapdandaTable { get; set; }
+    public bool IsGroup { get; set; } = false;
+    public bool IsSubGroup { get; set; } = false;
+    public bool IsSection { get; set; } = false;
+    public bool HasGroup { get; set; } = false;
 
     public ICollection<SubMapdanda> SubMapdandas { get; set; }
 

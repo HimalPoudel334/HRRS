@@ -34,6 +34,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<SubmissionType> SubmissionTypes { get; set; }
     public DbSet<AnusuchiMapping> AnusuchiMappings { get; set; }
     public DbSet<AnusuchiMapdandaTableMapping> AnusuchiMapdandaTableMappings { get; set; }
+    public DbSet<MapdandaTable> MapdandaTables { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
@@ -248,6 +249,7 @@ public class ApplicationDbContext : DbContext
                 context.SaveChanges();
             }
 
+            /*
             var mapdanda = context.Set<Mapdanda>().FirstOrDefault();
             if (mapdanda is null)
             {
@@ -312,6 +314,7 @@ public class ApplicationDbContext : DbContext
                 context.Set<Mapdanda>().AddRange(mapdandas);
                 context.SaveChanges();
             }
+            */
 
         }).UseAsyncSeeding(async (context, _, cancellationToken) =>
         {
@@ -514,7 +517,7 @@ public class ApplicationDbContext : DbContext
                 await context.SaveChangesAsync(cancellationToken);
             }
 
-            var mapdanda = context.Set<Mapdanda>().FirstOrDefaultAsync(cancellationToken);
+            /*var mapdanda = context.Set<Mapdanda>().FirstOrDefaultAsync(cancellationToken);
             if (mapdanda is null)
             {
                 List<Mapdanda> mapdandas = [
@@ -581,6 +584,7 @@ public class ApplicationDbContext : DbContext
                 await context.Set<Mapdanda>().AddRangeAsync(mapdandas, cancellationToken);
                 await context.SaveChangesAsync(cancellationToken);
             }
+            */
         });
     
 

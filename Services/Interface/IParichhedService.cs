@@ -25,6 +25,5 @@ public interface IParichhedService
 
     /* mapdandas insides of anusuchis, parichheds, subparichheds, subsubparichheds */
     Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetMapdandasOfSubParichhed(int subParichhedId);
-    Task<ResultWithDataDto<List<Mapdanda>>> GetMapdandasOfSubSubParichhed(int subSubParichhedId);
 
 }

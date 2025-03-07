@@ -111,18 +111,20 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
     public async Task<ResultWithDataDto<List<HospitalEntryDto>>> GetStandardEntries(Guid submissionCode)
     {
-        var res = await _dbContext.HospitalStandardEntrys
-            .Where(x => x.MasterStandardEntry.SubmissionCode == submissionCode)
-            .Select(x => new HospitalEntryDto
-            {
-                Id = x.Id,
-                Remarks = x.Remarks,
-                Anusuchi = x.HospitalStandards.First().Mapdanda.Anusuchi.Name,
-                Parichhed = x.HospitalStandards.First().Mapdanda.Parichhed != null ? x.HospitalStandards.First().Mapdanda.Parichhed!.Name : "",
-                SubParichhed = x.HospitalStandards.First().Mapdanda.SubParichhed != null ? x.HospitalStandards.First().Mapdanda.SubParichhed!.Name : ""
-            }).ToListAsync();
+        //var res = await _dbContext.HospitalStandardEntrys
+        //    .Where(x => x.MasterStandardEntry.SubmissionCode == submissionCode)
+        //    .Select(x => new HospitalEntryDto
+        //    {
+        //        Id = x.Id,
+        //        Remarks = x.Remarks,
+        //        Anusuchi = x.HospitalStandards.First().Mapdanda.Anusuchi.Name,
+        //        Parichhed = x.HospitalStandards.First().Mapdanda.Parichhed != null ? x.HospitalStandards.First().Mapdanda.Parichhed!.Name : "",
+        //        SubParichhed = x.HospitalStandards.First().Mapdanda.SubParichhed != null ? x.HospitalStandards.First().Mapdanda.SubParichhed!.Name : ""
+        //    }).ToListAsync();
 
-        return new ResultWithDataDto<List<HospitalEntryDto>>(true, res, null);
+        //return new ResultWithDataDto<List<HospitalEntryDto>>(true, res, null);
+
+        throw new NotImplementedException();
     }
 
     public async Task<ResultWithDataDto<List<HospitalStandard>>> GetStandards(int entryId)
@@ -151,7 +153,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
     public async Task<ResultWithDataDto<List<HospitalStandardModel>>> AdminGetHospitalStandardForEntry(int entryId)
     {
-        var bedCount = (await _dbContext.HospitalStandardEntrys.Include(x => x.MasterStandardEntry).FirstOrDefaultAsync(x => x.Id == entryId))?.MasterStandardEntry.BedCount;
+        /*var bedCount = (await _dbContext.HospitalStandardEntrys.Include(x => x.MasterStandardEntry).FirstOrDefaultAsync(x => x.Id == entryId))?.MasterStandardEntry.BedCount;
 
         if (bedCount is null)
             return ResultWithDataDto<List<HospitalStandardModel>>.Failure("Health faciltiy not found");
@@ -193,7 +195,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             })
         .ToListAsync();
 
-        return new ResultWithDataDto<List<HospitalStandardModel>>(true, standards, null);
+        return new ResultWithDataDto<List<HospitalStandardModel>>(true, standards, null);*/
+        throw new NotImplementedException();
     }
 
     public async Task<ResultDto> Update(HospitalStandardDto dto, int id)
@@ -269,16 +272,25 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
     {
         var healthFacility = await _dbContext.HealthFacilities.FindAsync(healthFacilityId);
         if (healthFacility is null)
-        {
             return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Failure("Health Facility not found");
 
-        }
         int bedCount = healthFacility.BedCount;
 
         var existing = _dbContext.HospitalStandards.Where(x => x.StandardEntry.MasterStandardEntry.SubmissionCode == submissionCode);
-        if (dto.AnusuchiId.HasValue) existing = existing.Where(x => x.Mapdanda.AnusuchiId == dto.AnusuchiId.Value && x.Mapdanda.ParichhedId == null);
-        if (dto.ParichhedId.HasValue) existing = existing.Where(x => x.Mapdanda.ParichhedId == dto.ParichhedId.Value && x.Mapdanda.SubParichhedId == null);
-        if (dto.SubParichhedId.HasValue) existing = existing.Where(x => x.Mapdanda.SubParichhedId == dto.SubParichhedId.Value);
+        if (dto.AnusuchiId.HasValue) existing = existing.Where(x => x.Mapdanda.MapdandaTable.AnusuchiId == dto.AnusuchiId.Value && x.Mapdanda.MapdandaTable.ParichhedId == null);
+        if (dto.ParichhedId.HasValue) existing = existing.Where(x => x.Mapdanda.MapdandaTable.ParichhedId == dto.ParichhedId.Value && x.Mapdanda.MapdandaTable.SubParichhedId == null);
+        if (dto.SubParichhedId.HasValue) existing = existing.Where(x => x.Mapdanda.MapdandaTable.SubParichhedId == dto.SubParichhedId.Value);
+
+        if(existing.Any())
+        {
+            var res = await existing
+                .Select(x => new HospitalStandardTableDto
+                {
+                    Id = x.Id,
+                    FormType = x.Mapdanda.MapdandaTable.FormType,
+                    Mapdandas = 
+                }).ToListAsync();
+        }
 
 
         if (existing.Any())
@@ -366,7 +378,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
            })
            .ToList();
 
-        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(mapdandas);
+        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(mapdandas);*/
+        throw new NotImplementedException();
     }
 
 

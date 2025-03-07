@@ -363,59 +363,7 @@ public class ParichhedService : IParichhedService
 
     public async Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetMapdandasOfSubParichhed(int subParichhedId)
     {
-        var map = await _context.Mapdandas
-            .Include(x => x.SubSubParichhed)
-            .Where(x => x.SubParichhedId == subParichhedId)
-            .ToListAsync();
-
-
-        var res = map
-            .GroupBy(m => m.SubSubParichhed)
-            .Select(m => new GroupedSubSubParichhedAndMapdanda
-            {
-                HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
-                SubSubParixed = m.Key?.Name,
-                List = m
-                .GroupBy(m => m.Group)
-                .Select(m => new GroupedMapdandaByGroupName
-                {
-                    GroupName = m.Key,
-                    GroupedMapdanda = m.Select( m => new GroupedAdminMapdanda
-                    {
-                        Id = m.Id,
-                        Name = m.Name,
-                        SerialNumber = m.SerialNumber,
-                        Is100Active = m.Is100Active,
-                        Is200Active = m.Is200Active,
-                        Is50Active = m.Is50Active,
-                        Is25Active = m.Is25Active,
-                        Value25 = m.Value25,
-                        Value50 = m.Value50,
-                        Value100 = m.Value100,
-                        Value200 = m.Value200,
-                        FormType = m.FormType,
-                        Status = m.Status,
-                        Parimaad = m.Parimaad,
-                        Group = m.Group,
-                        IsAvailableDivided = m.IsAvailableDivided,
-                    }).ToList()
-
-                }).ToList()
-            })
-            .ToList();
-
-        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(res);
-
-    }
-
-
-
-    public async Task<ResultWithDataDto<List<Mapdanda>>> GetMapdandasOfSubSubParichhed(int subSubParichhedId)
-    {
-        var map = await _context.Mapdandas
-            .Where(x => x.SubSubParichhedId != subSubParichhedId).ToListAsync();
-
-        return new ResultWithDataDto<List<Mapdanda>>(true, map, null);
+        throw new NotImplementedException();
     }
 
 }

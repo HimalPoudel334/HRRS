@@ -5,7 +5,7 @@ using HRRS.Dto.HealthStandard;
 namespace HRRS.Services.Interface;
 public interface IMapdandaService
 {
-    Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetAdminMapdandas(HospitalStandardQueryParams dto);
+    Task<ResultWithDataDto<List<MapdandaTableDto>>> GetAdminMapdandas(HospitalStandardQueryParams dto);
     Task<ResultDto> Add(MapdandaDto dto);
     Task<ResultDto> UpdateMapdanda(int mapdandaId, MapdandaDto dto);
     Task<ResultDto> ToggleStatus(int mapdandaId);

@@ -14,6 +14,7 @@ using HRRS.Dto.Parichhed;
 public class MapdandaDto
 {
     public int Id { get; set; }
+    public int OrderNo { get; set; }
     public string SerialNumber { get; set; }
     public string Name { get; set; }
     public string? Parimaad { get; set; }
@@ -42,8 +43,10 @@ public class MapdandaDto
     public string? Group { get; set; }
     public int? ParichhedId { get; set; }
     public int? SubParichhedId { get; set; }
-    public SubSubParichhedDto SubSubParichhed { get; set; }
-    public int? SubSubParichhedId { get; set; }
+    public bool IsGroup { get; set; } = false;
+    public bool IsSubGroup { get; set; } = false;
+    public bool IsSection { get; set; } = false;
+    public bool HasGroup { get; set; } = false;
 
 }
 
@@ -58,3 +61,18 @@ public class SubMapdandaDto
     public string? Group { get; set; }
 
 }
+
+public class MapdandaTableDto
+{
+    public int Id { get; set; }
+    public string? TableName { get; set; }
+    public int TableNumber { get; set; }
+    public int AnusuchiId { get; set; }
+    public int? ParichhedId { get; set; }
+    public int? SubParichhedId { get; set; }
+    public string? Description { get; set; }
+    public string? Note { get; set; }
+    public FormType FormType { get; set; }
+    public ICollection<MapdandaDto> Mapdandas { get; set; } = [];
+}
+

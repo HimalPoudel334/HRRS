@@ -15,5 +15,6 @@
         public string? Note { get; set; }
         public FormType FormType { get; set; }
         public ICollection<AnusuchiMapping> AnusuchiMappings { get; set; } = [];
+        public ICollection<Mapdanda> Mapdandas { get; set; } = [];
     }
 }

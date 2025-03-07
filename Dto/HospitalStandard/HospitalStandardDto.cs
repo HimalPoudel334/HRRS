@@ -100,3 +100,17 @@ public class StandardApprovalDto
     public bool IsApproved { get; set; }
     public string? Remarks { get; set; }
 }
+
+public class HospitalStandardTableDto
+{
+    public int Id { get; set; }
+    public string? TableName { get; set; }
+    public int TableNumber { get; set; }
+    public int AnusuchiId { get; set; }
+    public int? ParichhedId { get; set; }
+    public int? SubParichhedId { get; set; }
+    public string? Description { get; set; }
+    public string? Note { get; set; }
+    public FormType FormType { get; set; }
+    public ICollection<MapdandaModel> Mapdandas { get; set; } = [];
+}
