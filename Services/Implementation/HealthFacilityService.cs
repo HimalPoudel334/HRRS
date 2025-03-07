@@ -12,10 +12,12 @@ namespace HRRS.Services.Implementation
     public class HealthFacilityService : IHealthFacilityService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFileUploadService _fileService;
 
-        public HealthFacilityService(ApplicationDbContext context)
+        public HealthFacilityService(ApplicationDbContext context, IFileUploadService fileService)
         {
             _context = context;
+            _fileService = fileService;
         }
 
         public async Task<ResultWithDataDto<HealthFacilityDto>> GetById(int id)
@@ -48,7 +50,7 @@ namespace HRRS.Services.Implementation
                 Tole = healthFacility.Tole,
                 Latitude = healthFacility.Latitude,
                 Longitude = healthFacility.Longitude,
-                FilePath = healthFacility.FilePath,
+                FilePath = healthFacility.FilePath != null ? _fileService.GetHealthFacilityFilePath(healthFacility.FilePath) : null,
                 DateOfInspection = healthFacility.DateOfInspection,
                 FacilityEmail = healthFacility.FacilityEmail,
                 FacilityPhoneNumber = healthFacility.FacilityPhoneNumber,
@@ -129,7 +131,7 @@ namespace HRRS.Services.Implementation
                         Tole = facility.Tole,
                         Latitude = facility.Latitude,
                         Longitude = facility.Longitude,
-                        FilePath = facility.FilePath,
+                        FilePath = facility.FilePath != null ? _fileService.GetHealthFacilityFilePath(facility.FilePath) : null,
                         DateOfInspection = facility.DateOfInspection,
                         FacilityEmail = facility.FacilityEmail,
                         FacilityPhoneNumber = facility.FacilityPhoneNumber,
@@ -197,7 +199,7 @@ namespace HRRS.Services.Implementation
                     Tole = facility.Tole,
                     Latitude = facility.Latitude,
                     Longitude = facility.Longitude,
-                    FilePath = facility.FilePath,
+                    FilePath = facility.FilePath != null ? _fileService.GetHealthFacilityFilePath(facility.FilePath) : null,
                     DateOfInspection = facility.DateOfInspection,
                     FacilityEmail = facility.FacilityEmail,
                     FacilityPhoneNumber = facility.FacilityPhoneNumber,
@@ -259,7 +261,7 @@ namespace HRRS.Services.Implementation
                 Tole = facility.Tole,
                 Latitude = facility.Latitude,
                 Longitude = facility.Longitude,
-                FilePath = facility.FilePath,
+                FilePath = facility.FilePath != null ? _fileService.GetHealthFacilityFilePath(facility.FilePath) : null,
                 DateOfInspection = facility.DateOfInspection,
                 FacilityEmail = facility.FacilityEmail,
                 FacilityPhoneNumber = facility.FacilityPhoneNumber,
