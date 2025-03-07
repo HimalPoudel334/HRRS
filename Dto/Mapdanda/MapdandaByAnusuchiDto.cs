@@ -48,11 +48,14 @@ namespace HRRS.Dto.Mapdanda
         public string? Value { get; set; }
         public bool IsAvailableDivided { get; set; }
         public bool Status { get; set; }
-        public string? Group { get; set; }
         public bool? IsAvailable { get; set; }
         public string? FilePath { get; set; }
         public string? Remarks { get; set; }
         public bool? IsApproved { get; set; }
+        public bool IsGroup { get; set; }
+        public bool IsSubGroup { get; set; }
+        public bool IsSection { get; set; }
+        public bool HasGroup { get; set; }
 
     }
 

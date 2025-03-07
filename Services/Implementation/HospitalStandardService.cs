@@ -153,12 +153,12 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
     public async Task<ResultWithDataDto<List<HospitalStandardModel>>> AdminGetHospitalStandardForEntry(int entryId)
     {
-        /*var bedCount = (await _dbContext.HospitalStandardEntrys.Include(x => x.MasterStandardEntry).FirstOrDefaultAsync(x => x.Id == entryId))?.MasterStandardEntry.BedCount;
+        var bedCount = (await _dbContext.HospitalStandardEntrys.Include(x => x.MasterStandardEntry).FirstOrDefaultAsync(x => x.Id == entryId))?.MasterStandardEntry.BedCount;
 
         if (bedCount is null)
             return ResultWithDataDto<List<HospitalStandardModel>>.Failure("Health faciltiy not found");
 
-        var standards = await _dbContext.HospitalStandards
+        /*var standards = await _dbContext.HospitalStandards
             .AsSplitQuery()
             .Where(x => x.StandardEntryId == entryId)
             .GroupBy(m => m.Mapdanda.SubSubParichhed)
@@ -268,118 +268,100 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         return true;
     }
 
-    public async Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetHospitalStandardForEntry(Guid submissionCode, HospitalStandardQueryParams dto, int healthFacilityId)
+    public async Task<ResultWithDataDto<HospitalStandardTableDto>> GetHospitalStandardForEntry(Guid submissionCode, HospitalStandardQueryParams dto, int healthFacilityId)
     {
         var healthFacility = await _dbContext.HealthFacilities.FindAsync(healthFacilityId);
-        if (healthFacility is null)
-            return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Failure("Health Facility not found");
+        if (healthFacility is null) return ResultWithDataDto<HospitalStandardTableDto>.Failure("Health Facility not found");
 
         int bedCount = healthFacility.BedCount;
-
-        var existing = _dbContext.HospitalStandards.Where(x => x.StandardEntry.MasterStandardEntry.SubmissionCode == submissionCode);
+        
+        var existing = _dbContext.HospitalStandards.Include(x => x.Mapdanda).Where(x => x.StandardEntry.MasterStandardEntry.SubmissionCode == submissionCode);
         if (dto.AnusuchiId.HasValue) existing = existing.Where(x => x.Mapdanda.MapdandaTable.AnusuchiId == dto.AnusuchiId.Value && x.Mapdanda.MapdandaTable.ParichhedId == null);
         if (dto.ParichhedId.HasValue) existing = existing.Where(x => x.Mapdanda.MapdandaTable.ParichhedId == dto.ParichhedId.Value && x.Mapdanda.MapdandaTable.SubParichhedId == null);
         if (dto.SubParichhedId.HasValue) existing = existing.Where(x => x.Mapdanda.MapdandaTable.SubParichhedId == dto.SubParichhedId.Value);
 
         if(existing.Any())
         {
+            var mapdandaTable = (await existing.FirstAsync()).Mapdanda.MapdandaTable;
+            
             var res = await existing
-                .Select(x => new HospitalStandardTableDto
+                .OrderBy(x => x.Mapdanda.OrderNo)
+                .Select(m => new GroupedMapdanda
                 {
-                    Id = x.Id,
-                    FormType = x.Mapdanda.MapdandaTable.FormType,
-                    Mapdandas = 
-                }).ToListAsync();
+                    Id = m.MapdandaId,
+                    EntryId = m.Id,
+                    Name = m.Mapdanda.Name,
+                    SerialNumber = m.Mapdanda.SerialNumber,
+                    IsAvailable = m.IsAvailable,
+                    FilePath = m.FilePath,
+                    IsActive = determineActive(bedCount, m.Mapdanda.Is25Active, m.Mapdanda.Is50Active, m.Mapdanda.Is100Active, m.Mapdanda.Is200Active),
+                    Status = m.Status,
+                    Remarks = m.Remarks,
+                    IsApproved = m.IsApproved,
+                    IsGroup = m.Mapdanda.IsGroup,
+                    IsSubGroup = m.Mapdanda.IsSubGroup,
+                    IsSection = m.Mapdanda.IsSection,
+                    HasGroup = m.Mapdanda.HasGroup,
+                    Value = determineValue(bedCount, m.Mapdanda.FormType, m.Mapdanda.Value25, m.Mapdanda.Value50, m.Mapdanda.Value100, m.Mapdanda.Value200),
+
+                })
+                .ToListAsync();
+
+            var dtos = new HospitalStandardTableDto()
+            {
+                Id = mapdandaTable.Id,
+                FormType = mapdandaTable.FormType,
+                TableName = mapdandaTable.TableName,
+                Description = mapdandaTable.Description,
+                Note = mapdandaTable.Note,
+                Mapdandas = res
+
+            };
+
+            return ResultWithDataDto<HospitalStandardTableDto>.Success(dtos);
         }
 
+        var mapdandaTableQuery = _dbContext.MapdandaTables.AsQueryable();
 
-        if (existing.Any())
-        {
-            var res = await existing
-                .AsSplitQuery()
-                .GroupBy(m => m.Mapdanda.SubSubParichhed)
-                .Select(m => new GroupedSubSubParichhedAndMapdanda
-                {
-                    AnusuchiId = m.First().Mapdanda.AnusuchiId,
-                    ParichhedId = m.First().Mapdanda.ParichhedId,
-                    SubParichhedId = m.First().Mapdanda.SubParichhedId,
-                    FormType = m.First().Mapdanda.FormType,
-                    HasBedCount = m.First().Mapdanda.IsAvailableDivided,
-                    SubSubParixed = m.Key != null ? m.Key.Name : null,
-                    List = m
-                        .GroupBy(m => m.Mapdanda.SerialNumber)
-                        .Select(m => new GroupedMapdandaByGroupName
-                        {
-                            SerialNumber = m.Key,
-                            GroupName = m.First().Mapdanda.Group,
-                            GroupedMapdanda = m.Select(m => new GroupedMapdanda
-                            {
-                                Id = m.MapdandaId,
-                                EntryId = m.Id,
-                                Name = m.Mapdanda.Name,
-                                SerialNumber = m.Mapdanda.SerialNumber,
-                                IsAvailable = m.IsAvailable,
-                                FilePath = m.FilePath,
-                                IsActive = determineActive(bedCount, m.Mapdanda.Is25Active, m.Mapdanda.Is50Active, m.Mapdanda.Is100Active, m.Mapdanda.Is200Active),
-                                Status = m.Status,
-                                Group = m.Mapdanda.Group,
-                                Remarks = m.Remarks,
-                                IsApproved = m.IsApproved
-                            }).ToList()
+        if (dto.AnusuchiId.HasValue) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.AnusuchiId == dto.AnusuchiId);
+        if (dto.ParichhedId.HasValue) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.ParichhedId == dto.ParichhedId);
+        if (dto.SubParichhedId.HasValue) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.SubParichhedId == dto.SubParichhedId);
 
-                        }).ToList()
-                }).ToListAsync();
-
-            return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(res);
-
-        }
+        if (bedCount <= 25) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is25Active));
+        if (bedCount <= 50) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is50Active));
+        if (bedCount <= 100) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is100Active));
+        if (bedCount <= 200) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is200Active));
 
 
-        var mapdandaQuery = _dbContext.Mapdandas.Where(x => x.Status).AsQueryable();
+        var mapdandaTables = await mapdandaTableQuery
+            .Select(x => new HospitalStandardTableDto
+            {
+                Id = x.Id,
+                TableName = x.TableName,
+                AnusuchiId = x.AnusuchiId,
+                ParichhedId = x.ParichhedId,
+                SubParichhedId = x.SubParichhedId,
+                Description = x.Description,
+                Note = x.Note,
+                FormType = x.FormType,
+                Mapdandas = x.Mapdandas
+                    .OrderBy(x => x.OrderNo)
+                    .Select(m => new GroupedMapdanda
+                    {
+                        Id = m.Id,
+                        Name = m.Name,
+                        SerialNumber = m.SerialNumber,
+                        IsActive = determineActive(bedCount, m.Is25Active, m.Is50Active, m.Is100Active, m.Is200Active),
+                        Status = m.Status,
+                        IsGroup = m.IsGroup,
+                        IsSubGroup = m.IsSubGroup,
+                        IsSection = m.IsSection,
+                        HasGroup = m.HasGroup,
+                        Value = determineValue(bedCount, m.FormType, m.Value25, m.Value50, m.Value100, m.Value200),
+                    }).ToList()
+            }).FirstAsync();
 
-        if(dto.AnusuchiId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.AnusuchiId == dto.AnusuchiId.Value && x.ParichhedId == null);
-        if(dto.ParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.ParichhedId == dto.ParichhedId.Value && x.SubParichhedId == null);
-        if(dto.SubParichhedId.HasValue) mapdandaQuery = mapdandaQuery.Where(x => x.SubParichhedId == dto.SubParichhedId.Value);
-        if(bedCount <= 25) mapdandaQuery = mapdandaQuery.Where(x => x.Is25Active);
-        if(bedCount <= 50) mapdandaQuery = mapdandaQuery.Where(x => x.Is50Active);
-        if(bedCount <= 100) mapdandaQuery = mapdandaQuery.Where(x => x.Is100Active);
-        if(bedCount <= 200) mapdandaQuery = mapdandaQuery.Where(x => x.Is200Active);
-
-        var mapdandas = (await mapdandaQuery.ToListAsync())
-           .GroupBy(m => m.SubSubParichhed)
-           .Select(m => new GroupedSubSubParichhedAndMapdanda
-           {
-               AnusuchiId = m.FirstOrDefault()?.AnusuchiId,
-               ParichhedId = m.FirstOrDefault()?.ParichhedId,
-               SubParichhedId = m.FirstOrDefault()?.SubParichhedId,
-               FormType = m.FirstOrDefault()?.FormType,
-               HasBedCount = m.FirstOrDefault()?.IsAvailableDivided,
-               SubSubParixed = m.Key?.Name,
-               List = [.. m
-               .GroupBy(m => m.SerialNumber)
-               .Select(m => new GroupedMapdandaByGroupName
-               {
-                   SerialNumber = m.Key,
-                   GroupName = m.First().Group,
-                   GroupedMapdanda = [.. m.Select(m => new GroupedMapdanda
-                   {
-                       Id = m.Id,
-                       Name = m.Name,
-                       SerialNumber = m.SerialNumber,
-                       IsActive = determineActive(bedCount, m.Is25Active, m.Is50Active, m.Is100Active, m.Is200Active),
-                       Value = determineValue(bedCount, m.FormType, m.Value25, m.Value50, m.Value100, m.Value200),
-                       Status = m.Status,
-                       Parimaad = m.Parimaad,
-                       Group = m.Group,
-                       IsAvailableDivided = m.IsAvailableDivided,
-                   })]
-
-               })]
-           })
-           .ToList();
-
-        return ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>.Success(mapdandas);*/
-        throw new NotImplementedException();
+        return ResultWithDataDto<HospitalStandardTableDto>.Success(mapdandaTables);
     }
 
 

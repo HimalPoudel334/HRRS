@@ -1,3 +1,4 @@
+using HRRS.Dto.Mapdanda;
 using Persistence.Entities;
 
 namespace HRRS.Dto.HealthStandard;
@@ -112,5 +113,5 @@ public class HospitalStandardTableDto
     public string? Description { get; set; }
     public string? Note { get; set; }
     public FormType FormType { get; set; }
-    public ICollection<MapdandaModel> Mapdandas { get; set; } = [];
+    public ICollection<GroupedMapdanda> Mapdandas { get; set; } = [];
 }
