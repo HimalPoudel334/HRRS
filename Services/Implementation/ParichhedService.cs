@@ -1,6 +1,5 @@
 ﻿
 using HRRS.Dto;
-using HRRS.Dto.AdminMapdanda;
 using HRRS.Dto.Anusuchi;
 using HRRS.Dto.Parichhed;
 using HRRS.Persistence.Context;
@@ -361,7 +360,7 @@ public class ParichhedService : IParichhedService
         return ResultWithDataDto<List<SubSubParichhedDto>>.Success(subSubParichhedsDto);
     }
 
-    public async Task<ResultWithDataDto<List<GroupedSubSubParichhedAndMapdanda>>> GetMapdandasOfSubParichhed(int subParichhedId)
+    public async Task<ResultWithDataDto<List<MapdandaTableDto>>> GetMapdandasOfSubParichhed(int subParichhedId)
     {
         throw new NotImplementedException();
     }

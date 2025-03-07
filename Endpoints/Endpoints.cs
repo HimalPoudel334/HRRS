@@ -4,7 +4,6 @@ using HRRS.Dto.Anusuchi;
 using HRRS.Dto.Auth;
 using HRRS.Dto.FileUpload;
 using HRRS.Dto.HealthStandard;
-using HRRS.Dto.Mapdanda;
 using HRRS.Dto.MasterStandardEntry;
 using HRRS.Dto.Parichhed;
 using HRRS.Dto.User;

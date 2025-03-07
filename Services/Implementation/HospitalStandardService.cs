@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 using HRRS.Dto;
 using HRRS.Dto.HealthStandard;
-using HRRS.Dto.Mapdanda;
 using HRRS.Dto.MasterStandardEntry;
 using HRRS.Persistence.Context;
 using HRRS.Services.Interface;
@@ -151,52 +150,52 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         return new ResultWithDataDto<HospitalEntryDto>(true, dto, null);
     }
 
-    public async Task<ResultWithDataDto<List<HospitalStandardModel>>> AdminGetHospitalStandardForEntry(int entryId)
+    public async Task<ResultWithDataDto<HospitalStandardTableDto>> AdminGetHospitalStandardForEntry(int entryId)
     {
         var bedCount = (await _dbContext.HospitalStandardEntrys.Include(x => x.MasterStandardEntry).FirstOrDefaultAsync(x => x.Id == entryId))?.MasterStandardEntry.BedCount;
 
         if (bedCount is null)
-            return ResultWithDataDto<List<HospitalStandardModel>>.Failure("Health faciltiy not found");
+            return ResultWithDataDto<HospitalStandardTableDto>.Failure("Health faciltiy not found");
 
-        /*var standards = await _dbContext.HospitalStandards
-            .AsSplitQuery()
-            .Where(x => x.StandardEntryId == entryId)
-            .GroupBy(m => m.Mapdanda.SubSubParichhed)
-            .Select(m => new HospitalStandardModel
+        var existing = _dbContext.HospitalStandards.Include(x => x.Mapdanda).Where(x => x.StandardEntryId == entryId);
+        
+        var mapdandaTable = (await existing.FirstAsync()).Mapdanda.MapdandaTable;
+
+        var res = await existing
+            .OrderBy(x => x.Mapdanda.OrderNo)
+            .Select(m => new GroupedMapdanda
             {
-                AnusuchiId = m.FirstOrDefault() != null ? m.First().Mapdanda.AnusuchiId: null,
-                ParichhedId = m.FirstOrDefault() != null ? m.First().Mapdanda.ParichhedId : null,
-                SubParichhedId = m.FirstOrDefault() != null ? m.First().Mapdanda.SubParichhedId : null,
-                FormType = m.FirstOrDefault() != null ? m.First().Mapdanda.FormType : FormType.A1,
-                HasBedCount = m.FirstOrDefault() != null ? m.First().Mapdanda.IsAvailableDivided : false,
-                SubSubParixed = m.Key != null ? m.Key.Name : "",
-                List = m
-                    .GroupBy(m => m.Mapdanda.SerialNumber)
-                    .Select(group => new StandardGroupModel
-                    {
-                        SerialNumber = group.Key,
-                        GroupName = group.First().Mapdanda.Group,
-                        GroupedMapdanda = group.Select(item => new MapdandaModel
-                        {
-                            EntryId = item.Id,
-                            Id = item.MapdandaId,
-                            Name = item.Mapdanda.Name,
-                            SerialNumber = item.Mapdanda.SerialNumber,
-                            Parimaad = item.Mapdanda.Parimaad,
-                            Group = item.Mapdanda.Group,
-                            FilePath = item.FilePath,
-                            IsAvailable = item.IsAvailable,
-                            IsApproved = item.IsApproved,
-                            Remarks = item.Remarks,
-                            Value = determineValue(bedCount.Value, item.Mapdanda.FormType, item.Mapdanda.Value25, item.Mapdanda.Value50, item.Mapdanda.Value100, item.Mapdanda.Value200),
-                            IsAvailableDivided = item.Mapdanda.IsAvailableDivided,
-                        }).ToList()
-                    }).ToList()
-            })
-        .ToListAsync();
+                Id = m.MapdandaId,
+                EntryId = m.Id,
+                Name = m.Mapdanda.Name,
+                SerialNumber = m.Mapdanda.SerialNumber,
+                IsAvailable = m.IsAvailable,
+                FilePath = m.FilePath,
+                IsActive = determineActive(bedCount.Value, m.Mapdanda.Is25Active, m.Mapdanda.Is50Active, m.Mapdanda.Is100Active, m.Mapdanda.Is200Active),
+                Status = m.Status,
+                Remarks = m.Remarks,
+                IsApproved = m.IsApproved,
+                IsGroup = m.Mapdanda.IsGroup,
+                IsSubGroup = m.Mapdanda.IsSubGroup,
+                IsSection = m.Mapdanda.IsSection,
+                HasGroup = m.Mapdanda.HasGroup,
+                Value = determineValue(bedCount.Value, m.Mapdanda.FormType, m.Mapdanda.Value25, m.Mapdanda.Value50, m.Mapdanda.Value100, m.Mapdanda.Value200),
 
-        return new ResultWithDataDto<List<HospitalStandardModel>>(true, standards, null);*/
-        throw new NotImplementedException();
+            })
+            .ToListAsync();
+
+        var dto = new HospitalStandardTableDto()
+        {
+            Id = mapdandaTable.Id,
+            FormType = mapdandaTable.FormType,
+            TableName = mapdandaTable.TableName,
+            Description = mapdandaTable.Description,
+            Note = mapdandaTable.Note,
+            Mapdandas = res
+
+        };
+
+        return ResultWithDataDto<HospitalStandardTableDto>.Success(dto);
     }
 
     public async Task<ResultDto> Update(HospitalStandardDto dto, int id)

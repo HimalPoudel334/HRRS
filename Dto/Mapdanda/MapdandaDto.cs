@@ -2,15 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using HRRS.Dto.Anusuchi;
 using HRRS.Dto.Parichhed;
 
-//public class MapdandaDto
-//{
-//    public int Id { get; set; }
-//    public string? SerialNumber { get; set; }
-//    public string Name { get; set; }
-//    public int AnusuchiNumber { get; set; }
-//    public bool Status { get; set; }
-//}
-
 public class MapdandaDto
 {
     public int Id { get; set; }
@@ -50,17 +41,6 @@ public class MapdandaDto
 
 }
 
-public class SubMapdandaDto
-{
-    public int Id { get; set; }
-    public string SerialNumber { get; set; }
-    public string Name { get; set; }
-    public string? Parimaad { get; set; }
-    public int MapdandaId { get; set; }
-    public bool Status { get; set; }
-    public string? Group { get; set; }
-
-}
 
 public class MapdandaTableDto
 {
