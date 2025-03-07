@@ -68,8 +68,6 @@ public static class Endpoints
         endpoints.MapPost("api/healthfacility/register", async ([FromForm] RegisterFacilityDto dto, IAuthService service) => TypedResults.Ok(await service.RegisterHospitalAsync(dto))).DisableAntiforgery();
         endpoints.MapGet("api/healthfacility", async (IHealthFacilityService service, HttpContext context) => TypedResults.Ok(await service.GetAll(context))).RequireAuthorization();
         endpoints.MapGet("api/healthfacility/{id}", async (int id, IHealthFacilityService service) => TypedResults.Ok(await service.GetById(id)));
-        // healthfacility file
-        MapFileEndpoint(endpoints, "api/getmapdandafile/{filePath}", "MapdandaUpload");
 
         //health facility type
         endpoints.MapGet("api/facilitytypes", async (IFacilityTypeService service) => TypedResults.Ok(await service.GetAll()));
