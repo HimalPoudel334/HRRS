@@ -4,7 +4,9 @@ using HRRS.Dto.MasterStandardEntry;
 using HRRS.Persistence.Context;
 using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.SqlServer.Server;
 
 namespace HRRS.Services.Implementation
 {
@@ -135,10 +137,10 @@ namespace HRRS.Services.Implementation
                 return ResultDto.Failure("Cannot find entry");
 
             var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId);
-            if (user!.Role is null)
+            if (user!.UserType != Role.SuperAdmin && user!.Role is null)
                 return ResultDto.Failure("Cannot find entry");
 
-            if (user!.Role.BedCount.HasValue && user!.Role.BedCount != entry.BedCount)
+            if (user.UserType != Role.SuperAdmin && user!.Role.BedCount.HasValue && user!.Role.BedCount != entry.BedCount)
                 return ResultDto.Failure("Cannot find entry");
 
 
@@ -214,7 +216,7 @@ namespace HRRS.Services.Implementation
             if (user == null || user.UserType == "Hospital") return ResultWithDataDto<List<MasterStandardEntryDto>>.Failure("User not found");
 
             var masterEntryQuery = _context.MasterStandardEntries
-                .Where(x => x.IsNewEntry);
+                .Where(x => x.EntryStatus == EntryStatus.Pending);
 
             if (user.Role != null && user.Role.Title != Role.SuperAdmin)
                 masterEntryQuery = masterEntryQuery.Where(x => x.HealthFacility.BedCount == user.Role.BedCount);
@@ -240,7 +242,7 @@ namespace HRRS.Services.Implementation
             if (user == null || user.UserType == "Hospital") return ResultWithDataDto<int>.Failure("User not found");
 
             var masterEntryQuery = _context.MasterStandardEntries
-                .Where(x => x.IsNewEntry);
+                .Where(x => x.EntryStatus ==  EntryStatus.Pending);
 
             if (user.Role != null && user.Role.Title != Role.SuperAdmin)
                 masterEntryQuery = masterEntryQuery.Where(x => x.HealthFacility.BedCount == user.Role.BedCount);

@@ -157,9 +157,12 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         if (bedCount is null)
             return ResultWithDataDto<HospitalStandardTableDto>.Failure("Health faciltiy not found");
 
-        var existing = _dbContext.HospitalStandards.Include(x => x.Mapdanda).Where(x => x.StandardEntryId == entryId);
-        
-        var mapdandaTable = (await existing.FirstAsync()).Mapdanda.MapdandaTable;
+        var existing = _dbContext.HospitalStandards.Include(x => x.Mapdanda).ThenInclude(x => x.MapdandaTable).Where(x => x.StandardEntryId == entryId);
+
+        var existingStd = await existing.FirstOrDefaultAsync();
+        if (existingStd is null) return ResultWithDataDto<HospitalStandardTableDto>.Failure("Mapdanda not found");
+
+        var mapdandaTable = existingStd.Mapdanda.MapdandaTable;
 
         var res = await existing
             .OrderBy(x => x.Mapdanda.OrderNo)
@@ -191,7 +194,10 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             TableName = mapdandaTable.TableName,
             Description = mapdandaTable.Description,
             Note = mapdandaTable.Note,
-            Mapdandas = res
+            Mapdandas = res,
+            AnusuchiId = mapdandaTable.AnusuchiId,
+            ParichhedId = mapdandaTable.ParichhedId,
+            SubParichhedId = mapdandaTable.SubParichhedId
 
         };
 
@@ -279,8 +285,11 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
         if(existing.Any())
         {
-            var mapdandaTable = (await existing.FirstAsync()).Mapdanda.MapdandaTable;
-            
+            var existingStd = await existing.FirstOrDefaultAsync();
+            if(existingStd is null) return ResultWithDataDto<HospitalStandardTableDto>.Failure("Mapdanda not found");
+
+            var mapdandaTable = existingStd.Mapdanda.MapdandaTable;
+
             var res = await existing
                 .OrderBy(x => x.Mapdanda.OrderNo)
                 .Select(m => new GroupedMapdanda
@@ -356,7 +365,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                         HasGroup = m.HasGroup,
                         Value = determineValue(bedCount, m.FormType, m.Value25, m.Value50, m.Value100, m.Value200),
                     }).ToList()
-            }).FirstAsync();
+            }).FirstOrDefaultAsync();
 
         return ResultWithDataDto<HospitalStandardTableDto>.Success(mapdandaTables);
     }
