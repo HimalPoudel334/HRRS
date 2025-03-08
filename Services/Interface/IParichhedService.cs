@@ -21,8 +21,4 @@ public interface IParichhedService
     Task<ResultWithDataDto<List<SubSubParichhedDto>>> GetSubSubParichhedsBySubParichhed(int subParichhedId);
     Task<ResultWithDataDto<SubSubParichhedDto>> GetSubSubParichhedById(int id);
     Task<ResultWithDataDto<List<SubSubParichhedDto>>> GetAllSubSubParichheds();
-
-    /* mapdandas insides of anusuchis, parichheds, subparichheds, subsubparichheds */
-    Task<ResultWithDataDto<List<MapdandaTableDto>>> GetMapdandasOfSubParichhed(int subParichhedId);
-
 }

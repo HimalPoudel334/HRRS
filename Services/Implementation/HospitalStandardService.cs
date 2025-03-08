@@ -122,8 +122,6 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
             }).ToListAsync();
 
         return new ResultWithDataDto<List<HospitalEntryDto>>(true, res, null);
-
-        throw new NotImplementedException();
     }
 
     public async Task<ResultWithDataDto<List<HospitalStandard>>> GetStandards(int entryId)
@@ -319,8 +317,8 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
         var mapdandaTableQuery = _dbContext.MapdandaTables.AsQueryable();
 
-        if (dto.AnusuchiId.HasValue) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.AnusuchiId == dto.AnusuchiId);
-        if (dto.ParichhedId.HasValue) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.ParichhedId == dto.ParichhedId);
+        if (dto.AnusuchiId.HasValue) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.AnusuchiId == dto.AnusuchiId && x.Parichhed == null);
+        if (dto.ParichhedId.HasValue) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.ParichhedId == dto.ParichhedId && x.SubParichhed == null);
         if (dto.SubParichhedId.HasValue) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.SubParichhedId == dto.SubParichhedId);
 
         if (bedCount <= 25) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is25Active));

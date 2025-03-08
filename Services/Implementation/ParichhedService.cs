@@ -270,10 +270,7 @@ public class ParichhedService : IParichhedService
         {
             return ResultWithDataDto<SubSubParichhedDto>.Failure("Parichhed फेला परेन।");
         }
-        //if(await _context.SubSubParichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
-        //{
-        //    return ResultWithDataDto<SubSubParichhedDto>.Failure("Serial number already taken");
-        //}
+        
         var subSubParichhed = new SubSubParichhed()
         {
             SubParichhed = subParichhed,
@@ -302,11 +299,6 @@ public class ParichhedService : IParichhedService
         {
             return ResultDto.Failure("Parichhed फेला परेन।");
         }
-
-        //if (subSubParichhed.SerialNo != dto.SerialNo && await _context.SubSubParichheds.AnyAsync(x => x.SerialNo == dto.SerialNo))
-        //{
-        //    return ResultDto.Failure("Serial number already taken");
-        //}
 
         subSubParichhed.Name = dto.Name;
         subSubParichhed.SerialNo = dto.SerialNo;
@@ -360,9 +352,5 @@ public class ParichhedService : IParichhedService
         return ResultWithDataDto<List<SubSubParichhedDto>>.Success(subSubParichhedsDto);
     }
 
-    public async Task<ResultWithDataDto<List<MapdandaTableDto>>> GetMapdandasOfSubParichhed(int subParichhedId)
-    {
-        throw new NotImplementedException();
-    }
 
 }

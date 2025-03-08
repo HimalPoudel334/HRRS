@@ -3,6 +3,6 @@
     public class BedCount
     {
         public int Id { get; set; }
-        public int Count { get; set; }
+        public string Count { get; set; }
     }
 }
