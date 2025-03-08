@@ -13,7 +13,7 @@ namespace HRRS.Persistence.Entities
         public SubmissionType SubmissionType { get; set; }
         public int RoleId { get; set; }
         public Role Role { get; set; }
-
+        public ICollection<MapdandaTable> MapdandaTables { get; set; }
         public ICollection<AnusuchiMapdandaTableMapping> TableList { get; set; } = [];
     }
 
