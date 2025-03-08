@@ -117,8 +117,11 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                 Id = x.Id,
                 Remarks = x.Remarks,
                 Anusuchi = x.HospitalStandards.First().Mapdanda.MapdandaTable.Anusuchi.SerialNo,
+                AnusuchiId = x.HospitalStandards.First().Mapdanda.MapdandaTable.Anusuchi.Id,
                 Parichhed = x.HospitalStandards.First().Mapdanda.MapdandaTable.Parichhed != null ? x.HospitalStandards.First().Mapdanda.MapdandaTable.Parichhed!.SerialNo : "",
-                SubParichhed = x.HospitalStandards.First().Mapdanda.MapdandaTable.SubParichhed != null ? x.HospitalStandards.First().Mapdanda.MapdandaTable.SubParichhed!.SerialNo : ""
+                ParichhedId = x.HospitalStandards.First().Mapdanda.MapdandaTable.Parichhed != null ? x.HospitalStandards.First().Mapdanda.MapdandaTable.Parichhed!.Id : 0,
+                SubParichhed = x.HospitalStandards.First().Mapdanda.MapdandaTable.SubParichhed != null ? x.HospitalStandards.First().Mapdanda.MapdandaTable.SubParichhed!.SerialNo : "",
+                SubParichhedId = x.HospitalStandards.First().Mapdanda.MapdandaTable.SubParichhed != null ? x.HospitalStandards.First().Mapdanda.MapdandaTable.SubParichhed!.Id : 0,
             }).ToListAsync();
 
         return new ResultWithDataDto<List<HospitalEntryDto>>(true, res, null);
@@ -269,7 +272,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
 
         int bedCount = healthFacility.BedCount;
         
-        var existing = _dbContext.HospitalStandards.Include(x => x.Mapdanda).Where(x => x.StandardEntry.MasterStandardEntry.SubmissionCode == submissionCode);
+        var existing = _dbContext.HospitalStandards.Include(x => x.Mapdanda).ThenInclude(x => x.MapdandaTable).Where(x => x.StandardEntry.MasterStandardEntry.SubmissionCode == submissionCode);
         if (dto.AnusuchiId.HasValue) existing = existing.Where(x => x.Mapdanda.MapdandaTable.AnusuchiId == dto.AnusuchiId.Value && x.Mapdanda.MapdandaTable.ParichhedId == null);
         if (dto.ParichhedId.HasValue) existing = existing.Where(x => x.Mapdanda.MapdandaTable.ParichhedId == dto.ParichhedId.Value && x.Mapdanda.MapdandaTable.SubParichhedId == null);
         if (dto.SubParichhedId.HasValue) existing = existing.Where(x => x.Mapdanda.MapdandaTable.SubParichhedId == dto.SubParichhedId.Value);

@@ -38,9 +38,12 @@ public class HospitalEntryDto
 {
     public int Id { get; set; }
     public EntryStatus Status { get; set; }
-    public string? Parichhed { get; set; }
-    public string? SubParichhed { get; set; }
     public string Anusuchi { get; set; }
+    public int AnusuchiId { get; set; }
+    public string? Parichhed { get; set; }
+    public int? ParichhedId { get; set; }
+    public string? SubParichhed { get; set; }
+    public int? SubParichhedId { get; set; }
     public string? Remarks { get; set; }
     public string SubmissionType { get; set; }
 
