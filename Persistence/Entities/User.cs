@@ -4,7 +4,6 @@ namespace HRRS.Persistence.Entities;
 
 public class User
 {
-
     public long UserId { get; set; }
     public string UserName { get; set; }
     public string Password { get; set; }
@@ -22,7 +21,8 @@ public class User
     public District District { get; set; }
     public int FacilityTypeId { get; set; }
     public FacilityType FacilityType { get; set; }
-    public string? Post { get; set; }
+    public int? PostId { get; set; }
+    public UserPost? Post { get; set; }
     public string? FullName { get; set; }
     public string? MobileNumber { get; set; }
     public string? FacilityMobileNumber { get; set; }
@@ -30,6 +30,15 @@ public class User
     public string? FacilityEmail { get; set; }
     public string? PersonalEmail { get; set; }
     public string? Remarks { get; set; }
+}
+
+public class UserPost
+{
+    public const string KaryalayaPramukh = "";
+    public const string MantralayaSachib = "";
+    public const string Samiti = "";
+    public int Id { get; set; }
+    public string Post { get; set; }
 }
 
 

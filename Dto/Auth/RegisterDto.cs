@@ -8,6 +8,7 @@ public record RegisterDto
     public int ProvinceId { get; init; }
     public int DistrictId { get; init; }
     public int FacilityTypeId { get; init; }
+    public int PostId { get; set; }
     public string Post { get; init; }
     public string? FullName { get; init; }
     public string? MobileNumber { get; init; }

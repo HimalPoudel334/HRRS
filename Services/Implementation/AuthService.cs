@@ -72,6 +72,9 @@ public class AuthService : IAuthService
         if (facilityType is null)
             return ResultWithDataDto<AuthResponseDto>.Failure("Facility type cannot be found");
 
+        var post = await _context.UserPosts.FindAsync(dto.PostId);
+        if(post is null) return ResultWithDataDto<AuthResponseDto>.Failure("Post cannot be found");
+
         User newUser = new User
         {
             UserName = dto.Username,
@@ -81,7 +84,7 @@ public class AuthService : IAuthService
             District = district,
             Province = province,
             FacilityType = facilityType,
-            Post = dto.Post,
+            Post = post,
             FullName = dto.FullName,
             MobileNumber = dto.MobileNumber,
             FacilityMobileNumber = dto.FacilityMobileNumber,
@@ -123,12 +126,16 @@ public class AuthService : IAuthService
         if (await _context.HealthFacilities.AnyAsync(x => x.FacilityPhoneNumber != null && x.FacilityPhoneNumber.Equals(dto.PhoneNumber))) return ResultWithDataDto<string>.Failure("Phone number already exists");
 
 
+        var bedCount = await _context.BedCounts.FindAsync(dto.BedCountId);
+        if (bedCount is null)
+            return ResultWithDataDto<string>.Failure("Bed count cannot be found");
+
         var healthFacility = new TempHealthFacility()
         {
             FacilityName = dto.FacilityName,
             FacilityType = facilityType,
             PanNumber = dto.PanNumber,
-            BedCount = dto.BedCount,
+            BedCount = bedCount,
             SpecialistCount = dto.SpecialistCount,
             AvailableServices = dto.AvailableServices,
             District = district,
@@ -183,6 +190,7 @@ public class AuthService : IAuthService
             .Include(x => x.Province)
             .Include(x => x.FacilityType)
             .Include(x => x.Role)
+            .Include(x => x.Post)
             .Select(x => new UserDto
             {
                 UserId = x.UserId,
@@ -190,13 +198,12 @@ public class AuthService : IAuthService
                 UserType = x.UserType,
                 RoleId = x.RoleId,
                 Role = x.Role != null? x.Role.Title : "",
-                BedCount = x.Role != null ? x.Role.BedCount : null,
                 FacilityType = x.FacilityType.HOSP_TYPE,
                 DistrictId = x.DistrictId,
                 District = x.District.Name,
                 ProvinceId = x.ProvinceId,
                 Province = x.Province.Name,
-                Post = x.Post,
+                Post = x.Post  != null? x.Post.Post : "",
                 FullName = x.FullName,
                 MobileNumber = x.MobileNumber,
                 FacilityMobileNumber = x.FacilityMobileNumber,
@@ -225,13 +232,12 @@ public class AuthService : IAuthService
                 UserType = x.UserType,
                 RoleId = x.RoleId,
                 Role = x.Role != null ? x.Role.Title : "",
-                BedCount = x.Role != null ? x.Role.BedCount : null,
                 FacilityType = x.FacilityType.HOSP_TYPE,
                 DistrictId = x.DistrictId,
                 District = x.District.Name,
                 ProvinceId = x.ProvinceId,
                 Province = x.Province.Name,
-                Post = x.Post,
+                Post = x.Post != null ? x.Post.Post : "",
                 FullName = x.FullName,
                 MobileNumber = x.MobileNumber,
                 FacilityMobileNumber = x.FacilityMobileNumber,

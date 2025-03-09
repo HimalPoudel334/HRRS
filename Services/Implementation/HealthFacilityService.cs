@@ -13,22 +13,26 @@ namespace HRRS.Services.Implementation
     {
         private readonly ApplicationDbContext _context;
         private readonly IFileUploadService _fileService;
+        private readonly IRoleResolver _roleResolver;
 
-        public HealthFacilityService(ApplicationDbContext context, IFileUploadService fileService)
+        public HealthFacilityService(ApplicationDbContext context, IFileUploadService fileService, IRoleResolver roleResolver)
         {
             _context = context;
             _fileService = fileService;
+            _roleResolver = roleResolver;
         }
 
-        public async Task<ResultWithDataDto<HealthFacilityDto>> GetById(int id)
+        public async Task<ResultWithDataDto<HealthFacilityDto>> GetById(int id, long userId)
         {
-            var healthFacility = await _context.HealthFacilities
+            var healthFacility = await _roleResolver
+                .FacilitiesResolver(userId)
                 .Include(x => x.FacilityType)
                 .Include(x => x.Province)
+                .Include(x => x.BedCount)
                 .Include(x => x.District)
                 .Include(x => x.LocalLevel)
                 .FirstOrDefaultAsync(x => x.Id == id);
-            
+
             if(healthFacility == null) return ResultWithDataDto<HealthFacilityDto>.Failure("स्वास्थ्य संस्था फेला परेन।");
 
             var healthFacilityDto = new HealthFacilityDto
@@ -38,7 +42,7 @@ namespace HRRS.Services.Implementation
                 FacilityType = healthFacility.FacilityType.HOSP_TYPE,
                 FacilityTypeId = healthFacility.FacilityTypeId,
                 PanNumber = healthFacility.PanNumber,
-                BedCount = healthFacility.BedCount,
+                BedCount = healthFacility.BedCount.Count,
                 SpecialistCount = healthFacility.SpecialistCount,
                 AvailableServices = healthFacility.AvailableServices,
                 District = healthFacility.District.Name,
@@ -85,175 +89,22 @@ namespace HRRS.Services.Implementation
             return ResultWithDataDto<HealthFacilityDto>.Success(healthFacilityDto);
         }
 
-        public async Task<ResultWithDataDto<List<HealthFacilityDto>>> GetAll(HttpContext context)
+        public async Task<ResultWithDataDto<List<HealthFacilityDto>>> GetAll(long userId)
         {
-            var role = context.User.FindFirst(ClaimTypes.Role)?.Value;
-            var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(role))
-            {
-                return ResultWithDataDto<List<HealthFacilityDto>>.Failure("Cannot find user");
-            }
-
-            var userIdInt = long.Parse(userId);
-            var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userIdInt);
-            if (user == null) {
-                return ResultWithDataDto<List<HealthFacilityDto>>.Failure("Cannot find user");
-            }
-
-            if (user.Role is not null) 
-            { 
-                var facilityList =  await _context.HealthFacilities
-                    .Include(x => x.FacilityType)
-                    .Include(x => x.Province)
-                    .Include(x => x.District)
-                    .Include(x => x.LocalLevel)
-                    .Where(x => x.BedCount == user.Role.BedCount)
-                    .OrderByDescending(x => x.Id)
-                    .ToListAsync();
-
-                    var res = facilityList.Select(facility => new HealthFacilityDto() 
-                    {
-                        Id = facility.Id,
-                        FacilityName = facility.FacilityName,
-                        FacilityType = facility.FacilityType.HOSP_CODE,
-                        FacilityTypeId = facility.FacilityTypeId,
-                        PanNumber = facility.PanNumber,
-                        BedCount = facility.BedCount,
-                        SpecialistCount = facility.SpecialistCount,
-                        AvailableServices = facility.AvailableServices,
-                        Province = facility.Province.Name,
-                        District = facility.District.Name,
-                        DistrictId = facility.DistrictId,
-                        LocalLevel = facility.LocalLevel.Name,
-                        LocalLevelId = facility.LocalLevelId,
-                        WardNumber = facility.WardNumber,
-                        Tole = facility.Tole,
-                        Latitude = facility.Latitude,
-                        Longitude = facility.Longitude,
-                        FilePath = facility.FilePath != null ? _fileService.GetHealthFacilityFilePath(facility.FilePath) : null,
-                        DateOfInspection = facility.DateOfInspection,
-                        FacilityEmail = facility.FacilityEmail,
-                        FacilityPhoneNumber = facility.FacilityPhoneNumber,
-                        FacilityHeadName = facility.FacilityHeadName,
-                        FacilityHeadPhone = facility.FacilityHeadPhone,
-                        FacilityHeadEmail = facility.FacilityHeadEmail,
-                        ExecutiveHeadName = facility.ExecutiveHeadName,
-                        ExecutiveHeadMobile = facility.ExecutiveHeadMobile,
-                        ExecutiveHeadEmail = facility.ExecutiveHeadEmail,
-                        PermissionReceivedDate = facility.PermissionReceivedDate,
-                        LastRenewedDate = facility.LastRenewedDate,
-                        ApporvingAuthority = facility.ApporvingAuthority,
-                        RenewingAuthority = facility.RenewingAuthority,
-                        ApprovalValidityTill = facility.ApprovalValidityTill,
-                        RenewalValidityTill = facility.RenewalValidityTill,
-                        UpgradeDate = facility.UpgradeDate,
-                        UpgradingAuthority = facility.UpgradingAuthority,
-                        IsLetterOfIntent = facility.IsLetterOfIntent,
-                        IsExecutionPermission = facility.IsExecutionPermission,
-                        IsRenewal = facility.IsRenewal,
-                        IsUpgrade = facility.IsUpgrade,
-                        IsServiceExtension = facility.IsServiceExtension,
-                        IsBranchExtension = facility.IsBranchExtension,
-                        IsRelocation = facility.IsRelocation,
-                        Others = facility.Others,
-                        ApplicationSubmittedAuthority = facility.ApplicationSubmittedAuthority,
-                        ApplicationSubmittedDate = facility.ApplicationSubmittedDate,
-                        HasNewSubmission = _context.MasterStandardEntries.Any(x => x.HealthFacilityId == facility.Id && x.IsNewEntry)
-                    }).ToList();
-
-
-                return ResultWithDataDto<List<HealthFacilityDto>>.Success(res);
-            }
-
-            if (role == "Hospital")
-            {
-                var facility = await _context.HealthFacilities
-                    .Include(x => x.Province)
-                    .Include(x => x.District)
-                    .Include(x => x.LocalLevel)
-                    .Include(x => x.FacilityType)
-                    .Where(x=> x.Id == user.HealthFacilityId)
-                    .SingleOrDefaultAsync();
-
-                if (facility == null) {
-                    return new ResultWithDataDto<List<HealthFacilityDto>>(true, null, "स्वास्थ्य संस्था फेला परेन।");
-                }
-
-                var dto = new HealthFacilityDto()
-                {
-                    Id = facility.Id,
-                    FacilityName = facility.FacilityName,
-                    FacilityType = facility.FacilityType.HOSP_CODE,
-                    FacilityTypeId = facility.FacilityTypeId,
-                    PanNumber = facility.PanNumber,
-                    BedCount = facility.BedCount,
-                    SpecialistCount = facility.SpecialistCount,
-                    AvailableServices = facility.AvailableServices,
-                    Province = facility.Province.Name,
-                    District = facility.District.Name,
-                    DistrictId = facility.DistrictId,
-                    LocalLevel = facility.LocalLevel.Name,
-                    LocalLevelId = facility.LocalLevelId,
-                    WardNumber = facility.WardNumber,
-                    Tole = facility.Tole,
-                    Latitude = facility.Latitude,
-                    Longitude = facility.Longitude,
-                    FilePath = facility.FilePath != null ? _fileService.GetHealthFacilityFilePath(facility.FilePath) : null,
-                    DateOfInspection = facility.DateOfInspection,
-                    FacilityEmail = facility.FacilityEmail,
-                    FacilityPhoneNumber = facility.FacilityPhoneNumber,
-                    FacilityHeadName = facility.FacilityHeadName,
-                    FacilityHeadPhone = facility.FacilityHeadPhone,
-                    FacilityHeadEmail = facility.FacilityHeadEmail,
-                    ExecutiveHeadName = facility.ExecutiveHeadName,
-                    ExecutiveHeadMobile = facility.ExecutiveHeadMobile,
-                    ExecutiveHeadEmail = facility.ExecutiveHeadEmail,
-                    PermissionReceivedDate = facility.PermissionReceivedDate,
-                    LastRenewedDate = facility.LastRenewedDate,
-                    ApporvingAuthority = facility.ApporvingAuthority,
-                    RenewingAuthority = facility.RenewingAuthority,
-                    ApprovalValidityTill = facility.ApprovalValidityTill,
-                    RenewalValidityTill = facility.RenewalValidityTill,
-                    UpgradeDate = facility.UpgradeDate,
-                    UpgradingAuthority = facility.UpgradingAuthority,
-                    IsLetterOfIntent = facility.IsLetterOfIntent,
-                    IsExecutionPermission = facility.IsExecutionPermission,
-                    IsRenewal = facility.IsRenewal,
-                    IsUpgrade = facility.IsUpgrade,
-                    IsServiceExtension = facility.IsServiceExtension,
-                    IsBranchExtension = facility.IsBranchExtension,
-                    IsRelocation = facility.IsRelocation,
-                    Others = facility.Others,
-                    ApplicationSubmittedAuthority = facility.ApplicationSubmittedAuthority,
-                    ApplicationSubmittedDate = facility.ApplicationSubmittedDate,
-                    HasNewSubmission = _context.MasterStandardEntries.Any(x => x.HealthFacilityId == facility.Id && x.IsNewEntry)
-                };
-                return ResultWithDataDto<List<HealthFacilityDto>>.Success([dto]);
-
-            }
-
-
-            var list = await _context.HealthFacilities
-                .Include(x => x.Province)
-                .Include(x => x.District)
-                .Include(x => x.LocalLevel)
-                .Include(x => x.FacilityType)
-                .OrderByDescending(x => x.Id)
-                .ToListAsync();
-            
-            var facilityDtos = list.Select(facility => new HealthFacilityDto()
+            var healthFacilities = await _roleResolver
+                .FacilitiesResolver(userId)
+                .Select(facility => new HealthFacilityDto()
             {
                 Id = facility.Id,
                 FacilityName = facility.FacilityName,
-                FacilityType = facility.FacilityType.HOSP_CODE,
+                FacilityType = facility.FacilityType.HOSP_TYPE,
                 FacilityTypeId = facility.FacilityTypeId,
                 PanNumber = facility.PanNumber,
-                BedCount = facility.BedCount,
+                BedCount = facility.BedCount.Count,
                 SpecialistCount = facility.SpecialistCount,
                 AvailableServices = facility.AvailableServices,
-                District = facility.District.Name,
                 Province = facility.Province.Name,
+                District = facility.District.Name,
                 DistrictId = facility.DistrictId,
                 LocalLevel = facility.LocalLevel.Name,
                 LocalLevelId = facility.LocalLevelId,
@@ -290,14 +141,11 @@ namespace HRRS.Services.Implementation
                 ApplicationSubmittedAuthority = facility.ApplicationSubmittedAuthority,
                 ApplicationSubmittedDate = facility.ApplicationSubmittedDate,
                 HasNewSubmission = _context.MasterStandardEntries.Any(x => x.HealthFacilityId == facility.Id && x.IsNewEntry)
-            }).ToList();
+            }).ToListAsync();
 
-            if(facilityDtos.Count == 0)
-            {
-                return new ResultWithDataDto<List<HealthFacilityDto>>(true, facilityDtos, "कुनै पनि स्वास्थ्य संस्था फेला परेन।");
-            }
 
-            return ResultWithDataDto<List<HealthFacilityDto>>.Success(facilityDtos);
+            return ResultWithDataDto<List<HealthFacilityDto>>.Success(healthFacilities);
+            
         }
 
         

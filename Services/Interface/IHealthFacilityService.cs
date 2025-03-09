@@ -5,8 +5,8 @@ namespace HRRS.Services.Interface;
 public interface IHealthFacilityService
 {
     Task Update(int id, HealthFacilityDto healthFacilityDto);
-    Task<ResultWithDataDto<HealthFacilityDto>> GetById(int id);
-    Task<ResultWithDataDto<List<HealthFacilityDto>>> GetAll(HttpContext context);
+    Task<ResultWithDataDto<HealthFacilityDto>> GetById(int id, long userId);
+    Task<ResultWithDataDto<List<HealthFacilityDto>>> GetAll(long userId);
 
 
 }

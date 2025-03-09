@@ -21,6 +21,7 @@ namespace HRRS.Services.Implementation
             _fileService = service;
         }
 
+        // admins only
         public async Task<ResultWithDataDto<List<RegistrationRequestDto?>>> GetAllRegistrationRequestsAsync(long userId)
         {
             var requestQuery = _context.RegistrationRequests
@@ -29,11 +30,15 @@ namespace HRRS.Services.Implementation
                 .AsQueryable();
 
             var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId);
+            
+
             if(user!.Role is not null && user!.Role.Title != Role.SuperAdmin)
-                requestQuery = requestQuery.Where(x => x.HealthFacility.BedCount == user.Role.BedCount);
+                requestQuery = requestQuery.Where(x => user.Role.FacilityTypes.Contains(x.HealthFacility.FacilityType));
 
             var requests = await requestQuery
                 .OrderByDescending(x => x.CreatedAt)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.BedCount)
                 .Select(x => new RegistrationRequestDto
             {
                 Id = x.Id,
@@ -44,7 +49,7 @@ namespace HRRS.Services.Implementation
                 FacilityId = x.HealthFacility.Id,
                 FacilityName = x.HealthFacility.FacilityName,
                 Status = x.Status,
-                BedCount = x.HealthFacility.BedCount,
+                BedCount = x.HealthFacility.BedCount.Count,
                 Remarks = x.Remarks
             }).ToListAsync();
 
@@ -63,6 +68,8 @@ namespace HRRS.Services.Implementation
                 .ThenInclude(x => x.FacilityType)
                 .Include(x => x.HealthFacility)
                 .ThenInclude(x => x.Province)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.BedCount)
                 .Select(x => new RegistrationRequestWithFacilityDto
                 {
                     Id = x.Id,
@@ -76,7 +83,7 @@ namespace HRRS.Services.Implementation
                         FacilityName = x.HealthFacility.FacilityName,
                         FacilityType = x.HealthFacility.FacilityType.HOSP_TYPE,
                         PanNumber = x.HealthFacility.PanNumber,
-                        BedCount = x.HealthFacility.BedCount,
+                        BedCount = x.HealthFacility.BedCount.Count,
                         SpecialistCount = x.HealthFacility.SpecialistCount,
                         AvailableServices = x.HealthFacility.AvailableServices,
                         District = x.HealthFacility.District.Name,
@@ -158,7 +165,6 @@ namespace HRRS.Services.Implementation
                 Password = AuthService.GenerateHashedPassword(dto.Password),
                 HealthFacility = healthFacility,
                 IsFirstLogin = true,
-                Post = "",
                 FullName = "",
                 MobileNumber = request.HealthFacility.MobileNumber,
                 DistrictId = request.HealthFacility.DistrictId,
@@ -194,6 +200,18 @@ namespace HRRS.Services.Implementation
 
             await _context.SaveChangesAsync();
             return ResultWithDataDto<string>.Success("Registration request rejected successfully");
+        }
+
+        //authorized only to Samiti type user
+        public async Task<ResultDto> SifarisToPramukh(Guid submissionCode)
+        {
+            var masterEntry = await _context.MasterStandardEntries.FirstOrDefaultAsync(x => x.SubmissionCode == submissionCode);
+            if (masterEntry == null) return ResultDto.Failure("Submission not found");
+
+            masterEntry.EntryStatus = EntryStatus.STP;
+            await _context.SaveChangesAsync();
+            return ResultDto.Success();
+
         }
 
     }

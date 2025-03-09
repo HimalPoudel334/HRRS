@@ -34,6 +34,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<AnusuchiMapping> AnusuchiMappings { get; set; }
     public DbSet<AnusuchiMapdandaTableMapping> AnusuchiMapdandaTableMappings { get; set; }
     public DbSet<MapdandaTable> MapdandaTables { get; set; }
+    public DbSet<UserRoleFacilityType> RoleFacilities { get; set; }
+    public DbSet<BedCount> BedCounts { get; set; }
+    public DbSet<UserPost> UserPosts { get; set; }
+    public DbSet<UserRoleFacilityType> UserRoleFacilityTypes { get; set; }
 
 }
 

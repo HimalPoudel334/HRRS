@@ -64,8 +64,8 @@ public static class Endpoints
         
         //health facility
         endpoints.MapPost("api/healthfacility/register", async ([FromForm] RegisterFacilityDto dto, IAuthService service) => TypedResults.Ok(await service.RegisterHospitalAsync(dto))).DisableAntiforgery();
-        endpoints.MapGet("api/healthfacility", async (IHealthFacilityService service, HttpContext context) => TypedResults.Ok(await service.GetAll(context))).RequireAuthorization();
-        endpoints.MapGet("api/healthfacility/{id}", async (int id, IHealthFacilityService service) => TypedResults.Ok(await service.GetById(id)));
+        endpoints.MapGet("api/healthfacility", async (IHealthFacilityService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetAll(long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization();
+        endpoints.MapGet("api/healthfacility/{id}", async (int id, IHealthFacilityService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetById(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"))));
 
         //health facility type
         endpoints.MapGet("api/facilitytypes", async (IFacilityTypeService service) => TypedResults.Ok(await service.GetAll()));

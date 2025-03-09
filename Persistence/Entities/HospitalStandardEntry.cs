@@ -19,7 +19,8 @@ public enum EntryStatus
     Pending,
     Approved,
     Rejected,
-    Draft
+    Draft,
+    STP //Sifaaris to pramukh
 }
 
 public enum SubmissionTypeEnum

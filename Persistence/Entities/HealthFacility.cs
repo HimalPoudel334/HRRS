@@ -16,9 +16,9 @@ namespace Persistence.Entities
         public int FacilityTypeId { get; set; }
         public FacilityType FacilityType { get; set; }
 
+        public int BedCountId { get; set; }
+        public BedCount BedCount { get; set; }
         public string PanNumber { get; set; }
-
-        public int BedCount { get; set; }
 
         public int SpecialistCount { get; set; }
 
@@ -109,8 +109,13 @@ namespace Persistence.Entities
         public int SN { get; set; }
         public string HOSP_CODE { get; set; }
         public string HOSP_TYPE { get; set; }
-
         public bool ACTIVE { get; set; }
+
+        [ForeignKey(nameof(FacilityType))]
+        public int? FacilityTypeId { get; set; }
+        public ICollection<FacilityType> FacilitySubTypes { get; set; } = [];
+        public ICollection<Role> UserRoles { get; set; } = [];
+        public ICollection<BedCount> BedCounts { get; set; } = [];
     }
 
     public class TempHealthFacility
@@ -123,7 +128,8 @@ namespace Persistence.Entities
 
         public string PanNumber { get; set; }
 
-        public int BedCount { get; set; }
+        public int BedCountId { get; set; }
+        public BedCount BedCount { get; set; }
 
         public int SpecialistCount { get; set; }
 

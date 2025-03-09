@@ -28,7 +28,7 @@ namespace HRRS.Services.Implementation
             var role = new Role()
             {
                 Title = dto.Title,
-                BedCount = dto.BedCount,
+                //BedCountId = dto.BedCount,
                 
             };
 

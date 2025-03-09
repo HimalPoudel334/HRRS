@@ -276,7 +276,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         var healthFacility = await _dbContext.HealthFacilities.FindAsync(healthFacilityId);
         if (healthFacility is null) return ResultWithDataDto<HospitalStandardTableDto>.Failure("Health Facility not found");
 
-        int bedCount = healthFacility.BedCount;
+        //int bedCount = healthFacility.BedCount.Id;
         
         var existing = _dbContext.HospitalStandards.Include(x => x.Mapdanda).ThenInclude(x => x.MapdandaTable).Where(x => x.StandardEntry.MasterStandardEntry.SubmissionCode == submissionCode);
         if (dto.AnusuchiId.HasValue) existing = existing.Where(x => x.Mapdanda.MapdandaTable.AnusuchiId == dto.AnusuchiId.Value && x.Mapdanda.MapdandaTable.ParichhedId == null);
@@ -300,7 +300,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                     SerialNumber = m.Mapdanda.SerialNumber,
                     IsAvailable = m.IsAvailable,
                     FilePath = m.FilePath,
-                    IsActive = determineActive(bedCount, m.Mapdanda.Is25Active, m.Mapdanda.Is50Active, m.Mapdanda.Is100Active, m.Mapdanda.Is200Active),
+                    IsActive = true, //determineActive(bedCount, m.Mapdanda.Is25Active, m.Mapdanda.Is50Active, m.Mapdanda.Is100Active, m.Mapdanda.Is200Active),
                     Status = m.Status,
                     Remarks = m.Remarks,
                     IsApproved = m.IsApproved,
@@ -308,7 +308,7 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                     IsSubGroup = m.Mapdanda.IsSubGroup,
                     IsSection = m.Mapdanda.IsSection,
                     HasGroup = m.Mapdanda.HasGroup,
-                    Value = determineValue(bedCount, m.Mapdanda.FormType, m.Mapdanda.Value25, m.Mapdanda.Value50, m.Mapdanda.Value100, m.Mapdanda.Value200),
+                    Value = "",// determineValue(bedCount, m.Mapdanda.FormType, m.Mapdanda.Value25, m.Mapdanda.Value50, m.Mapdanda.Value100, m.Mapdanda.Value200),
 
                 })
                 .ToListAsync();
@@ -333,10 +333,10 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
         if (dto.ParichhedId.HasValue) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.ParichhedId == dto.ParichhedId && x.SubParichhed == null);
         if (dto.SubParichhedId.HasValue) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.SubParichhedId == dto.SubParichhedId);
 
-        if (bedCount <= 25) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is25Active));
-        if (bedCount <= 50) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is50Active));
-        if (bedCount <= 100) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is100Active));
-        if (bedCount <= 200) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is200Active));
+        //if (bedCount <= 25) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is25Active));
+        //if (bedCount <= 50) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is50Active));
+        //if (bedCount <= 100) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is100Active));
+        //if (bedCount <= 200) mapdandaTableQuery = mapdandaTableQuery.Where(x => x.Mapdandas.Any(y => y.Is200Active));
 
 
         var mapdandaTables = await mapdandaTableQuery
@@ -357,13 +357,13 @@ public class HospitalStandardService(ApplicationDbContext dbContext) : IHospital
                         Id = m.Id,
                         Name = m.Name,
                         SerialNumber = m.SerialNumber,
-                        IsActive = determineActive(bedCount, m.Is25Active, m.Is50Active, m.Is100Active, m.Is200Active),
+                        //IsActive = determineActive(bedCount, m.Is25Active, m.Is50Active, m.Is100Active, m.Is200Active),
                         Status = m.Status,
                         IsGroup = m.IsGroup,
                         IsSubGroup = m.IsSubGroup,
                         IsSection = m.IsSection,
                         HasGroup = m.HasGroup,
-                        Value = determineValue(bedCount, m.FormType, m.Value25, m.Value50, m.Value100, m.Value200),
+                        //Value = determineValue(bedCount, m.FormType, m.Value25, m.Value50, m.Value100, m.Value200),
                     }).ToList()
             }).FirstOrDefaultAsync();
 

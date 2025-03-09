@@ -6,7 +6,7 @@ public class HealthFacilityDto
     public int FacilityTypeId { get; set; }
     public string FacilityType { get; set; }
     public string PanNumber { get; set; }
-    public int BedCount { get; set; }
+    public string BedCount { get; set; }
     public int SpecialistCount { get; set; }
     public string AvailableServices { get; set; }
     public string Province { get; set; }
@@ -57,7 +57,8 @@ public class RegisterFacilityDto
     public int FacilityTypeId { get; set; }
     public string? FacilityType { get; set; }
     public string PanNumber { get; set; }
-    public int BedCount { get; set; }
+    public int BedCountId { get; set; }
+    public string BedCount { get; set; }
     public int SpecialistCount { get; set; }
     public string AvailableServices { get; set; }
     public int ProvinceId { get; set; }
