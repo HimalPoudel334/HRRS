@@ -118,6 +118,13 @@ namespace HRRS.Services.Implementation
             if(user!.Role.BedCount.HasValue && user!.Role.BedCount != entry.BedCount)
                 return ResultDto.Failure("Cannot find entry");
 
+            var entries = await _context.MasterStandardEntries
+                .Where(x => x.SubmissionCode == entryId)
+                .AnyAsync(x => x.HospitalStandardEntries
+                        .Any(x => x.HospitalStandards
+                        .Any(x => x.IsApproved == false)));
+
+
             entry.EntryStatus = EntryStatus.Approved;
             entry.Remarks = dto.Remarks;
             entry.UpdatedAt = DateTime.Now;

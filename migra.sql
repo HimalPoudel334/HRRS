@@ -191,11 +191,9 @@ CREATE TABLE [AnusuchiMappings] (
     [BedCountId] int NOT NULL,
     [SubmissionTypeId] int NOT NULL,
     [RoleId] int NOT NULL,
-    [MapdandaTableId] int NULL,
     CONSTRAINT [PK_AnusuchiMappings] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_AnusuchiMappings_BedCount_BedCountId] FOREIGN KEY ([BedCountId]) REFERENCES [BedCount] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_AnusuchiMappings_HospitalType_FacilityTypeId] FOREIGN KEY ([FacilityTypeId]) REFERENCES [HospitalType] ([SN]) ON DELETE CASCADE,
-    CONSTRAINT [FK_AnusuchiMappings_MapdandaTables_MapdandaTableId] FOREIGN KEY ([MapdandaTableId]) REFERENCES [MapdandaTables] ([Id]),
     CONSTRAINT [FK_AnusuchiMappings_SubmissionTypes_SubmissionTypeId] FOREIGN KEY ([SubmissionTypeId]) REFERENCES [SubmissionTypes] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_AnusuchiMappings_UserRoles_RoleId] FOREIGN KEY ([RoleId]) REFERENCES [UserRoles] ([Id]) ON DELETE CASCADE
 );
@@ -232,12 +230,8 @@ CREATE TABLE [Mapdandas] (
     [IsSubGroup] bit NOT NULL,
     [IsSection] bit NOT NULL,
     [HasGroup] bit NOT NULL,
-    [SubParichhedId] int NULL,
-    [SubSubParichhedId] int NULL,
     CONSTRAINT [PK_Mapdandas] PRIMARY KEY ([Id]),
     CONSTRAINT [FK_Mapdandas_MapdandaTables_MapdandaTableId] FOREIGN KEY ([MapdandaTableId]) REFERENCES [MapdandaTables] ([Id]) ON DELETE CASCADE,
-    CONSTRAINT [FK_Mapdandas_SubParichheds_SubParichhedId] FOREIGN KEY ([SubParichhedId]) REFERENCES [SubParichheds] ([Id]),
-    CONSTRAINT [FK_Mapdandas_SubSubParichheds_SubSubParichhedId] FOREIGN KEY ([SubSubParichhedId]) REFERENCES [SubSubParichheds] ([Id])
 );
 
 CREATE TABLE [Users] (
@@ -441,3 +435,6 @@ VALUES (N'20250307115538_InitialCreate', N'9.0.1');
 COMMIT;
 GO
 
+select * from UserRoles
+
+select * from mapdandas

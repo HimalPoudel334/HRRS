@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HRRS.Migrations
 {
     /// <inheritdoc />
-    public partial class FixMtoMRelation : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,7 +32,7 @@ namespace HRRS.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Count = table.Column<int>(type: "int", nullable: false)
+                    Count = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -136,6 +136,46 @@ namespace HRRS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AnusuchiMappings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FacilityTypeId = table.Column<int>(type: "int", nullable: false),
+                    BedCountId = table.Column<int>(type: "int", nullable: false),
+                    SubmissionTypeId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnusuchiMappings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMappings_BedCount_BedCountId",
+                        column: x => x.BedCountId,
+                        principalTable: "BedCount",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMappings_HospitalType_FacilityTypeId",
+                        column: x => x.FacilityTypeId,
+                        principalTable: "HospitalType",
+                        principalColumn: "SN",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMappings_SubmissionTypes_SubmissionTypeId",
+                        column: x => x.SubmissionTypeId,
+                        principalTable: "SubmissionTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMappings_UserRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "UserRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SubParichheds",
                 columns: table => new
                 {
@@ -174,6 +214,38 @@ namespace HRRS.Migrations
                         principalTable: "Districts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AnusuchiMapdandaTableMappings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AnusuchiMappingId = table.Column<int>(type: "int", nullable: false),
+                    AnusuchiId = table.Column<int>(type: "int", nullable: false),
+                    ParichhedId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnusuchiMapdandaTableMappings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMapdandaTableMappings_AnusuchiMappings_AnusuchiMappingId",
+                        column: x => x.AnusuchiMappingId,
+                        principalTable: "AnusuchiMappings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMapdandaTableMappings_Anusuchis_AnusuchiId",
+                        column: x => x.AnusuchiId,
+                        principalTable: "Anusuchis",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AnusuchiMapdandaTableMappings_Parichheds_ParichhedId",
+                        column: x => x.ParichhedId,
+                        principalTable: "Parichheds",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -364,41 +436,25 @@ namespace HRRS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AnusuchiMappings",
+                name: "AnusuchiMappingMapdandaTable",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FacilityTypeId = table.Column<int>(type: "int", nullable: false),
-                    BedCountId = table.Column<int>(type: "int", nullable: false),
-                    SubmissionTypeId = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false)
+                    AnusuchiMappingsId = table.Column<int>(type: "int", nullable: false),
+                    MapdandaTablesId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AnusuchiMappings", x => x.Id);
+                    table.PrimaryKey("PK_AnusuchiMappingMapdandaTable", x => new { x.AnusuchiMappingsId, x.MapdandaTablesId });
                     table.ForeignKey(
-                        name: "FK_AnusuchiMappings_BedCount_BedCountId",
-                        column: x => x.BedCountId,
-                        principalTable: "BedCount",
+                        name: "FK_AnusuchiMappingMapdandaTable_AnusuchiMappings_AnusuchiMappingsId",
+                        column: x => x.AnusuchiMappingsId,
+                        principalTable: "AnusuchiMappings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AnusuchiMappings_HospitalType_FacilityTypeId",
-                        column: x => x.FacilityTypeId,
-                        principalTable: "HospitalType",
-                        principalColumn: "SN",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AnusuchiMappings_SubmissionTypes_SubmissionTypeId",
-                        column: x => x.SubmissionTypeId,
-                        principalTable: "SubmissionTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AnusuchiMappings_UserRoles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "UserRoles",
+                        name: "FK_AnusuchiMappingMapdandaTable_MapdandaTables_MapdandaTablesId",
+                        column: x => x.MapdandaTablesId,
+                        principalTable: "MapdandaTables",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -517,38 +573,6 @@ namespace HRRS.Migrations
                         name: "FK_Users_UserRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "UserRoles",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AnusuchiMapdandaTableMappings",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    AnusuchiMappingId = table.Column<int>(type: "int", nullable: false),
-                    AnusuchiId = table.Column<int>(type: "int", nullable: false),
-                    ParichhedId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AnusuchiMapdandaTableMappings", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AnusuchiMapdandaTableMappings_AnusuchiMappings_AnusuchiMappingId",
-                        column: x => x.AnusuchiMappingId,
-                        principalTable: "AnusuchiMappings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AnusuchiMapdandaTableMappings_Anusuchis_AnusuchiId",
-                        column: x => x.AnusuchiId,
-                        principalTable: "Anusuchis",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AnusuchiMapdandaTableMappings_Parichheds_ParichhedId",
-                        column: x => x.ParichhedId,
-                        principalTable: "Parichheds",
                         principalColumn: "Id");
                 });
 
@@ -718,6 +742,11 @@ namespace HRRS.Migrations
                 name: "IX_AnusuchiMapdandaTableMappings_ParichhedId",
                 table: "AnusuchiMapdandaTableMappings",
                 column: "ParichhedId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnusuchiMappingMapdandaTable_MapdandaTablesId",
+                table: "AnusuchiMappingMapdandaTable",
+                column: "MapdandaTablesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AnusuchiMappings_BedCountId",
@@ -921,6 +950,9 @@ namespace HRRS.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AnusuchiMapdandaTableMappings");
+
+            migrationBuilder.DropTable(
+                name: "AnusuchiMappingMapdandaTable");
 
             migrationBuilder.DropTable(
                 name: "HospitalStandards");

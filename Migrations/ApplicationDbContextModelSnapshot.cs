@@ -47,6 +47,21 @@ namespace HRRS.Migrations
                     b.ToTable("Anusuchis");
                 });
 
+            modelBuilder.Entity("AnusuchiMappingMapdandaTable", b =>
+                {
+                    b.Property<int>("AnusuchiMappingsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MapdandaTablesId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AnusuchiMappingsId", "MapdandaTablesId");
+
+                    b.HasIndex("MapdandaTablesId");
+
+                    b.ToTable("AnusuchiMappingMapdandaTable");
+                });
+
             modelBuilder.Entity("HRRS.Persistence.Entities.AnusuchiMapdandaTableMapping", b =>
                 {
                     b.Property<int>("Id")
@@ -116,8 +131,9 @@ namespace HRRS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
+                    b.Property<string>("Count")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -981,6 +997,21 @@ namespace HRRS.Migrations
                     b.ToTable("SubSubParichheds");
                 });
 
+            modelBuilder.Entity("AnusuchiMappingMapdandaTable", b =>
+                {
+                    b.HasOne("HRRS.Persistence.Entities.AnusuchiMapping", null)
+                        .WithMany()
+                        .HasForeignKey("AnusuchiMappingsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HRRS.Persistence.Entities.MapdandaTable", null)
+                        .WithMany()
+                        .HasForeignKey("MapdandaTablesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("HRRS.Persistence.Entities.AnusuchiMapdandaTableMapping", b =>
                 {
                     b.HasOne("Anusuchi", "Anusuchi")
@@ -1057,7 +1088,7 @@ namespace HRRS.Migrations
                     b.HasOne("HRRS.Persistence.Entities.District", "District")
                         .WithMany()
                         .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("District");
@@ -1238,7 +1269,7 @@ namespace HRRS.Migrations
                     b.HasOne("HRRS.Persistence.Entities.District", "District")
                         .WithMany()
                         .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Persistence.Entities.FacilityType", "FacilityType")
@@ -1250,13 +1281,13 @@ namespace HRRS.Migrations
                     b.HasOne("HRRS.Persistence.Entities.LocalLevel", "LocalLevel")
                         .WithMany()
                         .HasForeignKey("LocalLevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("HRRS.Persistence.Entities.Province", "Province")
                         .WithMany()
                         .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("District");
@@ -1273,7 +1304,7 @@ namespace HRRS.Migrations
                     b.HasOne("HRRS.Persistence.Entities.District", "District")
                         .WithMany()
                         .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Persistence.Entities.FacilityType", "FacilityType")
@@ -1285,13 +1316,13 @@ namespace HRRS.Migrations
                     b.HasOne("HRRS.Persistence.Entities.LocalLevel", "LocalLevel")
                         .WithMany()
                         .HasForeignKey("LocalLevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("HRRS.Persistence.Entities.Province", "Province")
                         .WithMany()
                         .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("District");
@@ -1348,8 +1379,6 @@ namespace HRRS.Migrations
 
             modelBuilder.Entity("HRRS.Persistence.Entities.MapdandaTable", b =>
                 {
-                    b.Navigation("AnusuchiMappings");
-
                     b.Navigation("Mapdandas");
                 });
 
