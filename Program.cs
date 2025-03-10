@@ -47,6 +47,7 @@ builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<IFacilityAddressService, FacilityAddressService>();
 builder.Services.AddScoped<IRegistrationRequestService, RegistrationRequestService>();
 builder.Services.AddScoped<IRoleResolver, RoleResolver>();
+builder.Services.AddScoped<IUserPostService, UserPostService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();

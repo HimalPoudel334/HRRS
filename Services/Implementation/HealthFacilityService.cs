@@ -26,11 +26,6 @@ namespace HRRS.Services.Implementation
         {
             var healthFacility = await _roleResolver
                 .FacilitiesResolver(userId)
-                .Include(x => x.FacilityType)
-                .Include(x => x.Province)
-                .Include(x => x.BedCount)
-                .Include(x => x.District)
-                .Include(x => x.LocalLevel)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
             if(healthFacility == null) return ResultWithDataDto<HealthFacilityDto>.Failure("स्वास्थ्य संस्था फेला परेन।");

@@ -218,9 +218,6 @@ public class MasterStandardEntryService(ApplicationDbContext context, IRoleResol
 
     public async Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetAllNewSubmission(long userId)
     {
-        var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId);
-        if (user == null || user.UserType == "Hospital") return ResultWithDataDto<List<MasterStandardEntryDto>>.Failure("User not found");
-
         //var masterEntryQuery = _context.MasterStandardEntries.AsQueryable();
 
         //if (user.Post != null && user.Post.Post == UserPost.KaryalayaPramukh)
@@ -250,9 +247,6 @@ public class MasterStandardEntryService(ApplicationDbContext context, IRoleResol
 
     public async Task<ResultWithDataDto<int>> GetNewSubmissionCount(long userId)
     {
-        var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId);
-        if (user == null || user.UserType == "Hospital") return ResultWithDataDto<int>.Failure("User not found");
-
         // = _context.MasterStandardEntries.AsQueryable();
 
         //if (user.Post != null && user.Post.Post == UserPost.KaryalayaPramukh)
@@ -263,7 +257,7 @@ public class MasterStandardEntryService(ApplicationDbContext context, IRoleResol
         //if (user.Role != null && user.Role.Title != Role.SuperAdmin)
         //    masterEntryQuery = masterEntryQuery.Where(x => x.HealthFacility.BedCount == user.Role.BedCount.Value);
 
-        var count = await _rr.Submissions(userId).CountAsync();
+        var count = _rr.Submissions(userId).Count();
         return ResultWithDataDto<int>.Success(count);
     }
 

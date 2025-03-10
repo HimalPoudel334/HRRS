@@ -68,13 +68,15 @@ public static class Endpoints
         endpoints.MapGet("api/healthfacility/{id}", async (int id, IHealthFacilityService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetById(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"))));
 
         //health facility type
-        endpoints.MapGet("api/facilitytypes", async (IFacilityTypeService service) => TypedResults.Ok(await service.GetAll()));
+        endpoints.MapGet("api/facilitytypes", async (int? id, IFacilityTypeService service) => TypedResults.Ok(await service.GetAll(id)));
         endpoints.MapPost("api/facilitytypes", async (FacilityTypeDto dto, IFacilityTypeService service) => TypedResults.Ok(await service.Create(dto))).RequireAuthorization("SuperAdmin");
 
         //user get
         endpoints.MapGet("api/users", async (IAuthService service) => TypedResults.Ok(await service.GetAllUsers())).RequireAuthorization("SuperAdmin");
         endpoints.MapGet("api/users/{userId}", async (long userId, IAuthService service) => TypedResults.Ok(await service.GetById(userId))).RequireAuthorization("SuperAdmin");
 
+        //user post
+        endpoints.MapGet("api/userposts", async (IUserPostService service) => TypedResults.Ok(await service.GetAll())).RequireAuthorization();
 
         //user role services
         endpoints.MapGet("api/userrole", async (IUserRoleService service) => TypedResults.Ok(await service.GetAll())).RequireAuthorization("SuperAdmin");

@@ -29,5 +29,5 @@ namespace HRRS.Persistence.Entities
         public int BedCountId { get; set; }
         public BedCount BedCount { get; set; }
 
-    }
+        }
 }

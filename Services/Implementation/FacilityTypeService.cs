@@ -11,16 +11,22 @@ namespace HRRS.Services.Implementation
         private readonly ApplicationDbContext _context;
 
         public FacilityTypeService(ApplicationDbContext context) => _context = context;
-        public async Task<ResultWithDataDto<List<FacilityTypeDto>>> GetAll()
+        public async Task<ResultWithDataDto<List<FacilityTypeDto>>> GetAll(int? id)
         {
-            var facilityTypes = await _context.HospitalType.Where(x => x.ACTIVE).Select(x => new FacilityTypeDto
+            var facilityTypesQuery = _context.HospitalType.Where(x => x.ACTIVE);
+
+            if(id.HasValue)
+                facilityTypesQuery = facilityTypesQuery.Where(x => x.FacilityTypeId == id);
+
+            var facilityTypes = await facilityTypesQuery.Select(x => new FacilityTypeDto
             {
                 Id = x.SN,
                 Name = x.HOSP_TYPE,
                 HospitalCode = x.HOSP_CODE,
                 IsActive = x.ACTIVE,
             }).ToListAsync();
-            if(facilityTypes.Count == 0 || facilityTypes is null) 
+
+            if (facilityTypes.Count == 0 || facilityTypes is null) 
                 return new ResultWithDataDto<List<FacilityTypeDto>>(true, null, "Cannot find health facility types");
             return new ResultWithDataDto<List<FacilityTypeDto>>(true, facilityTypes, null);
 

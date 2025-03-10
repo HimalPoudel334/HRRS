@@ -37,5 +37,6 @@ namespace HRRS.Services.Implementation
 
             return ResultDto.Success();
         }
+
     }
 }
