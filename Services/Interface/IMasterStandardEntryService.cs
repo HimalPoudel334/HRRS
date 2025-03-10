@@ -8,7 +8,7 @@ namespace HRRS.Services.Interface
     public interface IMasterStandardEntryService
     {
         Task<ResultWithDataDto<string>> Create(SubmissionTypeDto dto, int healthFacilityId);
-        Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetByHospitalId(int healthFacilityId);
+        Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetByHospitalId(int healthFacilityId, long userId);
         Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetByUserHospitalId(int healthFacilityId);
         Task<ResultDto> UserFinalSubmission(Guid submissionCode);
         Task<ResultDto> ApproveStandardsWithRemark(Guid entryId, StandardRemarkDto dto, long userId);

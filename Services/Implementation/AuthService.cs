@@ -134,6 +134,10 @@ public class AuthService : IAuthService
         if (bedCount is null)
             return ResultWithDataDto<string>.Failure("Bed count cannot be found");
 
+        var handlerRole = await _context.UserRoles.FindAsync(dto.RoleId);
+        if (handlerRole is null)
+            return ResultWithDataDto<string>.Failure("You must select the office to request your registration");
+
         var healthFacility = new TempHealthFacility()
         {
             FacilityName = dto.FacilityName,
@@ -163,7 +167,8 @@ public class AuthService : IAuthService
         {
             HealthFacility = healthFacility,
             Status = RequestStatus.Pending,
-            CreatedAt = DateTime.Now
+            CreatedAt = DateTime.Now,
+            Role = handlerRole,
         };
 
         await _context.RegistrationRequests.AddAsync(registrationRequest);

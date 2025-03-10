@@ -22,11 +22,51 @@ namespace HRRS.Services.Implementation
             if (user.UserType == "Hospital")
                 return _context.MasterStandardEntries.Where(x => x.HealthFacilityId == user.HealthFacilityId);
 
+            var roleId = user.RoleId!;
+
+            var submissions = _context.MasterStandardEntries
+                .Where(x => x.EntryStatus != EntryStatus.Draft)
+                .Where(x => x.HealthFacility.RoleId == roleId);
+
+            //var submissions = _context.MasterStandardEntries
+            //.Include(x => x.HealthFacility)
+            //.AsSplitQuery();
+
+            //var facilityTypeIds = _context.AnusuchiMappings.Where(x => x.RoleId == user.RoleId).Select(x => x.FacilityTypeId).ToList();
+            ////var facilityTypeIds = user.Role!.UserRoleFacilityTypes.Select(y => y.FacilityTypeId).ToList();
+            //var bedCountIds = user.Role!.UserRoleFacilityTypes.Select(y => y.BedCountId).ToList();
+
+            //submissions = submissions
+            //    .Where(x => facilityTypeIds.Contains(x.HealthFacility.FacilityTypeId))
+            //    .Where(x => bedCountIds.Contains(x.HealthFacility.BedCountId));
+
+            //if (user.Post!.Post != UserPost.Samiti)
+            //    return submissions.Where(x => x.EntryStatus == EntryStatus.STP);
+
+            return submissions;
+
+        }
+
+        [Obsolete("This is for the automation, need to come back to this")]
+        public  IQueryable<MasterStandardEntry> SubmissionsOld(long userId)
+        {
+            var user = _context.Users
+                .Include(x => x.Role)
+                .Include(x => x.Post)
+                .FirstOrDefault(x => x.UserId == userId) ?? throw new Exception("User not found");
+
+            if (user.UserType == "SuperAdmin")
+                return _context.MasterStandardEntries.Where(x => x.EntryStatus != EntryStatus.Draft);
+
+            if (user.UserType == "Hospital")
+                return _context.MasterStandardEntries.Where(x => x.HealthFacilityId == user.HealthFacilityId);
+
             var submissions = _context.MasterStandardEntries
             .Include(x => x.HealthFacility)
             .AsSplitQuery();
 
-            var facilityTypeIds = user.Role!.UserRoleFacilityTypes.Select(y => y.FacilityTypeId).ToList();
+            var facilityTypeIds = _context.AnusuchiMappings.Where(x => x.RoleId == user.RoleId).Select(x => x.FacilityTypeId).ToList();
+            //var facilityTypeIds = user.Role!.UserRoleFacilityTypes.Select(y => y.FacilityTypeId).ToList();
             var bedCountIds = user.Role!.UserRoleFacilityTypes.Select(y => y.BedCountId).ToList();
 
             submissions = submissions

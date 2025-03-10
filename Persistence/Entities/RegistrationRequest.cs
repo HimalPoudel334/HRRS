@@ -13,6 +13,8 @@ namespace HRRS.Persistence.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public string? Remarks { get; set; }
+        public Role Role { get; set; }
+        public int RoleId { get; set; }
 
     }
 

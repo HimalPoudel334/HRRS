@@ -41,24 +41,32 @@ public class MasterStandardEntryService(ApplicationDbContext context, IRoleResol
         return ResultWithDataDto<string>.Success(masterEntry.SubmissionCode.ToString());
     }
 
-    public async Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetByHospitalId(int healthFacilityId)
+    // only to be accessed by admins
+    public async Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetByHospitalId(int healthFacilityId, long userId)
     {
-        var masterEntry = await _context
+        var roleId = await _context.Users.Where(x => x.UserId == userId).Select(x => x.RoleId).FirstOrDefaultAsync();
+
+        var query = _context
             .MasterStandardEntries
             .Where(m => m.HealthFacilityId == healthFacilityId)
-            .Where(x => x.EntryStatus != EntryStatus.Draft)
-            .OrderByDescending(x => x.CreatedAt)
-            .Select(x => new MasterStandardEntryDto
-            {
-                HealthFacility = x.HealthFacility.FacilityName,
-                HealthFacilityId = x.HealthFacilityId,
-                EntryStatus = x.EntryStatus,
-                Remarks = x.Remarks,
-                SubmissionType = x.SubmissionType.Title,
-                SubmissionCode = x.SubmissionCode,
-                SubmittedOn = x.UpdatedAt
-            })
-            .ToListAsync();
+            .Where(x => x.EntryStatus != EntryStatus.Draft);
+
+        if (roleId is not null)
+            query = query.Where(x => x.HealthFacility.RoleId == roleId);
+
+            var masterEntry = await query
+                .Select(x => new MasterStandardEntryDto
+                {
+                    HealthFacility = x.HealthFacility.FacilityName,
+                    HealthFacilityId = x.HealthFacilityId,
+                    EntryStatus = x.EntryStatus,
+                    Remarks = x.Remarks,
+                    SubmissionType = x.SubmissionType.Title,
+                    SubmissionCode = x.SubmissionCode,
+                    SubmittedOn = x.UpdatedAt
+                })
+                .OrderByDescending(x => x.SubmittedOn)
+                .ToListAsync();
 
         if (masterEntry is null)
             return new ResultWithDataDto<List<MasterStandardEntryDto>>(false, null, "Master standard entry not found");
@@ -66,7 +74,7 @@ public class MasterStandardEntryService(ApplicationDbContext context, IRoleResol
         return ResultWithDataDto<List<MasterStandardEntryDto>>.Success(masterEntry);
     }
 
-    // only to be accessed by admins
+    
     public async Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetByUserHospitalId(int healthFacilityId)
     {
         var masterEntry = await _context

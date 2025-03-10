@@ -30,4 +30,5 @@ namespace HRRS.Persistence.Entities
         public BedCount BedCount { get; set; }
 
         }
+
 }

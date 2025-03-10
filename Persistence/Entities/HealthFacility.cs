@@ -101,6 +101,8 @@ namespace Persistence.Entities
         public string? ApplicationSubmittedDate { get; set; }
 
         public string? ApplicationSubmittedAuthority { get; set; }
+        public Role Role { get; set; }
+        public int RoleId { get; set; }
     }
 
     public class FacilityType

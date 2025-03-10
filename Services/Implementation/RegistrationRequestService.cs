@@ -29,11 +29,15 @@ namespace HRRS.Services.Implementation
                 .Include(x => x.HealthFacility)
                 .AsQueryable();
 
-            var user = await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId);
-            
+            var user = (await _context.Users.Include(x => x.Role).FirstOrDefaultAsync(x => x.UserId == userId))!;
 
-            if(user!.Role is not null && user!.Role.Title != Role.SuperAdmin)
-                requestQuery = requestQuery.Where(x => user.Role.FacilityTypes.Contains(x.HealthFacility.FacilityType));
+            //if(user!.Role is not null && user!.Role.Title != Role.SuperAdmin)
+            //    requestQuery = requestQuery.Where(x => user.Role.FacilityTypes.Contains(x.HealthFacility.FacilityType));
+
+            if (user.Role is not null)
+            {
+                requestQuery = requestQuery.Where(x => x.RoleId == user.RoleId);
+            }
 
             var requests = await requestQuery
                 .OrderByDescending(x => x.CreatedAt)
@@ -59,17 +63,6 @@ namespace HRRS.Services.Implementation
         public async Task<ResultWithDataDto<RegistrationRequestWithFacilityDto?>> GetRegistrationRequestByIdAsync(int id)
         {
             var request = await _context.RegistrationRequests
-                .Include(x => x.HandledBy)
-                .Include(x => x.HealthFacility)
-                .ThenInclude(x => x.District)
-                .Include(x => x.HealthFacility)
-                .ThenInclude(x => x.LocalLevel)
-                .Include(x => x.HealthFacility)
-                .ThenInclude(x => x.FacilityType)
-                .Include(x => x.HealthFacility)
-                .ThenInclude(x => x.Province)
-                .Include(x => x.HealthFacility)
-                .ThenInclude(x => x.BedCount)
                 .Select(x => new RegistrationRequestWithFacilityDto
                 {
                     Id = x.Id,

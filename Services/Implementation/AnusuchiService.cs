@@ -83,20 +83,20 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
             .Where(x => x.MasterStandardEntry.SubmissionCode == submissionCode)
             .ToListAsync();
 
-        if (standardEntries.Count == 0)
-        {
-            var anusuchis = await _dbContext.Anusuchis
-                .Where(x => new[] { "17", "१७", "3", "३" }.Contains(x.SerialNo))
-                .Select(x => new AnusuchiDto
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    DafaNo = x.DafaNo,
-                    SerialNo = x.SerialNo
-                })
-                .ToListAsync();
-            return ResultWithDataDto<List<AnusuchiDto>>.Success(anusuchis);
-        }
+        //if (standardEntries.Count == 0)
+        //{
+        //    var anusuchis = await _dbContext.Anusuchis
+        //        .Where(x => new[] { "17", "१७", "3", "३" }.Contains(x.SerialNo))
+        //        .Select(x => new AnusuchiDto
+        //        {
+        //            Id = x.Id,
+        //            Name = x.Name,
+        //            DafaNo = x.DafaNo,
+        //            SerialNo = x.SerialNo
+        //        })
+        //        .ToListAsync();
+        //    return ResultWithDataDto<List<AnusuchiDto>>.Success(anusuchis);
+        //}
 
         var healthFacility = await _dbContext.HealthFacilities.FindAsync(user.HealthFacilityId);
         if (healthFacility == null)
