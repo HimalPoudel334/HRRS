@@ -68,8 +68,12 @@ public static class Endpoints
         endpoints.MapGet("api/healthfacility/{id}", async (int id, IHealthFacilityService service, ClaimsPrincipal user) => TypedResults.Ok(await service.GetById(id, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"))));
 
         //health facility type
-        endpoints.MapGet("api/facilitytypes", async (int? id, IFacilityTypeService service) => TypedResults.Ok(await service.GetAll(id)));
+        endpoints.MapGet("api/facilitytypes", async (IFacilityTypeService service) => TypedResults.Ok(await service.GetAll()));
+        endpoints.MapGet("api/facilitytypes/{id}/subtypes", async (int id, IFacilityTypeService service) => TypedResults.Ok(await service.GetSubTypesOfParent(id)));
         endpoints.MapPost("api/facilitytypes", async (FacilityTypeDto dto, IFacilityTypeService service) => TypedResults.Ok(await service.Create(dto))).RequireAuthorization("SuperAdmin");
+
+        //bed counts
+        endpoints.MapGet("api/bedcount/{facilityTypeId}", async (int facilityTypeId, IBedCountService service) => TypedResults.Ok(await service.GetBedCountsByFacilityType(facilityTypeId)));
 
         //user get
         endpoints.MapGet("api/users", async (IAuthService service) => TypedResults.Ok(await service.GetAllUsers())).RequireAuthorization("SuperAdmin");
@@ -119,6 +123,7 @@ public static class Endpoints
         endpoints.MapPost("api/standard/status/approve/{entryId}", async (Guid entryId, StandardRemarkDto dto, IMasterStandardEntryService service, ClaimsPrincipal user) => TypedResults.Ok(await service.ApproveStandardsWithRemark(entryId, dto, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization("AllAdmins");
         endpoints.MapPost("api/standard/status/reject/{entryId}", async (Guid entryId, StandardRemarkDto dto, IMasterStandardEntryService service, ClaimsPrincipal user) => TypedResults.Ok(await service.RejectStandardsWithRemark(entryId, dto, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization("AllAdmins");
         endpoints.MapPost("api/standard/status/pending/{entryId}", async (Guid entryId, IMasterStandardEntryService service, ClaimsPrincipal user) => TypedResults.Ok(await service.PendingHospitalStandardsEntry(entryId, int.Parse(user.FindFirstValue("HealthFacilityId")?.Trim() ?? "0")))).RequireAuthorization();
+        endpoints.MapPost("api/standard/status/sifaris/{entryId}", async (Guid entryId, IMasterStandardEntryService service, ClaimsPrincipal user) => TypedResults.Ok(await service.SifarisToPramukh(entryId, long.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0")))).RequireAuthorization();
 
         endpoints.MapGet("api/hospitalentry/{entryId}", async (int entryId, IHospitalStandardService service) => TypedResults.Ok(await service.GetHospitalEntryById(entryId)));
 

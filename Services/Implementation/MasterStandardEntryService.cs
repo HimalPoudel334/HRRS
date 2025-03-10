@@ -7,6 +7,7 @@ using HRRS.Services.Interface;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.SqlServer.Server;
+using Persistence.Entities;
 
 namespace HRRS.Services.Implementation;
 
@@ -149,7 +150,6 @@ public class MasterStandardEntryService(ApplicationDbContext context, IRoleResol
         //if (user.UserType != Role.SuperAdmin && user!.Role.BedCount.HasValue && user!.Role.BedCount != entry.BedCount)
         //    return ResultDto.Failure("Cannot find entry");
 
-
         entry.EntryStatus = EntryStatus.Rejected;
         entry.Remarks = dto.Remarks;
         entry.UpdatedAt = DateTime.Now;
@@ -262,8 +262,12 @@ public class MasterStandardEntryService(ApplicationDbContext context, IRoleResol
     }
 
     //authorized only to Samiti type user
-    public async Task<ResultDto> SifarisToPramukh(Guid submissionCode)
+    public async Task<ResultDto> SifarisToPramukh(Guid submissionCode, long userId)
     {
+        var user = await _context.Users.Include(x => x.Post).Include(x => x.Post).FirstOrDefaultAsync(x => x.UserId == userId);
+        if (user!.Post!.Post != UserPost.Samiti)
+            return ResultDto.Failure("You are not allowed to perform this action");
+
         var masterEntry = await _context.MasterStandardEntries.FirstOrDefaultAsync(x => x.SubmissionCode == submissionCode);
         if (masterEntry == null) return ResultDto.Failure("Submission not found");
 

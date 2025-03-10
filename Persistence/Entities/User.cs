@@ -34,9 +34,9 @@ public class User
 
 public class UserPost
 {
-    public const string KaryalayaPramukh = "";
-    public const string MantralayaSachib = "";
-    public const string Samiti = "";
+    public const string KaryalayaPramukh = "कार्यलय प्रमुख";
+    public const string MantralayaSachib = "सचिब";
+    public const string Samiti = "समिति";
     public int Id { get; set; }
     public string Post { get; set; }
 }

@@ -18,6 +18,7 @@ namespace HRRS.Services.Interface
         Task<ResultWithDataDto<List<SubmissionType>>> GetAllSubmissionTypes();
         Task<ResultWithDataDto<List<MasterStandardEntryDto>>> GetAllNewSubmission(long userId);
         Task<ResultWithDataDto<int>> GetNewSubmissionCount(long userId);
+        Task<ResultDto> SifarisToPramukh(Guid submissionCode, long userId);
 
     }
 }

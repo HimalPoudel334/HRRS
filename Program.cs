@@ -48,6 +48,7 @@ builder.Services.AddScoped<IFacilityAddressService, FacilityAddressService>();
 builder.Services.AddScoped<IRegistrationRequestService, RegistrationRequestService>();
 builder.Services.AddScoped<IRoleResolver, RoleResolver>();
 builder.Services.AddScoped<IUserPostService, UserPostService>();
+builder.Services.AddScoped<IBedCountService, BedCountService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -55,7 +56,7 @@ builder.Services.AddProblemDetails();
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddOpenApi();
 

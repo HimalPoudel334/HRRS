@@ -28,7 +28,7 @@ public class AuthService : IAuthService
 
     public async Task<ResultWithDataDto<AuthResponseDto>> LoginUser(LoginDto dto)
     {
-        var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == dto.Username);
+        var user = await _context.Users.Include(x => x.Post).SingleOrDefaultAsync(x => x.UserName == dto.Username);
         if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
         {
             return ResultWithDataDto<AuthResponseDto>.Failure("Invalid Username or Password");
@@ -107,6 +107,10 @@ public class AuthService : IAuthService
         if (facilityType is null)
             return ResultWithDataDto<string>.Failure("Facility type cannot be found");
 
+        if(await _context.HospitalType.AnyAsync(x => x.FacilityTypeId == facilityType.SN))
+            return ResultWithDataDto<string>.Failure("Facility type must have sub type");
+
+        
         var province = await _context.Provinces.FindAsync(dto.ProvinceId);
         if (province is null)
             return ResultWithDataDto<string>.Failure("Province cannot be found");
@@ -176,7 +180,7 @@ public class AuthService : IAuthService
 
     private ResultWithDataDto<AuthResponseDto> GenerateAuthResponse(User user)
     {
-        var loggedInUser = new LoggedInUser(user.UserId, user.UserName, user.UserType, user.HealthFacilityId);
+        var loggedInUser = new LoggedInUser(user.UserId, user.UserName, user.UserType, user.HealthFacilityId, user.Post?.Post);
         var token = _tokenService.GenerateJwt(loggedInUser);
 
         var authResponse = new AuthResponseDto(loggedInUser, token);

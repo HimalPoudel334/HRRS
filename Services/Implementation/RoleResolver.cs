@@ -16,22 +16,11 @@ namespace HRRS.Services.Implementation
                 .Include(x => x.Post)
                 .FirstOrDefault(x => x.UserId == userId) ?? throw new Exception("User not found");
 
-            //if(user.UserType == "SuperAdmin")
-            //    return _context.MasterStandardEntries.Where(x => x.EntryStatus != EntryStatus.Draft);
+            if (user.UserType == "SuperAdmin")
+                return _context.MasterStandardEntries.Where(x => x.EntryStatus != EntryStatus.Draft);
 
-            //if (user.UserType == "Hospital")
-            //    return _context.MasterStandardEntries.Where(x => x.HealthFacilityId == user.HealthFacilityId);
-
-            //var submissions =  _context.MasterStandardEntries
-            //    .Include(x => x.HealthFacility)
-            //    .AsSplitQuery()
-            //    .Where(x => user.Role!.UserRoleFacilityTypes.Any(y => y.FacilityTypeId == x.HealthFacility.FacilityTypeId))
-            //    .Where(x => user.Role!.UserRoleFacilityTypes.Any(y => y.BedCountId == x.HealthFacility.BedCountId));
-
-            //if(user.Post!.Post != UserPost.Samiti)
-            //    return submissions.Where(x => x.EntryStatus == EntryStatus.STP);
-
-            //return submissions;
+            if (user.UserType == "Hospital")
+                return _context.MasterStandardEntries.Where(x => x.HealthFacilityId == user.HealthFacilityId);
 
             var submissions = _context.MasterStandardEntries
             .Include(x => x.HealthFacility)
@@ -58,20 +47,24 @@ namespace HRRS.Services.Implementation
                 .Include(x => x.Post)
                 .FirstOrDefault(x => x.UserId == userId) ?? throw new Exception("User not found");
 
+            var healthfacilitiesQuery = _context.HealthFacilities.Include(x => x.FacilityType)
+                .Include(x => x.BedCount)
+                .Include(x => x.District)
+                .Include(x => x.Province)
+                .Include(x => x.LocalLevel);
+
             if (user.UserType == "SuperAdmin")
-                return _context.HealthFacilities;
+                return healthfacilitiesQuery;
 
             if (user.UserType == "Hospital")
-                return _context.HealthFacilities.Where(x => x.Id == user.HealthFacilityId);
+                return healthfacilitiesQuery.Where(x => x.Id == user.HealthFacilityId);
 
-            var facilities = _context.HealthFacilities
-                .AsSplitQuery()
-                .Include(x => x.Province)
-                .Include(x => x.District)
-                .Include(x => x.FacilityType)
-                .Include(x => x.LocalLevel)
-                .Where(x => user.Role!.UserRoleFacilityTypes.Any(y => y.FacilityTypeId == x.FacilityTypeId))
-                .Where(x => user.Role!.UserRoleFacilityTypes.Any(y => y.BedCountId == x.BedCountId));
+            var facilityTypeIds = user.Role!.UserRoleFacilityTypes.Select(y => y.FacilityTypeId).ToList();
+            var bedCountIds = user.Role!.UserRoleFacilityTypes.Select(y => y.BedCountId).ToList();
+
+            var facilities = healthfacilitiesQuery
+                .Where(x => facilityTypeIds.Contains(x.FacilityTypeId))
+                .Where(x => bedCountIds.Contains(x.BedCountId));
 
             return facilities;
         }

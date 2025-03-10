@@ -126,6 +126,8 @@ namespace HRRS.Services.Implementation
                 .ThenInclude(x => x.FacilityType)
                 .Include(x => x.HealthFacility)
                 .ThenInclude(x => x.Province)
+                .Include(x => x.HealthFacility)
+                .ThenInclude(x => x.BedCount)
                 .Where(x => x.Status == RequestStatus.Pending)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -173,6 +175,7 @@ namespace HRRS.Services.Implementation
                 FacilityEmail = request.HealthFacility.Email,
                 PersonalEmail = "",
                 TelephoneNumber = request.HealthFacility.PhoneNumber,
+
 
             };
 
