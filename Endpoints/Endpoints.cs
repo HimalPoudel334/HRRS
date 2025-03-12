@@ -83,7 +83,7 @@ public static class Endpoints
         endpoints.MapGet("api/userposts", async (IUserPostService service) => TypedResults.Ok(await service.GetAll())).RequireAuthorization();
 
         //user role services
-        endpoints.MapGet("api/userrole", async (IUserRoleService service) => TypedResults.Ok(await service.GetAll())).RequireAuthorization("SuperAdmin");
+        endpoints.MapGet("api/userrole", async (IUserRoleService service) => TypedResults.Ok(await service.GetAll()));
         endpoints.MapPost("api/userrole", async (UserRoleDto dto, IUserRoleService service) => TypedResults.Ok(await service.Create(dto))).RequireAuthorization("SuperAdmin");
 
         // anusuchi services

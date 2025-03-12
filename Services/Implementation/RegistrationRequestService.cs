@@ -105,9 +105,12 @@ namespace HRRS.Services.Implementation
             if(await _context.Users.AnyAsync(x => x.UserName == dto.Username))
                 return ResultWithDataDto<string>.Failure("Username already exists");
 
-            var user = await _context.Users.FindAsync(handledById);
+            var user = await _context.Users.Include(x => x.Post).FirstOrDefaultAsync(x => x.UserId == handledById);
             if (user == null) 
                 return ResultWithDataDto<string>.Failure("User not found");
+
+            if(user.Post != null && user.Post.Post == UserPost.Samiti)
+                return ResultWithDataDto<string>.Failure("You are not allowed to preform this action");
 
             var request = await _context.RegistrationRequests
                 .Include(x => x.HandledBy)
@@ -121,6 +124,7 @@ namespace HRRS.Services.Implementation
                 .ThenInclude(x => x.Province)
                 .Include(x => x.HealthFacility)
                 .ThenInclude(x => x.BedCount)
+                .Include(x => x.Role)
                 .Where(x => x.Status == RequestStatus.Pending)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -149,8 +153,8 @@ namespace HRRS.Services.Implementation
                 Province = request.HealthFacility.Province,
                 FacilityPhoneNumber = request.HealthFacility.PhoneNumber,
                 FacilityEmail = request.HealthFacility.Email,
-                FacilityHeadPhone = request.HealthFacility.MobileNumber
-
+                FacilityHeadPhone = request.HealthFacility.MobileNumber,
+                Role = request.Role,
             };
             await _context.HealthFacilities.AddAsync(healthFacility);
 
@@ -169,7 +173,6 @@ namespace HRRS.Services.Implementation
                 PersonalEmail = "",
                 TelephoneNumber = request.HealthFacility.PhoneNumber,
 
-
             };
 
             await _context.Users.AddAsync(newUser);
@@ -178,7 +181,7 @@ namespace HRRS.Services.Implementation
             //TODO: 
             //create a service that sends mail to the health facility with the username and password
 
-            return ResultWithDataDto<string>.Success($"Registration request approved successfully.\n The username is {newUser.UserName} and password is {dto.Password}");
+            return ResultWithDataDto<string>.Success($"Registration request approved successfully. The username is {newUser.UserName} and password is {dto.Password}");
         }
 
         public async Task<ResultWithDataDto<string>> RejectRegistrationRequestAsync(int id, long handledById, StandardRemarkDto dto)

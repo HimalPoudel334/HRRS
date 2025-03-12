@@ -4,7 +4,7 @@ namespace HRRS.Persistence.Entities
 {
     public class Role
     {
-        public const string Mantraalaya = "Mantraalaya";
+        public const string Mantraalaya = "मन्त्रालय";
         public const string Jilla = "Jilla";
         public const string Nirdeshanalaya = "Nirdeshanalaya";
         public const string SuperAdmin = "SuperAdmin";

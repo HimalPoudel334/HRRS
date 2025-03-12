@@ -134,9 +134,14 @@ public class AuthService : IAuthService
         if (bedCount is null)
             return ResultWithDataDto<string>.Failure("Bed count cannot be found");
 
-        var handlerRole = await _context.UserRoles.FindAsync(dto.RoleId);
-        if (handlerRole is null)
-            return ResultWithDataDto<string>.Failure("You must select the office to request your registration");
+
+        var mapping = await _context.AnusuchiMappings.Where(x => x.FacilityTypeId == dto.FacilityTypeId && x.BedCountId == dto.BedCountId).FirstAsync();
+        var role = await _context.UserRoles.FindAsync(mapping.RoleId);
+
+
+        //var handlerRole = await _context.UserRoles.FindAsync(dto.RoleId);
+        //if (handlerRole is null)
+        //    return ResultWithDataDto<string>.Failure("You must select the office to request your registration");
 
         var healthFacility = new TempHealthFacility()
         {
@@ -156,6 +161,7 @@ public class AuthService : IAuthService
             PhoneNumber = dto.PhoneNumber,
             MobileNumber = dto.MobileNumber,
             Email = dto.Email,
+            
         };
 
         if (dto.Photo is not null)
@@ -168,7 +174,7 @@ public class AuthService : IAuthService
             HealthFacility = healthFacility,
             Status = RequestStatus.Pending,
             CreatedAt = DateTime.Now,
-            Role = handlerRole,
+            Role = role,
         };
 
         await _context.RegistrationRequests.AddAsync(registrationRequest);
@@ -305,9 +311,8 @@ public class AuthService : IAuthService
         if(user.UserType == "Hospital")
             return ResultWithDataDto<string>.Failure("Cannot reset password for this user");
 
-
         user.Password = GenerateHashedPassword(dto.Password);
-        user.IsFirstLogin = false;
+        user.IsFirstLogin = true;
 
         await _context.SaveChangesAsync();
         return ResultWithDataDto<string>.Success("Password changed successfully");

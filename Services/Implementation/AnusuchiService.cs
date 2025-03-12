@@ -65,7 +65,7 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
         if (user == null)
             return ResultWithDataDto<List<AnusuchiDto>>.Failure("User not found");
 
-        if (user.UserType != "Hospital" || submissionCode == null)
+        if (user.UserType != "Hospital")
         {
             var anusuchis = await _dbContext.Anusuchis
                 .Select(x => new AnusuchiDto
@@ -79,9 +79,9 @@ public class AnusuchiService(ApplicationDbContext context) : IAnusuchiService
             return ResultWithDataDto<List<AnusuchiDto>>.Success(anusuchis);
         }
 
-        var standardEntries = await _dbContext.HospitalStandardEntrys
-            .Where(x => x.MasterStandardEntry.SubmissionCode == submissionCode)
-            .ToListAsync();
+        //var standardEntries = await _dbContext.HospitalStandardEntrys
+        //    .Where(x => x.MasterStandardEntry.SubmissionCode == submissionCode)
+        //    .ToListAsync();
 
         //if (standardEntries.Count == 0)
         //{

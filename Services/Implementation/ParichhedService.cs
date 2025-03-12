@@ -106,7 +106,8 @@ public class ParichhedService : IParichhedService
 
         var anusuchiMapping = await _context.AnusuchiMappings
             .FirstOrDefaultAsync(x => x.SubmissionTypeId == masterEntry.SubmissionTypeId
-                && x.FacilityTypeId == healthFacility.FacilityTypeId);
+                && x.FacilityTypeId == healthFacility.FacilityTypeId
+                && x.BedCountId == healthFacility.BedCountId);
 
         if (anusuchiMapping == null)
             return ResultWithDataDto<List<ParichhedDto>>.Failure("Anusuchi Mapping not found");

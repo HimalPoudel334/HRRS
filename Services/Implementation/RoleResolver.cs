@@ -1,4 +1,5 @@
-﻿using HRRS.Persistence.Context;
+﻿using HRRS.Migrations;
+using HRRS.Persistence.Context;
 using HRRS.Persistence.Entities;
 using HRRS.Services.Interface;
 using Microsoft.EntityFrameworkCore;
@@ -40,8 +41,8 @@ namespace HRRS.Services.Implementation
             //    .Where(x => facilityTypeIds.Contains(x.HealthFacility.FacilityTypeId))
             //    .Where(x => bedCountIds.Contains(x.HealthFacility.BedCountId));
 
-            //if (user.Post!.Post != UserPost.Samiti)
-            //    return submissions.Where(x => x.EntryStatus == EntryStatus.STP);
+            if (user.Post!.Post != UserPost.Samiti)
+                submissions =  submissions.Where(x => x.EntryStatus == EntryStatus.STP);
 
             return submissions;
 
@@ -87,11 +88,14 @@ namespace HRRS.Services.Implementation
                 .Include(x => x.Post)
                 .FirstOrDefault(x => x.UserId == userId) ?? throw new Exception("User not found");
 
-            var healthfacilitiesQuery = _context.HealthFacilities.Include(x => x.FacilityType)
+            var healthfacilitiesQuery = _context
+                .HealthFacilities
+                .Include(x => x.FacilityType)
                 .Include(x => x.BedCount)
                 .Include(x => x.District)
                 .Include(x => x.Province)
-                .Include(x => x.LocalLevel);
+                .Include(x => x.LocalLevel)
+                .Include(x => x.Role);
 
             if (user.UserType == "SuperAdmin")
                 return healthfacilitiesQuery;
@@ -103,8 +107,7 @@ namespace HRRS.Services.Implementation
             var bedCountIds = user.Role!.UserRoleFacilityTypes.Select(y => y.BedCountId).ToList();
 
             var facilities = healthfacilitiesQuery
-                .Where(x => facilityTypeIds.Contains(x.FacilityTypeId))
-                .Where(x => bedCountIds.Contains(x.BedCountId));
+                .Where(x => x.RoleId == user.RoleId);
 
             return facilities;
         }
